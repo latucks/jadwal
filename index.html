@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jadwal Bulanan 3TV - Real-Time Cloud Matrix</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberbg: '#050811',
+                        cybercard: '#0D1322',
+                        cyberborder: '#1E293B',
+                        neoncyan: '#00F0FF',
+                        neonpink: '#FF007F',
+                        neonamber: '#FFB800'
+                    },
+                    boxShadow: {
+                        'glow-cyan': '0 0 15px rgba(0, 240, 255, 0.35)',
+                        'glow-pink': '0 0 15px rgba(255, 0, 127, 0.35)',
+                        'glow-amber': '0 0 15px rgba(255, 184, 0, 0.35)',
+                        'glow-green': '0 0 15px rgba(0, 255, 102, 0.35)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- SheetJS for XLSX -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            min-height: 100dvh;
+            background-color: #050811;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 0, 127, 0.05) 0%, transparent 40%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+        }
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #0D1322; }
+        ::-webkit-scrollbar-thumb { background: #00F0FF; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF007F; }
+        
+        .sticky-col-1 { position: sticky; left: 0; z-index: 20; }
+        .sticky-col-2 { position: sticky; left: 40px; z-index: 20; }
+
+        .smooth-scroll { -webkit-overflow-scrolling: touch; }
+    </style>
+</head>
+<body class="h-full min-h-[100dvh] flex flex-row antialiased overflow-hidden">
+
+    <!-- OVERLAY MOBILE (Klik luar untuk menutup sidebar di HP) -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/80 z-40 hidden transition-opacity duration-300 backdrop-blur-sm" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR MOBILE & DESKTOP PERFECTLY SLIDING -->
+    <aside id="sidebar" class="fixed md:sticky top-0 inset-y-0 left-0 w-72 h-screen h-[100dvh] bg-cybercard/95 backdrop-blur-xl border-r border-cyan-500/30 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col justify-between shadow-2xl shrink-0">
+        <div class="flex-1 overflow-y-auto smooth-scroll">
+            <!-- Header Sidebar -->
+            <div class="p-4 border-b border-cyan-500/20 flex items-center justify-between bg-slate-950/40">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="w-10 h-10 shrink-0 rounded-lg bg-gradient-to-tr from-cyan-500 to-fuchsia-600 flex items-center justify-center text-slate-950 font-black shadow-glow-cyan">
+                        <i class="fa-solid fa-satellite-dish text-lg"></i>
+                    </div>
+                    <div class="whitespace-nowrap">
+                        <h1 class="font-cyber font-black text-sm tracking-widest text-cyan-400">3TV BROADCAST</h1>
+                        <p class="text-[10px] text-fuchsia-400 font-semibold tracking-wider uppercase">Cloud Matrix v4.3</p>
+                    </div>
+                </div>
+                <!-- Tombol Tutup Khusus Smartphone -->
+                <button type="button" onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-cyan-400 p-1.5 rounded-lg hover:bg-cyan-950/40 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Role Selector Badge -->
+            <div class="p-3 mx-3 my-3 bg-slate-950/60 rounded-xl border border-cyan-500/20 shadow-inner">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-cyber font-bold text-slate-400 uppercase tracking-widest">AKSES ROLE</span>
+                    <span id="role-badge" class="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-glow-green">
+                        ✏️ Editor
+                    </span>
+                </div>
+                <select id="role-select" onchange="handleRoleChange(this.value)" class="w-full bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-medium rounded-lg px-2 py-2 focus:ring-1 focus:ring-cyan-400 outline-none cursor-pointer">
+                    <option value="editor" selected>✏️ Editor</option>
+                    <option value="admin">👑 Admin</option>
+                    <option value="viewer">👁️ Viewer</option>
+                </select>
+            </div>
+
+            <!-- Navigasi Menu -->
+            <nav class="p-3 space-y-2">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-slate-950 bg-gradient-to-r from-cyan-400 to-cyan-500 shadow-glow-cyan">
+                    <i class="fa-solid fa-chart-pie text-base shrink-0"></i>
+                    <span class="whitespace-nowrap font-cyber">Dashboard Utama</span>
+                </button>
+                <button onclick="switchTab('monthly')" id="nav-monthly" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-slate-400 hover:text-cyan-300 hover:bg-cyan-950/30 border border-transparent hover:border-cyan-500/30">
+                    <i class="fa-solid fa-calendar-days text-base shrink-0"></i>
+                    <span class="whitespace-nowrap font-cyber">Jadwal Bulanan</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Bottom Action -->
+        <div class="p-3 border-t border-cyan-500/20 space-y-2 bg-slate-950/40 shrink-0">
+            <button onclick="openSheetConfigModal()" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold transition border border-emerald-500/30 hover:shadow-glow-green">
+                <i class="fa-solid fa-file-excel shrink-0 text-sm"></i>
+                <span class="whitespace-nowrap font-cyber">Google Sheets Sync</span>
+            </button>
+            <button id="sidebar-clear-btn" onclick="openClearDataModal()" class="w-full hidden items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 text-xs font-semibold transition border border-pink-500/30 hover:shadow-glow-pink">
+                <i class="fa-solid fa-trash-can shrink-0 text-sm"></i>
+                <span class="whitespace-nowrap font-cyber">Clear Data (Admin)</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 h-screen h-[100dvh] bg-cyberbg/90 overflow-hidden">
+        
+        <!-- HEADER TOP -->
+        <header class="bg-cybercard/95 backdrop-blur-xl border-b border-cyan-500/30 px-3 sm:px-5 py-2.5 sticky top-0 z-30 flex items-center justify-between shadow-2xl shrink-0">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Tombol Menu Buka Sidebar untuk Mobile -->
+                <button type="button" onclick="toggleSidebar()" class="p-2 rounded-lg bg-slate-900 text-cyan-400 hover:text-white border border-cyan-500/30 transition">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div>
+                    <h2 class="font-cyber font-black text-sm sm:text-lg text-white tracking-wider sm:tracking-widest bg-gradient-to-r from-cyan-400 via-white to-fuchsia-500 bg-clip-text text-transparent">
+                        JADWAL BULANAN 3TV
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <p id="page-subtitle" class="text-[10px] sm:text-[11px] text-cyan-400 font-semibold tracking-wider hidden sm:block">Real-Time Cloud Control</p>
+                        <span id="cloud-status-pill" onclick="openSheetConfigModal()" class="cursor-pointer text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Connecting...
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="forceSyncFromSheet()" title="Sync Ulang Data" class="p-2 rounded-xl bg-slate-950 border border-cyan-500/30 text-cyan-400 hover:text-white transition">
+                    <i id="sync-icon" class="fa-solid fa-rotate text-xs"></i>
+                </button>
+                <div class="relative hidden lg:block">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-cyan-500"></i>
+                    <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Cari crew..." class="pl-8 pr-3 py-1.5 bg-slate-950/80 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl focus:ring-1 focus:ring-cyan-400 outline-none w-40 lg:w-52 font-medium">
+                </div>
+                <div class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold flex items-center gap-1.5 shadow-glow-cyan">
+                    <i class="fa-regular fa-clock text-fuchsia-400 animate-pulse text-xs"></i>
+                    <span id="live-clock">--:--:--</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT SCROLL BODY -->
+        <div class="p-3 sm:p-5 space-y-4 flex-1 overflow-y-auto smooth-scroll">
+
+            <!-- TAB 1: DASHBOARD UTAMA -->
+            <section id="tab-dashboard" class="space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-cybercard p-3.5 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-2xl">
+                    <div>
+                        <h3 class="font-cyber font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                            <span>CREW ON DUTY HARI INI</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> LIVE
+                            </span>
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Penugasan personil IT Broadcast aktif hari ini.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="dashboard-date" class="text-xs text-cyan-400 font-cyber font-semibold">Tanggal:</label>
+                        <input type="date" id="dashboard-date" onchange="renderDashboard()" class="bg-slate-950 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold rounded-xl px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- METRICS METERS -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+                    <div class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-lg flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-cyber font-semibold text-slate-400 uppercase">Total On Duty</p>
+                            <h4 id="metric-onduty" class="text-xl sm:text-2xl font-cyber font-black text-cyan-400 mt-0.5">0</h4>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-glow-cyan text-sm">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="openOffDutyModal()" class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-amber-500/30 shadow-lg hover:border-amber-400 transition cursor-pointer flex items-center justify-between group">
+                        <div>
+                            <p class="text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-amber-300 transition uppercase">
+                                Off Duty <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-amber-500"></i>
+                            </p>
+                            <h4 id="metric-offduty" class="text-xl sm:text-2xl font-cyber font-black text-amber-400 mt-0.5">0</h4>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:shadow-glow-amber transition text-sm">
+                            <i class="fa-solid fa-user-slash"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="openActiveProgramsModal()" class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-fuchsia-500/30 shadow-lg hover:border-fuchsia-400 transition cursor-pointer flex items-center justify-between group">
+                        <div>
+                            <p class="text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-fuchsia-300 transition uppercase">
+                                Program <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-fuchsia-500"></i>
+                            </p>
+                            <h4 id="metric-programs" class="text-xl sm:text-2xl font-cyber font-black text-fuchsia-400 mt-0.5">0</h4>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 group-hover:shadow-glow-pink transition text-sm">
+                            <i class="fa-solid fa-tv"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-emerald-500/30 shadow-lg flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-cyber font-semibold text-slate-400 uppercase">Master Crew</p>
+                            <h4 id="metric-totalcrew" class="text-xl sm:text-2xl font-cyber font-black text-emerald-400 mt-0.5">0</h4>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-glow-green text-sm">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARDS GRID CREW ON DUTY -->
+                <div id="crew-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
+                <div id="no-crew-duty-msg" class="hidden text-center py-10 bg-cybercard/50 rounded-2xl border border-dashed border-cyan-500/30">
+                    <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600 mb-2"></i>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-300 font-cyber">TIDAK ADA CREW TUGAS / KOSONG</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Semua crew status OFF atau data dari Google Sheets belum terisi.</p>
+                </div>
+            </section>
+
+            <!-- TAB 2: MATRIKS JADWAL BULANAN -->
+            <section id="tab-monthly" class="space-y-4 hidden">
+                <div class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-xl space-y-3">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                        <div class="flex items-center justify-between sm:justify-start gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="changeMonth(-1)" class="p-2 rounded-xl bg-slate-950 hover:bg-slate-900 border border-cyan-500/30 text-cyan-400 transition">
+                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                </button>
+                                <span id="current-month-display" class="font-cyber font-bold text-cyan-300 text-xs sm:text-base min-w-[130px] text-center tracking-wider">---</span>
+                                <button onclick="changeMonth(1)" class="p-2 rounded-xl bg-slate-950 hover:bg-slate-900 border border-cyan-500/30 text-cyan-400 transition">
+                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                            <button onclick="goToCurrentMonth()" class="px-2.5 py-1.5 text-[11px] font-cyber font-bold rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 transition shadow-glow-cyan">
+                                HARI INI
+                            </button>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <label id="btn-import-xlsx" class="cursor-pointer px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>Import</span>
+                                <input type="file" id="xlsx-file-input" accept=".xlsx, .xls" class="hidden" onchange="importXLSX(event)">
+                            </label>
+                            <button onclick="downloadXlsxTemplate()" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-cyan-500/30 text-[11px] font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Template</span>
+                            </button>
+                            <button onclick="exportToCSV()" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-cyan-500/30 text-[11px] font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-file-csv"></i>
+                                <span>Export</span>
+                            </button>
+                            <button id="btn-add-crew" onclick="openAddCrewModal()" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-cyber font-bold text-[11px] flex items-center gap-1.5 transition shadow-glow-cyan">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>+ CREW</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE GRID MATRIKS AREA -->
+                <div class="bg-cybercard rounded-2xl border border-cyan-500/30 shadow-2xl overflow-x-auto max-h-[60vh] relative smooth-scroll">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-950 text-cyan-400 font-cyber font-bold uppercase tracking-wider sticky top-0 z-30 shadow-md border-b border-cyan-500/30">
+                            <tr id="matrix-header-row"></tr>
+                        </thead>
+                        <tbody id="matrix-tbody" class="divide-y divide-slate-800/80 text-slate-200"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- MODAL 1: OFF DUTY -->
+    <div id="offduty-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-amber-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-amber space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xs">
+                        <i class="fa-solid fa-user-slash"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-cyber font-bold text-amber-400 text-sm">CREW OFF DUTY</h3>
+                        <p id="offduty-modal-date" class="text-[10px] font-mono text-slate-400 mt-0.5">Tanggal: -</p>
+                    </div>
+                </div>
+                <button onclick="closeOffDutyModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="offduty-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button onclick="closeOffDutyModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:bg-slate-800">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: PROGRAM SIARAN BERJALAN (FIXED CLOSE) -->
+    <div id="programs-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-fuchsia-500/40 rounded-2xl w-full max-w-lg p-5 shadow-glow-pink space-y-4 max-h-[90vh] overflow-y-auto relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-fuchsia-500/20 border border-fuchsia-500/40 flex items-center justify-center text-fuchsia-400 text-xs">
+                        <i class="fa-solid fa-tv"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-cyber font-bold text-fuchsia-400 text-sm">PROGRAM SIARAN BERJALAN</h3>
+                        <p id="programs-modal-date" class="text-[10px] font-mono text-slate-400 mt-0.5">Tanggal: -</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeActiveProgramsModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-900 border border-slate-700 transition">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <div id="programs-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button type="button" onclick="closeActiveProgramsModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-fuchsia-500/30 text-fuchsia-300 text-xs font-semibold hover:bg-slate-800 transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ADMIN PIN -->
+    <div id="pin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-sm p-5 shadow-glow-cyan">
+            <div class="text-center space-y-3">
+                <div class="w-10 h-10 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto text-lg">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="font-cyber font-bold text-cyan-300 text-base">VERIFIKASI PIN ADMIN</h3>
+                <p class="text-xs text-slate-400">Masukkan 6 digit PIN Admin untuk melanjutkan.</p>
+                <div class="pt-2">
+                    <input type="password" id="pin-input" maxlength="6" placeholder="******" class="w-full text-center tracking-widest text-lg font-mono font-bold bg-slate-950 border border-cyan-500/40 text-cyan-300 py-2 rounded-xl outline-none focus:ring-2 focus:ring-cyan-400">
+                    <p id="pin-error-msg" class="text-xs text-pink-400 mt-2 font-medium hidden">PIN Salah! Akses ditolak.</p>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closePinModal()" class="flex-1 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
+                    <button onclick="verifyAdminPin()" class="flex-1 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Konfirmasi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: EDIT PROGRAM -->
+    <div id="edit-program-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                    <h3 class="font-cyber font-bold text-cyan-300 text-sm">EDIT PROGRAM SIARAN</h3>
+                    <p id="modal-sub-info" class="text-[10px] text-fuchsia-400 mt-0.5 font-mono">Crew: - | Tanggal: -</p>
+                </div>
+                <button onclick="closeProgramModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Pilih Preset Program</label>
+                    <select id="preset-program-select" onchange="applyProgramPreset(this.value)" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                        <option value="">-- Pilih Preset --</option>
+                        <option value="Kuis Halo RCTI">📺 Kuis Halo RCTI</option>
+                        <option value="DMD">📺 DMD</option>
+                        <option value="Liga Bintang Juara">📺 Liga Bintang Juara</option>
+                        <option value="SIRNAS">📺 SIRNAS</option>
+                        <option value="Futsal">📺 Futsal</option>
+                        <option value="Hafiz Indonesia">📺 Hafiz Indonesia</option>
+                        <option value="OFF">😴 OFF (Libur)</option>
+                        <option value="CUSTOM">✏️ Custom Text</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Program (Custom)</label>
+                    <input type="text" id="input-program-name" placeholder="Ketik program..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                </div>
+
+                <div class="pt-2 border-t border-slate-800/80">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="send-wa-checkbox" checked class="w-4 h-4 rounded bg-slate-950 border-cyan-500/40 text-cyan-500 focus:ring-cyan-400">
+                        <span class="text-xs font-medium text-emerald-400 flex items-center gap-1.5">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> Kirim WA Notifikasi
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                <button onclick="saveProgramAssignment(true)" class="px-2.5 py-1.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 text-xs font-semibold mr-auto">
+                    Kosongkan
+                </button>
+                <button onclick="closeProgramModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
+                <button onclick="saveProgramAssignment(false)" class="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: ADD CREW -->
+    <div id="crew-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 id="crew-modal-title" class="font-cyber font-bold text-cyan-300 text-sm">TAMBAH CREW IT BROADCAST</h3>
+                <button onclick="closeCrewModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="crew-form" onsubmit="handleCrewSubmit(event)" class="space-y-3">
+                <input type="hidden" id="crew-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Lengkap</label>
+                    <input type="text" id="crew-fullname" required placeholder="Contoh: Budi Santoso" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nomor HP / WhatsApp</label>
+                    <input type="text" id="crew-phone" placeholder="Contoh: 08123456789" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeCrewModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
+                    <button type="submit" class="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 6: GOOGLE SHEETS CONFIG -->
+    <div id="sheet-config-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-emerald-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-green space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-excel text-emerald-400 text-lg"></i>
+                    <h3 class="font-cyber font-bold text-emerald-400 text-sm">GOOGLE SHEETS WEBHOOK</h3>
+                </div>
+                <button onclick="closeSheetConfigModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">URL Google Apps Script</label>
+                    <input type="text" id="sheet-webhook-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-950 border border-emerald-500/30 text-emerald-200 text-xs font-mono rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-emerald-400">
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                <button onclick="closeSheetConfigModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
+                <button onclick="saveSheetConfig()" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-green">Simpan & Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 7: CLEAR DATA -->
+    <div id="clear-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-pink-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-pink space-y-4">
+            <div class="text-center space-y-2">
+                <h3 class="font-cyber font-bold text-pink-400 text-base">KONFIRMASI CLEAR DATA</h3>
+                <p class="text-xs text-slate-400">Pilih opsi pembersihan data:</p>
+            </div>
+            <div class="space-y-2 pt-1">
+                <button onclick="executeClearData('active_month')" class="w-full p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-left transition flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-amber-400">Clear Grid Bulan Ini</p>
+                    </div>
+                    <i class="fa-solid fa-calendar-minus text-amber-400 text-xs"></i>
+                </button>
+                <button onclick="executeClearData('all')" class="w-full p-2.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 text-left transition flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-pink-400">Reset Total Sistem</p>
+                    </div>
+                    <i class="fa-solid fa-trash-can text-pink-400 text-xs"></i>
+                </button>
+            </div>
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button onclick="closeClearDataModal()" class="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC LENGKAP -->
+    <script>
+        const ADMIN_PIN = "130723";
+        let currentUserRole = "editor";
+        
+        const realTimeToday = new Date();
+        let currentMonth = realTimeToday.getMonth();
+        let currentYear = realTimeToday.getFullYear();
+        let selectedCell = null;
+        let searchQuery = "";
+
+        // CREW SAMPLE DIBUAT KOSONG (100% PULL DARI GOOGLE SHEETS)
+        const sampleCrews = [];
+
+        let crewsData = [];
+        let scheduleData = {};
+
+        // WEBHOOK URL GOOGLE APPS SCRIPT
+        const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxmuqN8bE9GoKlM6KeR62uOcwrRfbuOLf0ZD7qfabwNeI-gnSx73qDGR78Pw4JfbN79Rw/exec';
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            localStorage.setItem('google_sheet_webhook_url', DEFAULT_WEBHOOK_URL);
+
+            loadFromLocalStorage();
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000);
+
+            document.getElementById('dashboard-date').value = getFormattedTodayDate();
+
+            renderDashboard();
+            renderMonthlyGrid();
+            applyRolePermissions();
+
+            await loadDataFromGoogleSheet();
+        });
+
+        function getFormattedTodayDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function loadFromLocalStorage() {
+            const savedCrews = localStorage.getItem('itb_crews');
+            const savedSchedules = localStorage.getItem('itb_schedules');
+            crewsData = savedCrews ? JSON.parse(savedCrews) : [];
+            
+            if (savedSchedules) {
+                scheduleData = JSON.parse(savedSchedules);
+            } else {
+                const currentKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+                scheduleData[currentKey] = {};
+                saveSchedulesToLocalStorage();
+            }
+        }
+
+        function saveCrewsToLocalStorage() { localStorage.setItem('itb_crews', JSON.stringify(crewsData)); }
+        function saveSchedulesToLocalStorage() { localStorage.setItem('itb_schedules', JSON.stringify(scheduleData)); }
+
+        function updateLiveClock() {
+            const now = new Date();
+            const clockEl = document.getElementById('live-clock');
+            if (clockEl) {
+                clockEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            }
+        }
+
+        function updateCloudPillStatus(status) {
+            const pill = document.getElementById('cloud-status-pill');
+            if (!pill) return;
+
+            if (status === 'online') {
+                pill.className = "cursor-pointer text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 shadow-glow-green";
+                pill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sheets Connected`;
+            } else if (status === 'syncing') {
+                pill.className = "cursor-pointer text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 flex items-center gap-1 shadow-glow-cyan";
+                pill.innerHTML = `<i class="fa-solid fa-rotate animate-spin text-[8px]"></i> Syncing...`;
+            } else {
+                pill.className = "cursor-pointer text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1";
+                pill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Local Only`;
+            }
+        }
+
+        // PULL DATA REAL-TIME DARI GOOGLE SHEETS
+        async function loadDataFromGoogleSheet() {
+            const webhookUrl = localStorage.getItem('google_sheet_webhook_url') || DEFAULT_WEBHOOK_URL;
+            if (!webhookUrl) {
+                updateCloudPillStatus('local');
+                return;
+            }
+
+            const syncIcon = document.getElementById('sync-icon');
+            if (syncIcon) syncIcon.classList.add('animate-spin');
+            updateCloudPillStatus('syncing');
+
+            try {
+                const response = await fetch(webhookUrl);
+                const data = await response.json();
+
+                if (data && data.length > 1) {
+                    const currentKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+                    if (!scheduleData[currentKey]) scheduleData[currentKey] = {};
+
+                    const headerRow = data[0]; 
+
+                    for (let i = 1; i < data.length; i++) {
+                        const row = data[i];
+                        const crewName = String(row[0] || '').trim();
+                        if (!crewName) continue;
+
+                        const crewPhone = row[1] ? String(row[1]).trim() : '';
+
+                        let crew = crewsData.find(c => c.fullname.toLowerCase() === crewName.toLowerCase());
+                        if (!crew) {
+                            crew = { id: 'c_' + Date.now() + '_' + i, fullname: crewName, phone: crewPhone };
+                            crewsData.push(crew);
+                        } else if (crewPhone) {
+                            crew.phone = crewPhone;
+                        }
+
+                        if (!scheduleData[currentKey][crew.id]) scheduleData[currentKey][crew.id] = {};
+
+                        for (let j = 2; j < row.length; j++) {
+                            const dayNum = parseInt(headerRow[j], 10);
+                            const progVal = String(row[j] || '').trim();
+                            
+                            if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= 31) {
+                                if (progVal) {
+                                    scheduleData[currentKey][crew.id][dayNum] = progVal;
+                                } else {
+                                    delete scheduleData[currentKey][crew.id][dayNum];
+                                }
+                            }
+                        }
+                    }
+
+                    saveCrewsToLocalStorage();
+                    saveSchedulesToLocalStorage();
+                    renderDashboard();
+                    renderMonthlyGrid();
+                    updateCloudPillStatus('online');
+                }
+            } catch (err) {
+                console.error("Gagal sinkronisasi dari Google Sheets:", err);
+                updateCloudPillStatus('local');
+            } finally {
+                if (syncIcon) syncIcon.classList.remove('animate-spin');
+            }
+        }
+
+        async function forceSyncFromSheet() {
+            await loadDataFromGoogleSheet();
+        }
+
+        function getFormattedWaLink(phone) {
+            if (!phone) return null;
+            let clean = String(phone).replace(/[^0-9]/g, '');
+            if (!clean || clean.length < 8) return null;
+            if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+            return `https://wa.me/${clean}`;
+        }
+
+        // FUNGSI PERBAIKAN TOGGLE SIDEBAR UNTUK SMARTPHONE
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (!sidebar || !overlay) return;
+
+            if (window.innerWidth < 768) {
+                const isHidden = sidebar.classList.contains('-translate-x-full');
+                if (isHidden) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
+            } else {
+                sidebar.classList.toggle('-translate-x-full');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('text-slate-950', 'bg-gradient-to-r', 'from-cyan-400', 'to-cyan-500', 'shadow-glow-cyan');
+                el.classList.add('text-slate-400', 'hover:text-cyan-300', 'hover:bg-cyan-950/30');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('text-slate-950', 'bg-gradient-to-r', 'from-cyan-400', 'to-cyan-500', 'shadow-glow-cyan');
+                activeBtn.classList.remove('text-slate-400', 'hover:text-cyan-300', 'hover:bg-cyan-950/30');
+            }
+
+            document.getElementById('tab-dashboard').classList.add('hidden');
+            document.getElementById('tab-monthly').classList.add('hidden');
+
+            if (tabName === 'dashboard') {
+                document.getElementById('tab-dashboard').classList.remove('hidden');
+                document.getElementById('page-subtitle').textContent = "Real-Time Cloud Control";
+                document.getElementById('dashboard-date').value = getFormattedTodayDate();
+                renderDashboard();
+            } else {
+                goToCurrentMonth();
+                document.getElementById('tab-monthly').classList.remove('hidden');
+                document.getElementById('page-subtitle').textContent = "Grid Matriks Scheduling";
+            }
+
+            // OTOMATIS TUTUP SIDEBAR DI MOBILE SETELAH MEMILIH MENU
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
+            }
+        }
+
+        function handleRoleChange(newRole) {
+            if (newRole === 'admin' && currentUserRole !== 'admin') {
+                document.getElementById('pin-input').value = "";
+                document.getElementById('pin-error-msg').classList.add('hidden');
+                document.getElementById('pin-modal').classList.remove('hidden');
+            } else {
+                currentUserRole = newRole;
+                applyRolePermissions();
+            }
+        }
+
+        function verifyAdminPin() {
+            if (document.getElementById('pin-input').value.trim() === ADMIN_PIN) {
+                currentUserRole = 'admin';
+                document.getElementById('pin-modal').classList.add('hidden');
+                applyRolePermissions();
+            } else {
+                document.getElementById('pin-error-msg').classList.remove('hidden');
+                document.getElementById('role-select').value = currentUserRole;
+            }
+        }
+
+        function closePinModal() {
+            document.getElementById('pin-modal').classList.add('hidden');
+            document.getElementById('role-select').value = currentUserRole;
+        }
+
+        function applyRolePermissions() {
+            const badge = document.getElementById('role-badge');
+            badge.textContent = currentUserRole === 'admin' ? "👑 Admin" : (currentUserRole === 'editor' ? "✏️ Editor" : "👁️ Viewer");
+            document.getElementById('sidebar-clear-btn').style.display = currentUserRole === 'admin' ? "flex" : "none";
+            document.getElementById('btn-add-crew').style.display = currentUserRole !== 'viewer' ? "flex" : "none";
+            document.getElementById('btn-import-xlsx').style.display = currentUserRole !== 'viewer' ? "flex" : "none";
+            renderDashboard();
+            renderMonthlyGrid();
+        }
+
+        function openOffDutyModal() {
+            const dateInput = document.getElementById('dashboard-date').value;
+            if (!dateInput) return;
+
+            const selectedDate = new Date(dateInput);
+            const day = selectedDate.getDate();
+            const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
+            const monthSchedule = scheduleData[monthKey] || {};
+
+            document.getElementById('offduty-modal-date').textContent = `Tanggal: ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
+            const container = document.getElementById('offduty-list-container');
+            container.innerHTML = "";
+
+            let count = 0;
+            crewsData.forEach(crew => {
+                const programName = monthSchedule[crew.id]?.[day] || "";
+                const isOff = !programName || programName.trim().toUpperCase() === "OFF";
+
+                if (isOff) {
+                    count++;
+                    const waUrl = getFormattedWaLink(crew.phone);
+                    const phoneHtml = waUrl 
+                        ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>`
+                        : '';
+
+                    const item = document.createElement('div');
+                    item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800";
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-amber-500 shadow-glow-amber"></div>
+                            <div>
+                                <p class="text-xs font-semibold text-slate-200">${crew.fullname}</p>
+                                ${phoneHtml}
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 text-[9px] font-mono font-bold rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">OFF</span>
+                    `;
+                    container.appendChild(item);
+                }
+            });
+
+            if (count === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">ALL CREW ON DUTY (0 OFF)</p>`;
+            }
+
+            document.getElementById('offduty-modal').classList.remove('hidden');
+        }
+
+        function closeOffDutyModal() {
+            document.getElementById('offduty-modal').classList.add('hidden');
+        }
+
+        function openActiveProgramsModal() {
+            const dateInput = document.getElementById('dashboard-date').value;
+            if (!dateInput) return;
+
+            const selectedDate = new Date(dateInput);
+            const day = selectedDate.getDate();
+            const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
+            const monthSchedule = scheduleData[monthKey] || {};
+
+            document.getElementById('programs-modal-date').textContent = `Tanggal: ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
+            const container = document.getElementById('programs-list-container');
+            container.innerHTML = "";
+
+            let count = 0;
+            crewsData.forEach(crew => {
+                const programName = monthSchedule[crew.id]?.[day] || "";
+                const isOff = !programName || programName.trim().toUpperCase() === "OFF";
+
+                if (!isOff) {
+                    count++;
+                    const waUrl = getFormattedWaLink(crew.phone);
+                    const phoneHtml = waUrl 
+                        ? `<a href="${waUrl}" target="_blank" class="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 ml-2 inline-flex items-center gap-1 transition"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>`
+                        : '';
+
+                    const item = document.createElement('div');
+                    item.className = "p-2.5 rounded-xl bg-slate-950/80 border border-fuchsia-500/30 flex items-center justify-between gap-2";
+                    item.innerHTML = `
+                        <div>
+                            <p class="text-xs font-cyber font-bold text-fuchsia-400 tracking-wide">${programName}</p>
+                            <p class="text-[11px] text-slate-300 mt-0.5"><i class="fa-solid fa-user-astronaut text-[10px] mr-1 text-cyan-400"></i> ${crew.fullname} ${phoneHtml}</p>
+                        </div>
+                        <span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/30 shadow-glow-pink whitespace-nowrap">ACTIVE</span>
+                    `;
+                    container.appendChild(item);
+                }
+            });
+
+            if (count === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">TIDAK ADA PROGRAM SIARAN BERJALAN</p>`;
+            }
+
+            document.getElementById('programs-modal').classList.remove('hidden');
+        }
+
+        function closeActiveProgramsModal() {
+            const modal = document.getElementById('programs-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function renderDashboard() {
+            const dateInput = document.getElementById('dashboard-date').value;
+            if (!dateInput) return;
+            const selectedDate = new Date(dateInput);
+            const day = selectedDate.getDate();
+            const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
+            const monthSchedule = scheduleData[monthKey] || {};
+
+            const cardsContainer = document.getElementById('crew-cards-grid');
+            cardsContainer.innerHTML = "";
+            let onDutyCount = 0;
+            let offDutyCount = 0;
+
+            crewsData.forEach(crew => {
+                if (searchQuery && !crew.fullname.toLowerCase().includes(searchQuery.toLowerCase())) return;
+                const programName = monthSchedule[crew.id]?.[day] || "";
+                const isOff = !programName || programName.trim().toUpperCase() === "OFF";
+
+                if (isOff) {
+                    offDutyCount++;
+                } else {
+                    onDutyCount++;
+                    const waUrl = getFormattedWaLink(crew.phone);
+                    const phoneHtml = waUrl 
+                        ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-xs"></i> ${crew.phone}</a>`
+                        : `<span></span>`;
+
+                    const card = document.createElement('div');
+                    card.className = "bg-cybercard border border-cyan-500/30 rounded-2xl p-3.5 shadow-xl hover:border-cyan-400 transition flex flex-col justify-between space-y-2.5 relative overflow-hidden group";
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-start justify-between gap-2">
+                                <h4 class="font-bold text-white text-xs sm:text-sm tracking-wide">${crew.fullname}</h4>
+                                <span class="px-2 py-0.5 text-[8px] sm:text-[9px] font-cyber font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green">ON DUTY</span>
+                            </div>
+                            <div class="mt-2 p-2 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                                <p class="text-[8px] text-cyan-400 font-cyber font-semibold tracking-wider uppercase">PROGRAM SIARAN</p>
+                                <p class="text-xs font-semibold text-white mt-0.5">${programName}</p>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                            ${phoneHtml}
+                            ${currentUserRole !== 'viewer' ? `<button onclick="openProgramModal('${crew.id}', ${day})" class="text-cyan-400 hover:text-cyan-300 font-medium p-1 ml-auto"><i class="fa-solid fa-pen-to-square"></i></button>` : ''}
+                        </div>
+                    `;
+                    cardsContainer.appendChild(card);
+                }
+            });
+
+            document.getElementById('metric-onduty').textContent = onDutyCount;
+            document.getElementById('metric-offduty').textContent = offDutyCount;
+            document.getElementById('metric-programs').textContent = onDutyCount;
+            document.getElementById('metric-totalcrew').textContent = crewsData.length;
+            document.getElementById('no-crew-duty-msg').classList.toggle('hidden', onDutyCount > 0);
+        }
+
+        function renderMonthlyGrid() {
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            document.getElementById('current-month-display').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const now = new Date();
+            const isCurrentRealMonth = (now.getMonth() === currentMonth && now.getFullYear() === currentYear);
+            const realTodayDay = now.getDate();
+
+            let headerHTML = `<th class="p-2 w-10 text-center border-b border-r border-cyan-500/20 sticky-col-1 bg-slate-950">No</th><th class="p-2 w-36 sm:w-48 text-left border-b border-r border-cyan-500/20 sticky-col-2 bg-slate-950">NAMA CREW</th>`;
+            for (let d = 1; d <= daysInMonth; d++) {
+                const isWeekend = [0, 6].includes(new Date(currentYear, currentMonth, d).getDay());
+                const isTodayCell = isCurrentRealMonth && (d === realTodayDay);
+                
+                headerHTML += `<th class="p-1.5 min-w-[70px] sm:min-w-[85px] text-center border-b border-r border-cyan-500/20 ${isTodayCell ? 'bg-cyan-500/30 text-cyan-300 shadow-glow-cyan font-black ring-1 ring-cyan-400' : (isWeekend ? 'bg-amber-500/10 text-amber-400' : '')}">
+                    <span class="block text-xs font-bold font-mono">${d} ${isTodayCell ? '📌' : ''}</span>
+                </th>`;
+            }
+            document.getElementById('matrix-header-row').innerHTML = headerHTML;
+
+            const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            const monthSchedule = scheduleData[monthKey] || {};
+            let bodyHTML = "";
+
+            crewsData.forEach((crew, idx) => {
+                if (searchQuery && !crew.fullname.toLowerCase().includes(searchQuery.toLowerCase())) return;
+                bodyHTML += `<tr class="hover:bg-cyan-950/20 transition"><td class="p-2 text-center border-b border-r border-slate-800 text-slate-400 sticky-col-1 bg-cybercard font-mono text-[11px]">${idx + 1}</td><td class="p-2 border-b border-r border-slate-800 sticky-col-2 bg-cybercard font-bold text-white text-[11px] truncate max-w-[120px]">${crew.fullname}</td>`;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const progName = monthSchedule[crew.id]?.[d] || "";
+                    const isOff = progName.toUpperCase() === "OFF";
+                    const isTodayCell = isCurrentRealMonth && (d === realTodayDay);
+
+                    const cellContent = progName ? (isOff ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-900 text-slate-500 border border-slate-800">OFF</span>` : `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 block truncate max-w-[70px]">${progName}</span>`) : `<span class="text-slate-600 text-[9px]">-</span>`;
+                    bodyHTML += `<td ${currentUserRole !== 'viewer' ? `onclick="openProgramModal('${crew.id}', ${d})"` : ''} class="p-1 border-b border-r border-slate-800 text-center ${isTodayCell ? 'bg-cyan-500/5' : ''} ${currentUserRole !== 'viewer' ? 'cursor-pointer hover:bg-cyan-900/30' : ''}">${cellContent}</td>`;
+                }
+                bodyHTML += `</tr>`;
+            });
+            document.getElementById('matrix-tbody').innerHTML = bodyHTML;
+        }
+
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderMonthlyGrid();
+        }
+
+        function goToCurrentMonth() {
+            const now = new Date();
+            currentMonth = now.getMonth();
+            currentYear = now.getFullYear();
+            renderMonthlyGrid();
+        }
+
+        function openProgramModal(crewId, dayIndex) {
+            if (currentUserRole === 'viewer') return;
+            selectedCell = { crewId, dayIndex, month: currentMonth, year: currentYear };
+            const crew = crewsData.find(c => c.id === crewId);
+            document.getElementById('modal-sub-info').textContent = `Crew: ${crew?.fullname || '-'} | Tanggal: ${dayIndex}`;
+            const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            const progName = scheduleData[monthKey]?.[crewId]?.[dayIndex] || "";
+            document.getElementById('input-program-name').value = progName;
+            document.getElementById('send-wa-checkbox').checked = true;
+            document.getElementById('edit-program-modal').classList.remove('hidden');
+        }
+
+        function applyProgramPreset(val) {
+            document.getElementById('input-program-name').value = val === "CUSTOM" ? "" : val;
+        }
+
+        function closeProgramModal() {
+            document.getElementById('edit-program-modal').classList.add('hidden');
+            selectedCell = null;
+        }
+
+        // PUSH PENUGASAN SINKRON KE GOOGLE SHEETS
+        async function saveProgramAssignment(clearCell = false) {
+            if (!selectedCell) return;
+            const { crewId, dayIndex, month, year } = selectedCell;
+            const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+            
+            const crew = crewsData.find(c => c.id === crewId);
+            if (!crew) return;
+
+            if (!scheduleData[monthKey]) scheduleData[monthKey] = {};
+            if (!scheduleData[monthKey][crewId]) scheduleData[monthKey][crewId] = {};
+
+            let newProgVal = "";
+
+            if (clearCell) {
+                delete scheduleData[monthKey][crewId][dayIndex];
+                newProgVal = "";
+            } else {
+                const progName = document.getElementById('input-program-name').value.trim();
+                if (progName) {
+                    scheduleData[monthKey][crewId][dayIndex] = progName;
+                    newProgVal = progName;
+                } else {
+                    delete scheduleData[monthKey][crewId][dayIndex];
+                    newProgVal = "";
+                }
+            }
+
+            saveSchedulesToLocalStorage();
+
+            const webhookUrl = localStorage.getItem('google_sheet_webhook_url') || DEFAULT_WEBHOOK_URL;
+            if (webhookUrl) {
+                updateCloudPillStatus('syncing');
+                
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        crewName: crew.fullname,
+                        day: dayIndex,
+                        program: newProgVal
+                    })
+                }).then(() => {
+                    setTimeout(() => updateCloudPillStatus('online'), 800);
+                }).catch(err => {
+                    console.error("Gagal update cloud:", err);
+                    updateCloudPillStatus('online');
+                });
+            }
+
+            const shouldSendWa = document.getElementById('send-wa-checkbox').checked;
+            if (shouldSendWa && crew.phone) {
+                const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                const dateFormatted = `${dayIndex} ${monthNames[month]} ${year}`;
+                const programText = newProgVal ? newProgVal : "TIDAK ADA TUGAS / OFF";
+                triggerWhatsAppNotification(crew.fullname, crew.phone, programText, dateFormatted);
+            }
+
+            closeProgramModal();
+            renderMonthlyGrid();
+            renderDashboard();
+        }
+
+        async function triggerWhatsAppNotification(crewName, crewPhone, programName, dateString) {
+            const message = `Halo *${crewName}*,\n\nPembaruan jadwal tugas Anda:\n🗓 *Tanggal:* ${dateString}\n📺 *Program:* ${programName}\n\nTerima kasih!\n- *IT Broadcast 3TV*`;
+
+            let cleanPhone = String(crewPhone).replace(/[^0-9]/g, '');
+            if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
+
+            const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+            window.open(waLink, '_blank');
+        }
+
+        function openAddCrewModal() {
+            document.getElementById('crew-id').value = "";
+            document.getElementById('crew-fullname').value = "";
+            document.getElementById('crew-phone').value = "";
+            document.getElementById('crew-modal').classList.remove('hidden');
+        }
+        function closeCrewModal() { document.getElementById('crew-modal').classList.add('hidden'); }
+
+        function handleCrewSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('crew-id').value || 'c_' + Date.now();
+            const fullname = document.getElementById('crew-fullname').value.trim();
+            const phone = document.getElementById('crew-phone').value.trim();
+            const existingIdx = crewsData.findIndex(c => c.id === id);
+            if (existingIdx >= 0) crewsData[existingIdx] = { id, fullname, phone };
+            else crewsData.push({ id, fullname, phone });
+            saveCrewsToLocalStorage();
+            closeCrewModal();
+            renderMonthlyGrid();
+            renderDashboard();
+        }
+
+        function openSheetConfigModal() {
+            const currentUrl = localStorage.getItem('google_sheet_webhook_url') || DEFAULT_WEBHOOK_URL;
+            document.getElementById('sheet-webhook-input').value = currentUrl;
+            document.getElementById('sheet-config-modal').classList.remove('hidden');
+        }
+
+        function closeSheetConfigModal() {
+            document.getElementById('sheet-config-modal').classList.add('hidden');
+        }
+
+        async function saveSheetConfig() {
+            const val = document.getElementById('sheet-webhook-input').value.trim();
+            if (val) {
+                localStorage.setItem('google_sheet_webhook_url', val);
+                closeSheetConfigModal();
+                await loadDataFromGoogleSheet();
+                alert("URL Google Sheets Webhook terhubung!");
+            } else {
+                alert("Masukkan URL Webhook!");
+            }
+        }
+
+        function importXLSX(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                    if (jsonData.length < 2) return alert("File Excel kosong!");
+                    
+                    const header = jsonData[0];
+                    const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+                    if (!scheduleData[monthKey]) scheduleData[monthKey] = {};
+
+                    for (let i = 1; i < jsonData.length; i++) {
+                        const row = jsonData[i];
+                        if (!row || !row[0]) continue;
+
+                        const crewName = String(row[0]).trim();
+                        if (!crewName) continue;
+
+                        const crewPhone = row[1] ? String(row[1]).trim() : "";
+
+                        let crew = crewsData.find(c => c.fullname.toLowerCase() === crewName.toLowerCase());
+                        if (!crew) {
+                            crew = { id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4), fullname: crewName, phone: crewPhone };
+                            crewsData.push(crew);
+                        } else if (crewPhone) {
+                            crew.phone = crewPhone;
+                        }
+
+                        if (!scheduleData[monthKey][crew.id]) scheduleData[monthKey][crew.id] = {};
+
+                        header.forEach((col, idx) => {
+                            const dayNum = parseInt(col, 10);
+                            if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= 31 && row[idx] !== undefined) {
+                                scheduleData[monthKey][crew.id][dayNum] = String(row[idx]).trim();
+                            }
+                        });
+                    }
+
+                    saveCrewsToLocalStorage();
+                    saveSchedulesToLocalStorage();
+                    renderMonthlyGrid();
+                    renderDashboard();
+                    alert("Import Excel Berhasil!");
+                } catch (err) {
+                    console.error("Import error:", err);
+                    alert("Gagal membaca file Excel.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function downloadXlsxTemplate() {
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const headerRow = ["NAMA CREW", "NO HP / WHATSAPP"];
+            for (let d = 1; d <= daysInMonth; d++) headerRow.push(d);
+            const ws = XLSX.utils.aoa_to_sheet([headerRow, ["Budi Santoso", "081234567890", "Kuis Halo RCTI", "OFF"]]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Template_Jadwal");
+            XLSX.writeFile(wb, `Template_Jadwal_3TV_${currentMonth + 1}_${currentYear}.xlsx`);
+        }
+
+        function exportToCSV() {
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            let csvContent = "data:text/csv;charset=utf-8,No,Nama Crew,No HP";
+            for (let d = 1; d <= daysInMonth; d++) csvContent += `,${d}`;
+            csvContent += "\n";
+            const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            crewsData.forEach((crew, idx) => {
+                let rowStr = `${idx + 1},"${crew.fullname}","${crew.phone || ''}"`;
+                for (let d = 1; d <= daysInMonth; d++) rowStr += `,"${scheduleData[monthKey]?.[crew.id]?.[d] || ''}"`;
+                csvContent += rowStr + "\n";
+            });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", `Jadwal_3TV_${currentMonth + 1}_${currentYear}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function openClearDataModal() { document.getElementById('clear-modal').classList.remove('hidden'); }
+        function closeClearDataModal() { document.getElementById('clear-modal').classList.add('hidden'); }
+
+        function executeClearData(type) {
+            if (type === 'active_month') {
+                delete scheduleData[`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`];
+            } else {
+                crewsData = [];
+                scheduleData = {};
+                localStorage.clear();
+            }
+            saveSchedulesToLocalStorage();
+            closeClearDataModal();
+            renderMonthlyGrid();
+            renderDashboard();
+        }
+
+        function handleGlobalSearch(val) {
+            searchQuery = val.trim();
+            renderDashboard();
+            renderMonthlyGrid();
+        }
+    </script>
+</body>
+</html>
