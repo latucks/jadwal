@@ -33,11 +33,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
-    <!-- SheetJS for XLSX Export & Import -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- jsPDF & html2canvas for PDF Export -->
+    <!-- SheetJS with Style Support for Professional XLSX Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <!-- jsPDF & jsPDF-AutoTable for Multi-page Vector PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -64,7 +64,7 @@
         .smooth-scroll { -webkit-overflow-scrolling: touch; }
     </style>
 </head>
-<body class="h-full min-h-[100dvh] flex flex-row antialiased overflow-hidden">
+<body class="h-full min-h-[100dvh] flex flex-col md:flex-row antialiased overflow-hidden">
 
     <!-- OVERLAY MOBILE -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/80 z-40 hidden transition-opacity duration-300 backdrop-blur-sm" onclick="toggleSidebar()"></div>
@@ -80,7 +80,9 @@
                     </div>
                     <div class="whitespace-nowrap">
                         <h1 class="font-cyber font-black text-sm tracking-widest text-cyan-400">3TV BROADCAST</h1>
-                        <p class="text-[10px] text-fuchsia-400 font-semibold tracking-wider uppercase">Cloud Matrix v5.2</p>
+                        <p class="text-[10px] text-fuchsia-400 font-semibold tracking-wider uppercase">Cloud Matrix v5.6</p>
+                        <!-- CREDIT AUTHOR -->
+                        <p class="text-[9px] text-slate-400 font-mono tracking-tight mt-0.5">Create by Surya Ardiansyah</p>
                     </div>
                 </div>
                 <button type="button" onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-cyan-400 p-1.5 rounded-lg hover:bg-cyan-950/40 transition">
@@ -92,14 +94,14 @@
             <div class="p-3 bg-slate-950/60 rounded-xl border border-cyan-500/20 shadow-inner">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-cyber font-bold text-slate-400 uppercase tracking-widest">AKSES ROLE</span>
-                    <span id="role-badge" class="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-glow-green">
-                        ✏️ Editor
+                    <span id="role-badge" class="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-500/20 text-slate-300 border border-slate-500/40">
+                        👁️ Viewer
                     </span>
                 </div>
                 <select id="role-select" onchange="handleRoleChange(this.value)" class="w-full bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-medium rounded-lg px-2 py-2 focus:ring-1 focus:ring-cyan-400 outline-none cursor-pointer">
-                    <option value="editor" selected>✏️ Editor</option>
+                    <option value="viewer" selected>👁️ Viewer</option>
+                    <option value="editor">✏️ Editor</option>
                     <option value="admin">👑 Admin</option>
-                    <option value="viewer">👁️ Viewer</option>
                 </select>
             </div>
 
@@ -125,45 +127,44 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT AREA -->
+    <!-- MAIN CONTENT AREA DINAMIS -->
     <main class="flex-1 flex flex-col min-w-0 h-screen h-[100dvh] bg-cyberbg/90 overflow-hidden">
         
         <!-- HEADER TOP -->
-        <header class="bg-cybercard/95 backdrop-blur-xl border-b border-cyan-500/30 px-3 sm:px-5 py-2.5 sticky top-0 z-30 flex items-center justify-between shadow-2xl shrink-0">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <button type="button" onclick="toggleSidebar()" class="p-2 rounded-lg bg-slate-900 text-cyan-400 hover:text-white border border-cyan-500/30 transition">
+        <header class="bg-cybercard/95 backdrop-blur-xl border-b border-cyan-500/30 px-3 sm:px-5 py-2.5 sticky top-0 z-30 flex items-center justify-between shadow-2xl shrink-0 gap-2">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <button type="button" onclick="toggleSidebar()" class="p-2 rounded-lg bg-slate-900 text-cyan-400 hover:text-white border border-cyan-500/30 transition shrink-0">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>
-                <div>
-                    <h2 class="font-cyber font-black text-sm sm:text-lg text-white tracking-wider sm:tracking-widest bg-gradient-to-r from-cyan-400 via-white to-fuchsia-500 bg-clip-text text-transparent">
+                <div class="truncate">
+                    <h2 class="font-cyber font-black text-xs sm:text-base md:text-lg text-white tracking-wider truncate bg-gradient-to-r from-cyan-400 via-white to-fuchsia-500 bg-clip-text text-transparent">
                         JADWAL BULANAN 3TV
                     </h2>
                     <div class="flex items-center gap-2">
-                        <p id="page-subtitle" class="text-[10px] sm:text-[11px] text-cyan-400 font-semibold tracking-wider hidden sm:block">Real-Time Cloud Control</p>
-                        <span id="cloud-status-pill" onclick="openSheetConfigModal()" class="cursor-pointer text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                        <p id="page-subtitle" class="text-[9px] sm:text-[11px] text-cyan-400 font-semibold tracking-wider hidden sm:block truncate">Real-Time Cloud Control</p>
+                        <span id="cloud-status-pill" onclick="openSheetConfigModal()" class="cursor-pointer text-[8px] sm:text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1 shrink-0">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Connecting...
                         </span>
                     </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 sm:gap-3">
+            <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
                 <button onclick="forceSyncFromSheet()" title="Sync Ulang Data" class="p-2 rounded-xl bg-slate-950 border border-cyan-500/30 text-cyan-400 hover:text-white transition">
                     <i id="sync-icon" class="fa-solid fa-rotate text-xs"></i>
                 </button>
                 <div class="relative hidden lg:block">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-cyan-500"></i>
-                    <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Cari crew..." class="pl-8 pr-3 py-1.5 bg-slate-950/80 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl focus:ring-1 focus:ring-cyan-400 outline-none w-40 lg:w-52 font-medium">
+                    <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Cari crew..." class="pl-8 pr-3 py-1.5 bg-slate-950/80 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl focus:ring-1 focus:ring-cyan-400 outline-none w-36 lg:w-48 font-medium">
                 </div>
                 
-                <!-- CONTAINER DIGI CLOCK + LOKASI GPS & CUACA -->
+                <!-- DIGI CLOCK + LOKASI GPS & CUACA -->
                 <div class="flex flex-col items-end">
-                    <div class="px-2.5 py-1 rounded-xl bg-slate-950 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold flex items-center gap-1.5 shadow-glow-cyan">
-                        <i class="fa-regular fa-clock text-fuchsia-400 animate-pulse text-xs"></i>
+                    <div class="px-2 sm:px-2.5 py-1 rounded-xl bg-slate-950 border border-cyan-500/40 text-cyan-300 font-mono text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 shadow-glow-cyan">
+                        <i class="fa-regular fa-clock text-fuchsia-400 animate-pulse text-[10px] sm:text-xs"></i>
                         <span id="live-clock">--:--:--</span>
                     </div>
-                    <!-- GPS & WEATHER DISPLAY -->
-                    <div id="weather-widget" class="text-[9px] font-mono text-slate-400 flex items-center gap-1 mt-0.5">
+                    <div id="weather-widget" class="text-[8px] sm:text-[9px] font-mono text-slate-400 flex items-center gap-1 mt-0.5">
                         <i class="fa-solid fa-location-dot text-amber-400 text-[8px]"></i>
                         <span id="weather-info">Memuat Cuaca...</span>
                     </div>
@@ -172,68 +173,68 @@
         </header>
 
         <!-- CONTENT SCROLL BODY -->
-        <div class="p-3 sm:p-5 space-y-4 flex-1 overflow-y-auto smooth-scroll">
+        <div class="p-2.5 sm:p-4 md:p-5 space-y-4 flex-1 overflow-y-auto smooth-scroll">
 
             <!-- TAB 1: DASHBOARD UTAMA -->
             <section id="tab-dashboard" class="space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-cybercard p-3.5 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-2xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-cybercard p-3 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-2xl">
                     <div>
-                        <h3 class="font-cyber font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                        <h3 class="font-cyber font-bold text-white text-xs sm:text-base flex items-center gap-2">
                             <span>CREW ON DUTY HARI INI</span>
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> LIVE
                             </span>
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Penugasan personil IT Broadcast aktif hari ini.</p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">Penugasan personil IT Broadcast aktif hari ini.</p>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
                         <label for="dashboard-date" class="text-xs text-cyan-400 font-cyber font-semibold">Tanggal:</label>
                         <input type="date" id="dashboard-date" onchange="renderDashboard()" class="bg-slate-950 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold rounded-xl px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer">
                     </div>
                 </div>
 
                 <!-- METRICS METERS -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
-                    <div class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-lg flex items-center justify-between">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+                    <div class="bg-cybercard p-2.5 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-lg flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-cyber font-semibold text-slate-400 uppercase">Total On Duty</p>
-                            <h4 id="metric-onduty" class="text-xl sm:text-2xl font-cyber font-black text-cyan-400 mt-0.5">0</h4>
+                            <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 uppercase">Total On Duty</p>
+                            <h4 id="metric-onduty" class="text-lg sm:text-2xl font-cyber font-black text-cyan-400 mt-0.5">0</h4>
                         </div>
-                        <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-glow-cyan text-sm">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-glow-cyan text-xs sm:text-sm">
                             <i class="fa-solid fa-user-check"></i>
                         </div>
                     </div>
 
-                    <div onclick="openOffDutyModal()" class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-amber-500/30 shadow-lg hover:border-amber-400 transition cursor-pointer flex items-center justify-between group">
+                    <div onclick="openOffDutyModal()" class="bg-cybercard p-2.5 sm:p-4 rounded-2xl border border-amber-500/30 shadow-lg hover:border-amber-400 transition cursor-pointer flex items-center justify-between group">
                         <div>
-                            <p class="text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-amber-300 transition uppercase">
+                            <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-amber-300 transition uppercase">
                                 Off Duty <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-amber-500"></i>
                             </p>
-                            <h4 id="metric-offduty" class="text-xl sm:text-2xl font-cyber font-black text-amber-400 mt-0.5">0</h4>
+                            <h4 id="metric-offduty" class="text-lg sm:text-2xl font-cyber font-black text-amber-400 mt-0.5">0</h4>
                         </div>
-                        <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:shadow-glow-amber transition text-sm">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:shadow-glow-amber transition text-xs sm:text-sm">
                             <i class="fa-solid fa-user-slash"></i>
                         </div>
                     </div>
 
-                    <div onclick="openActiveProgramsModal()" class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-fuchsia-500/30 shadow-lg hover:border-fuchsia-400 transition cursor-pointer flex items-center justify-between group">
+                    <div onclick="openActiveProgramsModal()" class="bg-cybercard p-2.5 sm:p-4 rounded-2xl border border-fuchsia-500/30 shadow-lg hover:border-fuchsia-400 transition cursor-pointer flex items-center justify-between group">
                         <div>
-                            <p class="text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-fuchsia-300 transition uppercase">
+                            <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-fuchsia-300 transition uppercase">
                                 Program <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-fuchsia-500"></i>
                             </p>
-                            <h4 id="metric-programs" class="text-xl sm:text-2xl font-cyber font-black text-fuchsia-400 mt-0.5">0</h4>
+                            <h4 id="metric-programs" class="text-lg sm:text-2xl font-cyber font-black text-fuchsia-400 mt-0.5">0</h4>
                         </div>
-                        <div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 group-hover:shadow-glow-pink transition text-sm">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 group-hover:shadow-glow-pink transition text-xs sm:text-sm">
                             <i class="fa-solid fa-tv"></i>
                         </div>
                     </div>
 
-                    <div class="bg-cybercard p-3 sm:p-4 rounded-2xl border border-emerald-500/30 shadow-lg flex items-center justify-between">
+                    <div class="bg-cybercard p-2.5 sm:p-4 rounded-2xl border border-emerald-500/30 shadow-lg flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-cyber font-semibold text-slate-400 uppercase">Master Crew</p>
-                            <h4 id="metric-totalcrew" class="text-xl sm:text-2xl font-cyber font-black text-emerald-400 mt-0.5">0</h4>
+                            <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 uppercase">Master Crew</p>
+                            <h4 id="metric-totalcrew" class="text-lg sm:text-2xl font-cyber font-black text-emerald-400 mt-0.5">0</h4>
                         </div>
-                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-glow-green text-sm">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-glow-green text-xs sm:text-sm">
                             <i class="fa-solid fa-users"></i>
                         </div>
                     </div>
@@ -257,43 +258,40 @@
                                 <button onclick="changeMonth(-1)" class="p-2 rounded-xl bg-slate-950 hover:bg-slate-900 border border-cyan-500/30 text-cyan-400 transition">
                                     <i class="fa-solid fa-chevron-left text-xs"></i>
                                 </button>
-                                <span id="current-month-display" class="font-cyber font-bold text-cyan-300 text-xs sm:text-base min-w-[130px] text-center tracking-wider">---</span>
+                                <span id="current-month-display" class="font-cyber font-bold text-cyan-300 text-xs sm:text-base min-w-[120px] sm:min-w-[140px] text-center tracking-wider">---</span>
                                 <button onclick="changeMonth(1)" class="p-2 rounded-xl bg-slate-950 hover:bg-slate-900 border border-cyan-500/30 text-cyan-400 transition">
                                     <i class="fa-solid fa-chevron-right text-xs"></i>
                                 </button>
                             </div>
-                            <button onclick="goToCurrentMonth()" class="px-2.5 py-1.5 text-[11px] font-cyber font-bold rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 transition shadow-glow-cyan">
+                            <button onclick="goToCurrentMonth()" class="px-2.5 py-1.5 text-[10px] sm:text-[11px] font-cyber font-bold rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 transition shadow-glow-cyan">
                                 HARI INI
                             </button>
                         </div>
 
-                        <!-- ACTION BUTTONS -->
+                        <!-- ACTION BUTTONS: FILTERED BY ROLE ACCESS -->
                         <div class="flex flex-wrap items-center gap-1.5">
-                            <label id="btn-import-xlsx" class="cursor-pointer px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-semibold flex items-center gap-1.5 transition">
+                            <label id="btn-import-xlsx" class="role-action-btn cursor-pointer px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] sm:text-[11px] font-semibold flex items-center gap-1.5 transition">
                                 <i class="fa-solid fa-file-excel"></i>
                                 <span>Import</span>
                                 <input type="file" id="xlsx-file-input" accept=".xlsx, .xls" class="hidden" onchange="importXLSX(event)">
                             </label>
-                            <button onclick="downloadXlsxTemplate()" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-cyan-500/30 text-[11px] font-semibold flex items-center gap-1.5 transition">
+                            <button id="btn-dl-template" onclick="downloadXlsxTemplate()" class="role-action-btn px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-cyan-500/30 text-[10px] sm:text-[11px] font-semibold flex items-center gap-1.5 transition">
                                 <i class="fa-solid fa-download"></i>
                                 <span>Template</span>
                             </button>
-                            <!-- EXPORT TO XLSX -->
-                            <button onclick="exportToXLSX()" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-semibold flex items-center gap-1.5 transition shadow-glow-green">
+                            <button id="btn-export-xlsx" onclick="exportToXLSX()" class="role-action-btn px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] sm:text-[11px] font-semibold flex items-center gap-1.5 transition shadow-glow-green">
                                 <i class="fa-solid fa-file-excel"></i>
                                 <span>Export XLSX</span>
                             </button>
-                            <!-- EXPORT TO PDF -->
-                            <button onclick="exportToPDF()" class="px-2.5 py-1.5 rounded-xl bg-fuchsia-500/20 hover:bg-fuchsia-500/30 text-fuchsia-300 border border-fuchsia-500/40 text-[11px] font-semibold flex items-center gap-1.5 transition shadow-glow-pink">
+                            <button id="btn-export-pdf" onclick="exportToPDF()" class="role-action-btn px-2.5 py-1.5 rounded-xl bg-fuchsia-500/20 hover:bg-fuchsia-500/30 text-fuchsia-300 border border-fuchsia-500/40 text-[10px] sm:text-[11px] font-semibold flex items-center gap-1.5 transition shadow-glow-pink">
                                 <i class="fa-solid fa-file-pdf"></i>
                                 <span>Export PDF</span>
                             </button>
-                            <button id="btn-add-crew" onclick="openAddCrewModal()" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-cyber font-bold text-[11px] flex items-center gap-1.5 transition shadow-glow-cyan">
+                            <button id="btn-add-crew" onclick="openAddCrewModal()" class="role-action-btn px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-cyber font-bold text-[10px] sm:text-[11px] flex items-center gap-1.5 transition shadow-glow-cyan">
                                 <i class="fa-solid fa-plus"></i>
                                 <span>+ CREW</span>
                             </button>
-                            <!-- MENU CLEAR DATA DI TAB JADWAL BULANAN (ROLE ADMIN) -->
-                            <button id="tab-clear-btn" onclick="openClearDataModal()" class="px-2.5 py-1.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/50 text-[11px] font-bold flex items-center gap-1.5 transition shadow-glow-pink" style="display: none;">
+                            <button id="tab-clear-btn" onclick="openClearDataModal()" class="role-action-btn px-2.5 py-1.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/50 text-[10px] sm:text-[11px] font-bold flex items-center gap-1.5 transition shadow-glow-pink" style="display: none;">
                                 <i class="fa-solid fa-trash-can"></i>
                                 <span>Clear Data</span>
                             </button>
@@ -301,8 +299,8 @@
                     </div>
                 </div>
 
-                <!-- TABLE GRID MATRIKS AREA -->
-                <div id="matrix-table-container" class="bg-cybercard rounded-2xl border border-cyan-500/30 shadow-2xl overflow-x-auto max-h-[60vh] relative smooth-scroll">
+                <!-- TABLE GRID MATRIKS AREA DINAMIS -->
+                <div id="matrix-table-container" class="bg-cybercard rounded-2xl border border-cyan-500/30 shadow-2xl overflow-x-auto max-h-[62vh] relative smooth-scroll">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead class="bg-slate-950 text-cyan-400 font-cyber font-bold uppercase tracking-wider sticky top-0 z-30 shadow-md border-b border-cyan-500/30">
                             <tr id="matrix-header-row"></tr>
@@ -362,22 +360,22 @@
         </div>
     </div>
 
-    <!-- MODAL 3: ADMIN PIN -->
+    <!-- MODAL 3: ROLE VERIFICATION PIN -->
     <div id="pin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-sm p-5 shadow-glow-cyan">
             <div class="text-center space-y-3">
                 <div class="w-10 h-10 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto text-lg">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h3 class="font-cyber font-bold text-cyan-300 text-base">VERIFIKASI PIN ADMIN</h3>
-                <p class="text-xs text-slate-400">Masukkan 6 digit PIN Admin untuk melanjutkan.</p>
+                <h3 id="pin-modal-title" class="font-cyber font-bold text-cyan-300 text-base">VERIFIKASI PIN</h3>
+                <p id="pin-modal-subtitle" class="text-xs text-slate-400">Masukkan PIN untuk melanjutkan.</p>
                 <div class="pt-2">
-                    <input type="password" id="pin-input" maxlength="6" placeholder="******" class="w-full text-center tracking-widest text-lg font-mono font-bold bg-slate-950 border border-cyan-500/40 text-cyan-300 py-2 rounded-xl outline-none focus:ring-2 focus:ring-cyan-400">
+                    <input type="password" id="pin-input" maxlength="6" placeholder="****" class="w-full text-center tracking-widest text-lg font-mono font-bold bg-slate-950 border border-cyan-500/40 text-cyan-300 py-2 rounded-xl outline-none focus:ring-2 focus:ring-cyan-400">
                     <p id="pin-error-msg" class="text-xs text-pink-400 mt-2 font-medium hidden">PIN Salah! Akses ditolak.</p>
                 </div>
                 <div class="flex gap-2 pt-2">
                     <button onclick="closePinModal()" class="flex-1 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
-                    <button onclick="verifyAdminPin()" class="flex-1 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Konfirmasi</button>
+                    <button onclick="verifyRolePin()" class="flex-1 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Konfirmasi</button>
                 </div>
             </div>
         </div>
@@ -509,10 +507,13 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC DENGAN GOOGLE APPS SCRIPT URL BARU -->
+    <!-- JAVASCRIPT LOGIC DENGAN EXPORT XLSX DENGAN HEADER CYANN/HITAM & WRAP TEXT -->
     <script>
         const ADMIN_PIN = "130723";
-        let currentUserRole = "editor";
+        const EDITOR_PIN = "8080";
+        
+        let currentUserRole = "viewer";
+        let targetPendingRole = "";
         
         const realTimeToday = new Date();
         let currentMonth = realTimeToday.getMonth();
@@ -523,8 +524,7 @@
         let crewsData = [];
         let scheduleData = {};
 
-        // URL GOOGLE APPS SCRIPT WEB APP BARU
-        const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwHWvMvSRlnLIih5BQsjLKnwPwgEs99vdFS2lnITiDCQiENNIrB37zpdsf4dJppMOE1qA/exec';
+        const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby9ZGF7vE06r2W51bMTAHQGMAHLEYYiV4BVjlS7SeWsZDFj4nhqkyxrj21VefN_m8IL/exec';
 
         // WEB AUDIO API SOUND EFFECT
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -544,7 +544,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // SET DEPLOYMENT ID BARU KE LOCAL STORAGE
             localStorage.setItem('google_sheet_webhook_url', DEFAULT_WEBHOOK_URL);
 
             document.addEventListener('click', (e) => {
@@ -561,9 +560,9 @@
 
             document.getElementById('dashboard-date').value = getFormattedTodayDate();
 
+            applyRolePermissions();
             renderDashboard();
             renderMonthlyGrid();
-            applyRolePermissions();
 
             await loadDataFromGoogleSheet();
         });
@@ -779,18 +778,36 @@
         }
 
         function handleRoleChange(newRole) {
-            if (newRole === 'admin' && currentUserRole !== 'admin') {
+            if (newRole === currentUserRole) return;
+
+            if (newRole === 'viewer') {
+                currentUserRole = 'viewer';
+                applyRolePermissions();
+            } else {
+                targetPendingRole = newRole;
                 document.getElementById('pin-input').value = "";
                 document.getElementById('pin-error-msg').classList.add('hidden');
+
+                if (newRole === 'editor') {
+                    document.getElementById('pin-modal-title').textContent = "VERIFIKASI PIN EDITOR";
+                    document.getElementById('pin-modal-subtitle').textContent = "Masukkan 4 digit PIN Editor (8080)";
+                } else if (newRole === 'admin') {
+                    document.getElementById('pin-modal-title').textContent = "VERIFIKASI PIN ADMIN";
+                    document.getElementById('pin-modal-subtitle').textContent = "Masukkan 6 digit PIN Admin";
+                }
+
                 document.getElementById('pin-modal').classList.remove('hidden');
-            } else {
-                currentUserRole = newRole;
-                applyRolePermissions();
             }
         }
 
-        function verifyAdminPin() {
-            if (document.getElementById('pin-input').value.trim() === ADMIN_PIN) {
+        function verifyRolePin() {
+            const inputVal = document.getElementById('pin-input').value.trim();
+
+            if (targetPendingRole === 'editor' && inputVal === EDITOR_PIN) {
+                currentUserRole = 'editor';
+                document.getElementById('pin-modal').classList.add('hidden');
+                applyRolePermissions();
+            } else if (targetPendingRole === 'admin' && inputVal === ADMIN_PIN) {
                 currentUserRole = 'admin';
                 document.getElementById('pin-modal').classList.add('hidden');
                 applyRolePermissions();
@@ -807,18 +824,34 @@
 
         function applyRolePermissions() {
             const badge = document.getElementById('role-badge');
-            const tabClearBtn = document.getElementById('tab-clear-btn');
+            const selectEl = document.getElementById('role-select');
             
+            if (selectEl) selectEl.value = currentUserRole;
+
             if (badge) {
-                badge.textContent = currentUserRole === 'admin' ? "👑 Admin" : (currentUserRole === 'editor' ? "✏️ Editor" : "👁️ Viewer");
+                if (currentUserRole === 'admin') {
+                    badge.textContent = "👑 Admin";
+                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-glow-amber";
+                } else if (currentUserRole === 'editor') {
+                    badge.textContent = "✏️ Editor";
+                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-glow-green";
+                } else {
+                    badge.textContent = "👁️ Viewer";
+                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-slate-500/20 text-slate-300 border border-slate-500/40";
+                }
             }
 
+            const isViewer = (currentUserRole === 'viewer');
             const isAdmin = (currentUserRole === 'admin');
-            if (tabClearBtn) tabClearBtn.style.display = isAdmin ? 'flex' : 'none';
 
-            document.getElementById('btn-add-crew').style.display = currentUserRole !== 'viewer' ? "flex" : "none";
-            document.getElementById('btn-import-xlsx').style.display = currentUserRole !== 'viewer' ? "flex" : "none";
+            document.getElementById('btn-import-xlsx').style.display = isViewer ? "none" : "flex";
+            document.getElementById('btn-dl-template').style.display = isViewer ? "none" : "flex";
+            document.getElementById('btn-export-xlsx').style.display = isViewer ? "none" : "flex";
+            document.getElementById('btn-export-pdf').style.display = isViewer ? "none" : "flex";
+            document.getElementById('btn-add-crew').style.display = isViewer ? "none" : "flex";
             
+            document.getElementById('tab-clear-btn').style.display = isAdmin ? "flex" : "none";
+
             renderDashboard();
             renderMonthlyGrid();
         }
@@ -952,7 +985,7 @@
                     const waUrl = getFormattedWaLink(crew.phone);
                     const phoneHtml = waUrl 
                         ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-xs"></i> ${crew.phone}</a>`
-                        : `<span></span>`;
+                        : `<span class="text-[10px] text-slate-500 font-mono">3TV IT Broadcast</span>`;
 
                     const card = document.createElement('div');
                     card.className = "bg-cybercard border border-cyan-500/30 rounded-2xl p-3.5 shadow-xl hover:border-cyan-400 transition flex flex-col justify-between space-y-2.5 relative overflow-hidden group";
@@ -1241,53 +1274,215 @@
             XLSX.writeFile(wb, `Template_Jadwal_3TV_${currentMonth + 1}_${currentYear}.xlsx`);
         }
 
+        // FUNGSI EXPORT XLSX TERPERBAIKI DENGAN STYLING CYAAN/HITAM, HEADER DAN WRAP TEXT
         function exportToXLSX() {
+            if (typeof XLSX === 'undefined' || !XLSX.utils) {
+                alert("Pustaka XLSX-Style belum siap, silakan refresh halaman.");
+                return;
+            }
+
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const headerRow = ["No", "NAMA CREW", "NO HP / WHATSAPP"];
-            for (let d = 1; d <= daysInMonth; d++) headerRow.push(d);
-
+            const monthTitle = document.getElementById('current-month-display').textContent;
             const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-            const rowsData = [headerRow];
 
+            // 1. BARIS 1 & 2: TITLE HEADER DENGAN FONT BIRU MUDA (LIGHT CYAN)
+            const titleRow1 = [`JADWAL MATRIKS BULANAN 3TV BROADCAST`];
+            const titleRow2 = [`Periode: ${monthTitle}`];
+
+            // 2. BARIS 3: HEADER KOLOM UTAMA
+            const colHeaders = ["No", "NAMA CREW", "NO HP / WHATSAPP"];
+            for (let d = 1; d <= daysInMonth; d++) colHeaders.push(d);
+
+            const allRows = [titleRow1, titleRow2, colHeaders];
+
+            // 3. BARIS DATA CREW
             crewsData.forEach((crew, idx) => {
-                const row = [idx + 1, crew.fullname, crew.phone || ''];
+                const row = [idx + 1, crew.fullname, crew.phone || '-'];
                 for (let d = 1; d <= daysInMonth; d++) {
-                    row.push(scheduleData[monthKey]?.[crew.id]?.[d] || '');
+                    const prog = scheduleData[monthKey]?.[crew.id]?.[d] || '-';
+                    row.push(prog);
                 }
-                rowsData.push(row);
+                allRows.push(row);
             });
 
-            const ws = XLSX.utils.aoa_to_sheet(rowsData);
+            // TERJEMAHKAN ARRAY DUA DIMENSI KE WORKSHEET
+            const ws = XLSX.utils.aoa_to_sheet(allRows);
+
+            // STYLING KHUSUS CELL DEMI CELL DENGAN XLSX-JS-STYLE
+            const borderThin = {
+                top: { style: "thin", color: { rgb: "1E293B" } },
+                bottom: { style: "thin", color: { rgb: "1E293B" } },
+                left: { style: "thin", color: { rgb: "1E293B" } },
+                right: { style: "thin", color: { rgb: "1E293B" } }
+            };
+
+            // TITLE HEADER STYLES (BIRU MUDA / LIGHT CYAN)
+            const titleStyle = {
+                font: { name: "Calibri", sz: 14, bold: true, color: { rgb: "00C8FF" } },
+                alignment: { horizontal: "left", vertical: "center" }
+            };
+            const subtitleStyle = {
+                font: { name: "Calibri", sz: 11, italic: true, color: { rgb: "38BDF8" } },
+                alignment: { horizontal: "left", vertical: "center" }
+            };
+
+            // HEADER TABLE STYLES (FONT CYAN + BG HITAM + CENTER)
+            const headerColStyle = {
+                font: { name: "Calibri", sz: 11, bold: true, color: { rgb: "00F0FF" } },
+                fill: { fgColor: { rgb: "000000" } },
+                alignment: { horizontal: "center", vertical: "center", wrapText: true },
+                border: borderThin
+            };
+
+            // DATA CELLS STYLES (WRAP TEXT VERTIKAL & CENTER RAPI)
+            const dataCenterStyle = {
+                font: { name: "Calibri", sz: 10 },
+                alignment: { horizontal: "center", vertical: "center", wrapText: true },
+                border: borderThin
+            };
+            const dataLeftBoldStyle = {
+                font: { name: "Calibri", sz: 10, bold: true },
+                alignment: { horizontal: "left", vertical: "center", wrapText: true },
+                border: borderThin
+            };
+
+            // TERAPKAN STYLING KE SETIAP SEL
+            if (ws['A1']) ws['A1'].s = titleStyle;
+            if (ws['A2']) ws['A2'].s = subtitleStyle;
+
+            const totalCols = daysInMonth + 3;
+            const totalRows = crewsData.length + 3;
+
+            for (let R = 2; R < totalRows; R++) { // Baris 3 ke bawah
+                for (let C = 0; C < totalCols; C++) {
+                    const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+                    if (!ws[cellRef]) continue;
+
+                    if (R === 2) {
+                        // BARIS HEADER KOLOM (R=2 / Baris 3 di Excel)
+                        ws[cellRef].s = headerColStyle;
+                    } else {
+                        // BARIS DATA (R > 2)
+                        if (C === 1) { // Nama Crew
+                            ws[cellRef].s = dataLeftBoldStyle;
+                        } else {
+                            ws[cellRef].s = dataCenterStyle;
+                        }
+                    }
+                }
+            }
+
+            // ATUR LEBAR KOLOM KHUSUS (COL WIDTHS)
+            const colWidths = [
+                { wch: 6 },  // No
+                { wch: 25 }, // Nama Crew
+                { wch: 18 }  // No HP / WhatsApp
+            ];
+            for (let d = 1; d <= daysInMonth; d++) {
+                colWidths.push({ wch: 14 }); // Kolom tanggal presisi untuk Wrap Text
+            }
+            ws['!cols'] = colWidths;
+
+            // DUKUNGAN MERGE CELL UNTUK TITLE HEADER
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } }
+            ];
+
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Jadwal_3TV");
+            XLSX.utils.book_append_sheet(wb, ws, "Jadwal_Matriks_3TV");
             XLSX.writeFile(wb, `Jadwal_3TV_${currentMonth + 1}_${currentYear}.xlsx`);
         }
 
-        async function exportToPDF() {
-            const target = document.getElementById('matrix-table-container');
-            if (!target) return;
-
-            alert("Proses pembuatan dokumen PDF dimulai, harap tunggu...");
-
-            try {
-                const canvas = await html2canvas(target, { scale: 2, useCORS: true });
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('l', 'mm', 'a4');
-
-                const imgWidth = 280;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-                pdf.setFont("helvetica", "bold");
-                pdf.setFontSize(14);
-                pdf.text(`JADWAL BULANAN 3TV BROADCAST - ${document.getElementById('current-month-display').textContent}`, 10, 10);
-
-                pdf.addImage(imgData, 'PNG', 10, 15, imgWidth, imgHeight);
-                pdf.save(`Jadwal_3TV_${currentMonth + 1}_${currentYear}.pdf`);
-            } catch (err) {
-                console.error("Export PDF error:", err);
-                alert("Gagal mengunduh dokumen PDF.");
+        // FUNGSI EXPORT MULTI-PAGE PDF: MENCETAK SAMPAI AKHIR BULAN DENGAN RAPI BANYAK HALAMAN
+        function exportToPDF() {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("Pustaka PDF belum siap, coba refresh halaman.");
+                return;
             }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+            const monthTitle = document.getElementById('current-month-display').textContent;
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+
+            const DAYS_PER_PAGE = 16;
+            const totalChunks = Math.ceil(daysInMonth / DAYS_PER_PAGE);
+
+            for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+                if (chunkIdx > 0) {
+                    doc.addPage();
+                }
+
+                const startDay = (chunkIdx * DAYS_PER_PAGE) + 1;
+                const endDay = Math.min((chunkIdx + 1) * DAYS_PER_PAGE, daysInMonth);
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(0, 150, 200);
+                doc.text("3TV BROADCAST - JADWAL MATRIKS BULANAN", 10, 10);
+
+                doc.setFontSize(9);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Periode: ${monthTitle} (Tanggal ${startDay} - ${endDay}) - Hal ${chunkIdx + 1}/${totalChunks}`, 10, 15);
+
+                const tableHeaders = ["No", "Nama Crew"];
+                for (let d = startDay; d <= endDay; d++) {
+                    tableHeaders.push(String(d));
+                }
+
+                const tableData = [];
+                crewsData.forEach((crew, idx) => {
+                    const row = [String(idx + 1), crew.fullname];
+                    for (let d = startDay; d <= endDay; d++) {
+                        const prog = scheduleData[monthKey]?.[crew.id]?.[d] || "";
+                        row.push(prog ? prog : "-");
+                    }
+                    tableData.push(row);
+                });
+
+                const colStyles = {
+                    0: { cellWidth: 8, halign: 'center' },
+                    1: { cellWidth: 32, halign: 'left', fontStyle: 'bold' }
+                };
+
+                const activeDaysInChunk = (endDay - startDay) + 1;
+                const flexDayWidth = (280 - 40) / activeDaysInChunk;
+
+                for (let i = 2; i <= activeDaysInChunk + 1; i++) {
+                    colStyles[i] = { cellWidth: flexDayWidth, halign: 'center' };
+                }
+
+                doc.autoTable({
+                    head: [tableHeaders],
+                    body: tableData,
+                    startY: 18,
+                    theme: 'grid',
+                    styles: {
+                        fontSize: 7,
+                        cellPadding: 1.5,
+                        overflow: 'linebreak',
+                        valign: 'middle'
+                    },
+                    headStyles: {
+                        fillColor: [13, 19, 34],
+                        textColor: [0, 240, 255],
+                        fontStyle: 'bold',
+                        halign: 'center',
+                        lineWidth: 0.1,
+                        lineColor: [30, 41, 59]
+                    },
+                    columnStyles: colStyles,
+                    alternateRowStyles: {
+                        fillColor: [248, 250, 252]
+                    },
+                    margin: { top: 18, left: 8, right: 8, bottom: 8 }
+                });
+            }
+
+            doc.save(`Jadwal_3TV_${currentMonth + 1}_${currentYear}.pdf`);
         }
 
         function openClearDataModal() { document.getElementById('clear-modal').classList.remove('hidden'); }
