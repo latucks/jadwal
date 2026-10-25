@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jadwal Bulanan 3TV - Real-Time Cloud Matrix</title>
+    <title>3TV Broadcast Dashboard - Matrix Control System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -17,13 +17,24 @@
                         cyberborder: '#1E293B',
                         neoncyan: '#00F0FF',
                         neonpink: '#FF007F',
-                        neonamber: '#FFB800'
+                        neonamber: '#FFB800',
+                        tvred: '#E50914'
                     },
                     boxShadow: {
                         'glow-cyan': '0 0 15px rgba(0, 240, 255, 0.35)',
                         'glow-pink': '0 0 15px rgba(255, 0, 127, 0.35)',
                         'glow-amber': '0 0 15px rgba(255, 184, 0, 0.35)',
                         'glow-green': '0 0 15px rgba(0, 255, 102, 0.35)',
+                        'glow-red': '0 0 15px rgba(229, 9, 20, 0.4)'
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(-100%)' }
+                        }
+                    },
+                    animation: {
+                        marquee: 'marquee 12s linear infinite'
                     }
                 }
             }
@@ -33,9 +44,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
-    <!-- SheetJS with Style Support for Professional XLSX Export -->
+    <!-- SheetJS with Style Support -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-    <!-- jsPDF & jsPDF-AutoTable for Multi-page Vector PDF Generation -->
+    <!-- jsPDF & AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
@@ -53,41 +64,105 @@
             background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
         }
         .font-cyber { font-family: 'Orbitron', sans-serif; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0D1322; }
-        ::-webkit-scrollbar-thumb { background: #00F0FF; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #00F0FF; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #FF007F; }
         
-        .sticky-col-1 { position: sticky; left: 0; z-index: 20; }
-        .sticky-col-2 { position: sticky; left: 40px; z-index: 20; }
+        .sticky-col-1 { position: sticky; left: 0px; z-index: 25; background-color: #0B1120; }
+        .sticky-col-2 { position: sticky; left: 42px; z-index: 25; background-color: #0B1120; }
+        thead th.sticky-col-1, thead th.sticky-col-2 { z-index: 35 !important; background-color: #030712 !important; }
+
+        .schedule-cell {
+            white-space: normal !important;
+            word-break: break-word !important;
+            min-width: 90px;
+            max-width: 140px;
+            vertical-align: middle;
+        }
+        .schedule-cell span {
+            white-space: normal !important;
+            display: inline-block;
+            width: 100%;
+            overflow: visible !important;
+            text-overflow: clip !important;
+        }
 
         .smooth-scroll { -webkit-overflow-scrolling: touch; }
+        
+        .live-indicator {
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(229, 9, 20, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0); }
+        }
+
+        .perspective-1000 { perspective: 1000px; }
+        .modal-flip-container {
+            transform-style: preserve-3d;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+        }
+        .modal-flip-hidden {
+            opacity: 0;
+            transform: rotateY(-60deg) scale(0.85);
+            pointer-events: none;
+        }
+        .modal-flip-visible {
+            opacity: 1;
+            transform: rotateY(0deg) scale(1);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            #sidebar.sidebar-collapsed { transform: translateX(-100%); }
+            #sidebar.sidebar-expanded { transform: translateX(0); }
+        }
     </style>
 </head>
-<body class="h-full min-h-[100dvh] flex flex-col md:flex-row antialiased overflow-hidden">
+<body class="h-full min-h-[100dvh] flex flex-col md:flex-row antialiased overflow-x-hidden">
 
-    <!-- OVERLAY MOBILE -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/80 z-40 hidden transition-opacity duration-300 backdrop-blur-sm" onclick="toggleSidebar()"></div>
+    <!-- MOBILE OVERLAY BACKDROP -->
+    <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden transition-opacity duration-300"></div>
 
-    <!-- SIDEBAR MOBILE & DESKTOP -->
-    <aside id="sidebar" class="fixed md:sticky top-0 inset-y-0 left-0 w-72 h-screen h-[100dvh] bg-cybercard/95 backdrop-blur-xl border-r border-cyan-500/30 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col justify-between shadow-2xl shrink-0">
-        <div class="flex-1 overflow-y-auto smooth-scroll p-3 space-y-3">
-            <!-- Header Sidebar -->
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="sidebar-collapsed md:sidebar-expanded fixed md:sticky top-0 h-screen h-[100dvh] w-72 bg-cybercard/95 backdrop-blur-xl border-r border-cyan-500/30 z-50 flex flex-col shadow-2xl shrink-0 transition-transform duration-300">
+        
+        <!-- CENTER-EDGE TOGGLE BUTTON -->
+        <button id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar" class="absolute -right-4 top-1/2 -translate-y-1/2 w-9 h-12 bg-slate-900 border border-cyan-500/50 rounded-r-xl text-cyan-400 hover:text-white flex items-center justify-center shadow-glow-cyan z-50 cursor-pointer transition-all hover:w-10">
+            <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-right md:fa-chevron-left text-xs transition-transform duration-300"></i>
+        </button>
+
+        <div class="flex-1 overflow-y-auto smooth-scroll p-3 space-y-3 pb-20 md:pb-3">
             <div class="p-3 border-b border-cyan-500/20 flex items-center justify-between bg-slate-950/40 rounded-xl">
                 <div class="flex items-center gap-3 overflow-hidden">
-                    <div class="w-10 h-10 shrink-0 rounded-lg bg-gradient-to-tr from-cyan-500 to-fuchsia-600 flex items-center justify-center text-slate-950 font-black shadow-glow-cyan">
-                        <i class="fa-solid fa-satellite-dish text-lg"></i>
+                    <div class="w-10 h-10 shrink-0 rounded-lg bg-gradient-to-tr from-cyan-500 via-fuchsia-600 to-red-600 flex items-center justify-center text-slate-950 font-black shadow-glow-cyan">
+                        <i class="fa-solid fa-tv text-lg text-white"></i>
                     </div>
                     <div class="whitespace-nowrap">
                         <h1 class="font-cyber font-black text-sm tracking-widest text-cyan-400">3TV BROADCAST</h1>
-                        <p class="text-[10px] text-fuchsia-400 font-semibold tracking-wider uppercase">Cloud Matrix v5.6</p>
-                        <!-- CREDIT AUTHOR -->
-                        <p class="text-[9px] text-slate-400 font-mono tracking-tight mt-0.5">Create by Surya Ardiansyah</p>
+                        <p class="text-[10px] text-fuchsia-400 font-semibold tracking-wider uppercase">Media Broadcast Hub</p>
+                        <p class="text-[9px] text-slate-400 font-mono tracking-tight mt-0.5">Created by Surya Ardiansyah</p>
                     </div>
                 </div>
-                <button type="button" onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-cyan-400 p-1.5 rounded-lg hover:bg-cyan-950/40 transition">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
+            </div>
+
+            <!-- RUNNING TEXT STASIUN TV -->
+            <div class="p-2.5 bg-gradient-to-r from-red-950/60 via-slate-950 to-red-950/60 rounded-xl border border-red-500/40 flex items-center gap-2 overflow-hidden shadow-glow-red relative">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-600 live-indicator shrink-0"></span>
+                <div class="overflow-hidden whitespace-nowrap w-full">
+                    <div class="inline-block animate-marquee font-cyber font-bold text-[11px] text-red-400 uppercase tracking-wider">
+                        RCTI &bull; MNCTV &bull; GTV &bull; 3TV BROADCAST
+                    </div>
+                </div>
             </div>
 
             <!-- Role Selector Badge -->
@@ -115,35 +190,63 @@
                     <i class="fa-solid fa-calendar-days text-base shrink-0"></i>
                     <span class="whitespace-nowrap font-cyber">Jadwal Bulanan</span>
                 </button>
-            </nav>
-        </div>
+                <button onclick="switchTab('jobreport')" id="nav-jobreport" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-slate-400 hover:text-amber-300 hover:bg-amber-950/30 border border-transparent hover:border-amber-500/30" style="display: none;">
+                    <i class="fa-solid fa-clipboard-check text-base shrink-0 text-amber-400"></i>
+                    <span class="whitespace-nowrap font-cyber">Job Report</span>
+                </button>
+                <button onclick="switchTab('personalreport')" id="nav-personalreport" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-slate-400 hover:text-amber-300 hover:bg-amber-950/30 border border-transparent hover:border-amber-500/30">
+                    <i class="fa-solid fa-user-pen text-base shrink-0 text-amber-400"></i>
+                    <span class="whitespace-nowrap font-cyber">Personal Report</span>
+                </button>
 
-        <!-- BOTTOM SIDEBAR -->
-        <div class="p-3 border-t border-cyan-500/20 bg-slate-950/80 shrink-0">
-            <button onclick="openSheetConfigModal()" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold transition border border-emerald-500/30 hover:shadow-glow-green">
-                <i class="fa-solid fa-file-excel shrink-0 text-sm"></i>
-                <span class="whitespace-nowrap font-cyber">Google Sheets Sync</span>
-            </button>
+                <!-- Tombol Google Sheets Sync (Dipindah ke dalam area navigasi) -->
+                <div class="pt-3 mt-3 border-t border-cyan-500/20">
+                    <button onclick="openSheetConfigModal()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:shadow-glow-green">
+                        <i class="fa-solid fa-file-excel text-base shrink-0"></i>
+                        <span class="whitespace-nowrap font-cyber">Google Sheets Sync</span>
+                    </button>
+                </div>
+            </nav>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT AREA DINAMIS -->
-    <main class="flex-1 flex flex-col min-w-0 h-screen h-[100dvh] bg-cyberbg/90 overflow-hidden">
+    <!-- MODAL ROLE PIN VERIFICATION -->
+    <div id="pin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-sm p-5 shadow-glow-cyan">
+            <div class="text-center space-y-3">
+                <div class="w-10 h-10 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto text-lg">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 id="pin-modal-title" class="font-cyber font-bold text-cyan-300 text-base">VERIFIKASI PIN</h3>
+                <p id="pin-modal-subtitle" class="text-xs text-slate-400">Masukkan PIN untuk melanjutkan.</p>
+                <div class="pt-2">
+                    <input type="password" id="pin-input" maxlength="6" placeholder="****" class="w-full text-center tracking-widest text-lg font-mono font-bold bg-slate-950 border border-cyan-500/40 text-cyan-300 py-2 rounded-xl outline-none focus:ring-2 focus:ring-cyan-400">
+                    <p id="pin-error-msg" class="text-xs text-pink-400 mt-2 font-medium hidden">PIN Salah! Akses ditolak.</p>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closePinModal()" class="flex-1 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
+                    <button onclick="verifyRolePin()" class="flex-1 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Konfirmasi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 h-screen h-[100dvh] bg-cyberbg/90 overflow-x-hidden">
         
-        <!-- HEADER TOP -->
         <header class="bg-cybercard/95 backdrop-blur-xl border-b border-cyan-500/30 px-3 sm:px-5 py-2.5 sticky top-0 z-30 flex items-center justify-between shadow-2xl shrink-0 gap-2">
             <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-                <button type="button" onclick="toggleSidebar()" class="p-2 rounded-lg bg-slate-900 text-cyan-400 hover:text-white border border-cyan-500/30 transition shrink-0">
-                    <i class="fa-solid fa-bars text-base"></i>
+                <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-xl bg-slate-950 border border-cyan-500/30 text-cyan-400 hover:text-white shrink-0">
+                    <i class="fa-solid fa-bars text-sm"></i>
                 </button>
                 <div class="truncate">
                     <h2 class="font-cyber font-black text-xs sm:text-base md:text-lg text-white tracking-wider truncate bg-gradient-to-r from-cyan-400 via-white to-fuchsia-500 bg-clip-text text-transparent">
-                        JADWAL BULANAN 3TV
+                        3TV BROADCAST DASHBOARD
                     </h2>
                     <div class="flex items-center gap-2">
-                        <p id="page-subtitle" class="text-[9px] sm:text-[11px] text-cyan-400 font-semibold tracking-wider hidden sm:block truncate">Real-Time Cloud Control</p>
-                        <span id="cloud-status-pill" onclick="openSheetConfigModal()" class="cursor-pointer text-[8px] sm:text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1 shrink-0">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Connecting...
+                        <p id="page-subtitle" class="text-[9px] sm:text-[11px] text-cyan-400 font-semibold tracking-wider hidden sm:block truncate">Broadcast Control Matrix</p>
+                        <span id="firestore-status-pill" class="text-[8px] sm:text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sheet Webhook Ready
                         </span>
                     </div>
                 </div>
@@ -158,7 +261,6 @@
                     <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Cari crew..." class="pl-8 pr-3 py-1.5 bg-slate-950/80 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl focus:ring-1 focus:ring-cyan-400 outline-none w-36 lg:w-48 font-medium">
                 </div>
                 
-                <!-- DIGI CLOCK + LOKASI GPS & CUACA -->
                 <div class="flex flex-col items-end">
                     <div class="px-2 sm:px-2.5 py-1 rounded-xl bg-slate-950 border border-cyan-500/40 text-cyan-300 font-mono text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 shadow-glow-cyan">
                         <i class="fa-regular fa-clock text-fuchsia-400 animate-pulse text-[10px] sm:text-xs"></i>
@@ -172,7 +274,6 @@
             </div>
         </header>
 
-        <!-- CONTENT SCROLL BODY -->
         <div class="p-2.5 sm:p-4 md:p-5 space-y-4 flex-1 overflow-y-auto smooth-scroll">
 
             <!-- TAB 1: DASHBOARD UTAMA -->
@@ -180,12 +281,12 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-cybercard p-3 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-2xl">
                     <div>
                         <h3 class="font-cyber font-bold text-white text-xs sm:text-base flex items-center gap-2">
-                            <span>CREW ON DUTY HARI INI</span>
+                            <span>CREW BROADCAST ON DUTY HARI INI</span>
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> LIVE
                             </span>
                         </h3>
-                        <p class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">Penugasan personil IT Broadcast aktif hari ini.</p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">Penugasan studio & IT Broadcast aktif hari ini.</p>
                     </div>
                     <div class="flex items-center gap-2 self-start sm:self-auto">
                         <label for="dashboard-date" class="text-xs text-cyan-400 font-cyber font-semibold">Tanggal:</label>
@@ -193,9 +294,8 @@
                     </div>
                 </div>
 
-                <!-- METRICS METERS -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
-                    <div class="bg-cybercard p-2.5 sm:p-4 rounded-2xl border border-cyan-500/30 shadow-lg flex items-center justify-between">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
+                    <div class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-cyan-500/30 shadow-lg flex items-center justify-between">
                         <div>
                             <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 uppercase">Total On Duty</p>
                             <h4 id="metric-onduty" class="text-lg sm:text-2xl font-cyber font-black text-cyan-400 mt-0.5">0</h4>
@@ -205,7 +305,7 @@
                         </div>
                     </div>
 
-                    <div onclick="openOffDutyModal()" class="bg-cybercard p-2.5 sm:p-4 rounded-2xl border border-amber-500/30 shadow-lg hover:border-amber-400 transition cursor-pointer flex items-center justify-between group">
+                    <div onclick="openOffDutyModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-amber-500/30 shadow-lg hover:border-amber-400 transition cursor-pointer flex items-center justify-between group">
                         <div>
                             <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-amber-300 transition uppercase">
                                 Off Duty <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-amber-500"></i>
@@ -217,19 +317,31 @@
                         </div>
                     </div>
 
-                    <div onclick="openActiveProgramsModal()" class="bg-cybercard p-2.5 sm:p-4 rounded-2xl border border-fuchsia-500/30 shadow-lg hover:border-fuchsia-400 transition cursor-pointer flex items-center justify-between group">
+                    <div onclick="openMntModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-blue-500/30 shadow-lg hover:border-blue-400 transition cursor-pointer flex items-center justify-between group">
                         <div>
-                            <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-fuchsia-300 transition uppercase">
-                                Program <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-fuchsia-500"></i>
+                            <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-blue-300 transition uppercase">
+                                MNT / Maintenance <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-blue-500"></i>
                             </p>
-                            <h4 id="metric-programs" class="text-lg sm:text-2xl font-cyber font-black text-fuchsia-400 mt-0.5">0</h4>
+                            <h4 id="metric-mnt" class="text-lg sm:text-2xl font-cyber font-black text-blue-400 mt-0.5">0</h4>
                         </div>
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 group-hover:shadow-glow-pink transition text-xs sm:text-sm">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:shadow-glow-cyan transition text-xs sm:text-sm">
+                            <i class="fa-solid fa-wrench"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="openActiveProgramsModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-emerald-500/30 shadow-lg hover:border-emerald-400 transition cursor-pointer flex items-center justify-between group">
+                        <div>
+                            <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-emerald-300 transition uppercase">
+                                Program On Air <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-emerald-500"></i>
+                            </p>
+                            <h4 id="metric-programs" class="text-lg sm:text-2xl font-cyber font-black text-emerald-400 mt-0.5">0</h4>
+                        </div>
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:shadow-glow-green transition text-xs sm:text-sm">
                             <i class="fa-solid fa-tv"></i>
                         </div>
                     </div>
 
-                    <div class="bg-cybercard p-2.5 sm:p-4 rounded-2xl border border-emerald-500/30 shadow-lg flex items-center justify-between">
+                    <div class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-emerald-500/30 shadow-lg flex items-center justify-between">
                         <div>
                             <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 uppercase">Master Crew</p>
                             <h4 id="metric-totalcrew" class="text-lg sm:text-2xl font-cyber font-black text-emerald-400 mt-0.5">0</h4>
@@ -240,7 +352,6 @@
                     </div>
                 </div>
 
-                <!-- CARDS GRID CREW ON DUTY -->
                 <div id="crew-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
                 <div id="no-crew-duty-msg" class="hidden text-center py-10 bg-cybercard/50 rounded-2xl border border-dashed border-cyan-500/30">
                     <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600 mb-2"></i>
@@ -268,7 +379,6 @@
                             </button>
                         </div>
 
-                        <!-- ACTION BUTTONS: FILTERED BY ROLE ACCESS -->
                         <div class="flex flex-wrap items-center gap-1.5">
                             <label id="btn-import-xlsx" class="role-action-btn cursor-pointer px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] sm:text-[11px] font-semibold flex items-center gap-1.5 transition">
                                 <i class="fa-solid fa-file-excel"></i>
@@ -299,8 +409,7 @@
                     </div>
                 </div>
 
-                <!-- TABLE GRID MATRIKS AREA DINAMIS -->
-                <div id="matrix-table-container" class="bg-cybercard rounded-2xl border border-cyan-500/30 shadow-2xl overflow-x-auto max-h-[62vh] relative smooth-scroll">
+                <div id="matrix-table-container" class="bg-cybercard rounded-2xl border border-cyan-500/30 shadow-2xl overflow-x-auto max-h-[65vh] relative smooth-scroll">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead class="bg-slate-950 text-cyan-400 font-cyber font-bold uppercase tracking-wider sticky top-0 z-30 shadow-md border-b border-cyan-500/30">
                             <tr id="matrix-header-row"></tr>
@@ -309,12 +418,399 @@
                     </table>
                 </div>
             </section>
+
+            <!-- TAB 3: JOB REPORT -->
+            <section id="tab-jobreport" class="space-y-5 hidden">
+                <div class="bg-slate-900/90 border border-amber-500/30 p-4 rounded-2xl shadow-2xl backdrop-blur-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[9px] font-cyber font-bold tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase">
+                                Operational Analytics
+                            </span>
+                            <span class="text-xs text-slate-400 font-mono">Laporan Kinerja Crew & Studio</span>
+                        </div>
+                        <h3 class="text-xl font-cyber font-black text-amber-300 mt-1 tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-award text-amber-400"></i> JOB REPORT & BROADCAST AUDIT
+                        </h3>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                        <select id="report-period-filter" onchange="renderJobReport()" class="bg-slate-950 border border-amber-500/40 text-amber-300 text-xs font-semibold rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer">
+                            <option value="month">Bulan Ini</option>
+                            <option value="all">Semua Data Log</option>
+                        </select>
+                        <button onclick="exportJobReportPDF()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-cyber font-bold text-xs flex items-center gap-2 shadow-glow-amber transition">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Cetak Laporan PDF</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <div class="bg-slate-900/80 border border-amber-500/30 p-4 rounded-2xl shadow-xl flex items-center justify-between relative overflow-hidden">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-cyber font-bold text-amber-400/80 uppercase tracking-widest">Total Tugas Terlaksana</p>
+                            <h4 id="jr-total-tasks" class="text-2xl font-cyber font-black text-white">0</h4>
+                            <p class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check text-[9px]"></i> Verifikasi Sistem OK
+                            </p>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg shadow-glow-amber">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 border border-cyan-500/30 p-4 rounded-2xl shadow-xl flex items-center justify-between relative overflow-hidden">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-cyber font-bold text-cyan-400/80 uppercase tracking-widest">Crew Teraktif</p>
+                            <h4 id="jr-top-crew" class="text-sm font-bold text-cyan-300 truncate max-w-[140px]">-</h4>
+                            <p id="jr-top-crew-count" class="text-[10px] text-slate-400 font-mono">0 Sesi Siaran</p>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg shadow-glow-cyan">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 border border-emerald-500/30 p-4 rounded-2xl shadow-xl flex items-center justify-between relative overflow-hidden">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-cyber font-bold text-emerald-400/80 uppercase tracking-widest">Rasio On-Air / Duty</p>
+                            <h4 id="jr-duty-ratio" class="text-2xl font-cyber font-black text-emerald-400">0%</h4>
+                            <p class="text-[10px] text-slate-400 font-mono">Operasional Siaran Aktif</p>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg shadow-glow-green">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 border border-fuchsia-500/30 p-4 rounded-2xl shadow-xl flex items-center justify-between relative overflow-hidden">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-cyber font-bold text-fuchsia-400/80 uppercase tracking-widest">Program Terbanyak</p>
+                            <h4 id="jr-top-program" class="text-sm font-bold text-fuchsia-300 truncate max-w-[140px]">-</h4>
+                            <p id="jr-top-program-count" class="text-[10px] text-slate-400 font-mono">0 Penayangan</p>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-fuchsia-500/10 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 text-lg shadow-glow-pink">
+                            <i class="fa-solid fa-clapperboard"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                            <h4 class="font-cyber font-bold text-amber-300 text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-ranking-star text-amber-400"></i> PERFORMA & BEBAN CREW
+                            </h4>
+                            <span class="text-[9px] font-mono text-slate-400">Top Duty Rank</span>
+                        </div>
+                        <div id="jr-crew-ranking-list" class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1 smooth-scroll"></div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                            <h4 class="font-cyber font-bold text-cyan-300 text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> LOG AKTIVITAS & AUDIT PENUGASAN
+                            </h4>
+                            <span id="jr-log-count-badge" class="px-2 py-0.5 text-[9px] font-mono font-bold rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">0 Entri</span>
+                        </div>
+                        <div class="overflow-x-auto max-h-[380px] overflow-y-auto smooth-scroll rounded-xl border border-slate-800/80">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-950 text-slate-400 font-cyber font-bold uppercase text-[10px] sticky top-0 z-10 border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-2.5">Tanggal</th>
+                                        <th class="p-2.5">Nama Crew</th>
+                                        <th class="p-2.5">Program / Duty</th>
+                                        <th class="p-2.5 text-center">Kategori</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="jr-audit-table-body" class="divide-y divide-slate-800/60 text-slate-300 text-[11px]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: PERSONAL REPORT & LOCAL STORAGE AUTHENTICATION -->
+            <section id="tab-personalreport" class="space-y-5 hidden">
+                
+                <div id="pr-auth-card" class="max-w-md mx-auto bg-slate-900/90 border border-amber-500/40 p-6 rounded-2xl shadow-glow-amber space-y-5">
+                    <div class="text-center space-y-2">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto text-xl shadow-glow-amber">
+                            <i class="fa-solid fa-user-lock"></i>
+                        </div>
+                        <h3 id="pr-auth-title" class="font-cyber font-black text-amber-300 text-lg uppercase tracking-wider">IT BROADCAST 3TV</h3>
+                        <p id="pr-auth-subtitle" class="text-xs text-slate-400 font-mono">Masukan Username Anda</p>
+                    </div>
+
+                    <form id="pr-login-form" onsubmit="handlePRLogin(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Username / ID Admin</label>
+                            <input type="text" id="pr-login-user" required placeholder="Masukkan username" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-amber-400 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                            <input type="password" id="pr-login-pass" required placeholder="Masukkan password" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-amber-400 font-mono">
+                        </div>
+                        <div class="pt-2">
+                            <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber transition">
+                                Login ITB 3TV <i class="fa-solid fa-right-to-bracket ml-1"></i>
+                            </button>
+                        </div>
+                        <p class="text-[11px] text-center text-slate-400 pt-2">
+                            Belum punya akun ITB 3TV? <a href="javascript:void(0)" onclick="togglePRAuthMode('register')" class="text-amber-400 font-semibold hover:underline">Registrasi Baru</a>
+                        </p>
+                    </form>
+
+                    <form id="pr-register-form" onsubmit="handlePRRegister(event)" class="space-y-3 hidden">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Lengkap</label>
+                            <input type="text" id="pr-reg-name" required oninput="this.value = this.value.toUpperCase()" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400 uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Nomor Handphone / WA</label>
+                            <input type="text" id="pr-reg-phone" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Username</label>
+                            <input type="text" id="pr-reg-user" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                            <input type="password" id="pr-reg-pass" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400 font-mono">
+                        </div>
+                        <div class="pt-2 flex gap-2">
+                            <button type="button" onclick="togglePRAuthMode('login')" class="flex-1 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-300 font-cyber font-bold text-xs transition">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Batal
+                            </button>
+                            <button type="submit" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan transition">
+                                Daftar Akun ITB 3TV <i class="fa-solid fa-user-plus ml-1"></i>
+                            </button>
+                        </div>
+                        <p class="text-[11px] text-center text-slate-400 pt-2">
+                            Sudah memiliki akun? <a href="javascript:void(0)" onclick="togglePRAuthMode('login')" class="text-amber-400 font-semibold hover:underline">Login disini</a>
+                        </p>
+                    </form>
+                </div>
+
+                <div id="pr-main-container" class="space-y-5 hidden">
+                    
+                    <div class="bg-slate-900/90 border border-amber-500/30 p-4 rounded-2xl shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold font-cyber shrink-0">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                            <div>
+                                <span id="pr-logged-role-badge" class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase">Root Admin</span>
+                                <h4 id="pr-logged-user-name" class="text-sm font-bold text-white mt-1">Nama Crew Logged</h4>
+                                <p id="pr-logged-user-phone" class="text-[10px] text-slate-400 font-mono">HP: -</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 self-end md:self-auto flex-wrap">
+                            <button onclick="toggleManageAccountsModal()" id="manage-accounts-btn" class="hidden px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-users-gear"></i>
+                                <span>Kelola Akun Lokal</span>
+                            </button>
+                            <button onclick="toggleChangePasswordModal()" class="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-key"></i>
+                                <span>Ganti Password</span>
+                            </button>
+                            <button onclick="logoutPRUser()" class="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-slate-800 p-4 sm:p-5 rounded-2xl shadow-2xl space-y-4">
+                        <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                            <h3 id="pr-form-header-title" class="font-cyber font-bold text-amber-300 text-sm sm:text-base flex items-center gap-2">
+                                <i class="fa-solid fa-file-signature text-amber-400"></i> FORM INPUT PERSONAL REPORT SIARAN
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <button id="pr-form-toggle-btn" type="button" onclick="togglePRFormVisibility()" class="hidden px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-cyber font-semibold flex items-center gap-1.5 transition shadow-glow-amber">
+                                    <i id="pr-form-toggle-icon" class="fa-solid fa-eye text-[10px]"></i>
+                                    <span id="pr-form-toggle-text">Tampilkan Form</span>
+                                </button>
+                                <button id="pr-cancel-edit-btn" onclick="cancelReportEdit()" class="hidden px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white text-[10px] font-semibold">
+                                    Batal Edit
+                                </button>
+                            </div>
+                        </div>
+
+                        <form id="personal-report-form" onsubmit="handlePersonalReportSubmit(event)" class="space-y-4 hidden">
+                            <input type="hidden" id="pr-editing-report-id">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Program Siaran <span class="text-red-400">*</span></label>
+                                    <div class="space-y-1.5">
+                                        <select id="pr-program-select" onchange="applyPRProgramSelection(this.value)" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400 font-semibold cursor-pointer">
+                                            <option value="">-- Pilih dari Jadwal Siaran Hari Ini --</option>
+                                        </select>
+                                        <input type="text" id="pr-program-name" required placeholder="Atau ketik manual nama program siaran..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400 font-semibold">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Lokasi Siaran / Studio <span class="text-red-400">*</span></label>
+                                    <input type="text" id="pr-location" required placeholder="Contoh: Studio 1 Kebon Jeruk / OB Van 3" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Jam On System <span class="text-red-400">*</span></label>
+                                    <input type="time" id="pr-time-on" onchange="calculateWorkHours()" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400 font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Jam Off System <span class="text-red-400">*</span></label>
+                                    <input type="time" id="pr-time-off" onchange="calculateWorkHours()" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400 font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Status Program <span class="text-red-400">*</span></label>
+                                    <select id="pr-program-status" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400 font-semibold cursor-pointer">
+                                        <option value="Live">🔴 Live (Siaran Langsung)</option>
+                                        <option value="Taping">📼 Taping (Rekaman)</option>
+                                        <option value="GR">🎭 GR (General Rehearsal)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Total Jam Kerja (Work Hours)</label>
+                                    <input type="text" id="pr-work-hours" readonly placeholder="Otomatis terhitung..." class="w-full bg-slate-950/80 border border-amber-500/20 text-amber-300 text-xs rounded-xl px-3 py-2.5 outline-none font-mono font-bold cursor-not-allowed select-none">
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-cyber font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                                        <i class="fa-solid fa-boxes-packing"></i> PERALATAN & KONDISI ALAT
+                                    </label>
+                                    <button type="button" onclick="addEquipmentItemRow()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-semibold flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-plus text-[9px]"></i> Tambah Alat
+                                    </button>
+                                </div>
+                                <div id="equipment-items-container" class="space-y-2"></div>
+                            </div>
+
+                            <div class="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-cyber font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                                        <i class="fa-solid fa-users-gear"></i> CREW IT ON DUTY / BERTUGAS
+                                    </label>
+                                    <button type="button" onclick="addCrewTagRow()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-[10px] font-semibold flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-user-plus text-[9px]"></i> Tambah Crew
+                                    </button>
+                                </div>
+                                <div id="crew-tags-container" class="space-y-2"></div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Catatan Tambahan / Operational Log</label>
+                                <textarea id="pr-notes" rows="3" placeholder="Tuliskan kendala teknis, instruksi khusus, atau catatan siaran..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl p-3 outline-none focus:ring-1 focus:ring-cyan-400"></textarea>
+                            </div>
+
+                            <div class="pt-2 flex justify-end gap-2">
+                                <button type="submit" id="pr-submit-btn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber transition flex items-center gap-2">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <span>Simpan Laporan</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-slate-800 p-4 sm:p-5 rounded-2xl shadow-2xl space-y-4">
+                        <div class="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-cyber font-bold text-cyan-300 text-sm sm:text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-history text-cyan-400"></i> RIWAYAT PERSONAL REPORT (LOCAL)
+                                </h4>
+                                <span id="pr-history-count" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">0 Laporan</span>
+                            </div>
+
+                            <div id="pr-admin-export-tools" class="hidden items-center gap-1.5 flex-wrap">
+                                <button onclick="exportPRHistoryXLSX()" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] font-semibold flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-file-excel"></i> Export XLSX
+                                </button>
+                                <button onclick="exportPRHistoryPDF()" class="px-2.5 py-1 rounded-lg bg-fuchsia-500/20 hover:bg-fuchsia-500/30 text-fuchsia-300 border border-fuchsia-500/40 text-[10px] font-semibold flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-file-pdf"></i> Export PDF
+                                </button>
+                            </div>
+                        </div>
+                        <div id="pr-history-list" class="space-y-3 max-h-[400px] overflow-y-auto smooth-scroll pr-1"></div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
-    <!-- MODAL 1: OFF DUTY -->
-    <div id="offduty-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-cybercard border border-amber-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-amber space-y-4 max-h-[90vh] overflow-y-auto">
+    <!-- MODAL CHANGE PASSWORD -->
+    <div id="change-pass-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-amber-500/40 rounded-2xl w-full max-w-sm p-5 shadow-glow-amber space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-cyber font-bold text-amber-300 text-sm">GANTI PASSWORD AKUN LOKAL</h3>
+                <button onclick="toggleChangePasswordModal(false)" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="handleChangePasswordSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Password Lama</label>
+                    <input type="password" id="pr-old-pass" required placeholder="******" class="w-full bg-slate-950 border border-slate-700 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Password Baru</label>
+                    <input type="password" id="pr-new-pass" required placeholder="******" class="w-full bg-slate-950 border border-slate-700 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Konfirmasi Password Baru</label>
+                    <input type="password" id="pr-confirm-pass" required placeholder="******" class="w-full bg-slate-950 border border-slate-700 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none font-mono">
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                    <button type="button" onclick="toggleChangePasswordModal(false)" class="px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 text-xs font-semibold">Batal</button>
+                    <button type="submit" class="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL MANAGE ACCOUNTS (ROOT ADMIN) -->
+    <div id="manage-accounts-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-2xl p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-users-gear text-cyan-400 text-base"></i>
+                    <h3 class="font-cyber font-bold text-cyan-300 text-sm">KELOLA AKUN CREW LOKAL & RESET PASSWORD</h3>
+                </div>
+                <button onclick="toggleManageAccountsModal(false)" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="manage-accounts-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button onclick="toggleManageAccountsModal(false)" class="px-4 py-2 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-semibold">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PREVIEW PERSONAL REPORT -->
+    <div id="pr-preview-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-lg p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice text-cyan-400 text-base"></i>
+                    <h3 class="font-cyber font-bold text-cyan-300 text-sm">PREVIEW PERSONAL REPORT SIARAN</h3>
+                </div>
+                <button onclick="closePRPreviewModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="pr-preview-modal-body" class="space-y-3"></div>
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button onclick="closePRPreviewModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-semibold hover:bg-slate-800">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTHER MODALS -->
+    <div id="offduty-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden perspective-1000">
+        <div id="offduty-modal-card" class="modal-flip-container modal-flip-hidden bg-cybercard border border-amber-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-amber space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xs">
@@ -325,63 +821,58 @@
                         <p id="offduty-modal-date" class="text-[10px] font-mono text-slate-400 mt-0.5">Tanggal: -</p>
                     </div>
                 </div>
-                <button onclick="closeOffDutyModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button type="button" onclick="closeOffDutyModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition"><i class="fa-solid fa-xmark text-base"></i></button>
             </div>
             <div id="offduty-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button onclick="closeOffDutyModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:bg-slate-800">Tutup</button>
+                <button type="button" onclick="closeOffDutyModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:bg-slate-800 transition">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: PROGRAM SIARAN BERJALAN -->
-    <div id="programs-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-cybercard border border-fuchsia-500/40 rounded-2xl w-full max-w-lg p-5 shadow-glow-pink space-y-4 max-h-[90vh] overflow-y-auto relative">
+    <div id="programs-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden perspective-1000">
+        <div id="programs-modal-card" class="modal-flip-container modal-flip-hidden bg-cybercard border border-emerald-500/40 rounded-2xl w-full max-w-lg p-5 shadow-glow-green space-y-4 max-h-[90vh] overflow-y-auto relative">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-fuchsia-500/20 border border-fuchsia-500/40 flex items-center justify-center text-fuchsia-400 text-xs">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xs">
                         <i class="fa-solid fa-tv"></i>
                     </div>
                     <div>
-                        <h3 class="font-cyber font-bold text-fuchsia-400 text-sm">PROGRAM SIARAN BERJALAN</h3>
+                        <h3 class="font-cyber font-bold text-emerald-400 text-sm">PROGRAM SIARAN BERJALAN</h3>
                         <p id="programs-modal-date" class="text-[10px] font-mono text-slate-400 mt-0.5">Tanggal: -</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeActiveProgramsModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-900 border border-slate-700 transition">
-                    <i class="fa-solid fa-xmark text-base"></i>
-                </button>
+                <button type="button" onclick="closeActiveProgramsModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition"><i class="fa-solid fa-xmark text-base"></i></button>
             </div>
             <div id="programs-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button type="button" onclick="closeActiveProgramsModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-fuchsia-500/30 text-fuchsia-300 text-xs font-semibold hover:bg-slate-800 transition">
-                    Tutup
-                </button>
+                <button type="button" onclick="closeActiveProgramsModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-semibold hover:bg-slate-800 transition">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 3: ROLE VERIFICATION PIN -->
-    <div id="pin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-sm p-5 shadow-glow-cyan">
-            <div class="text-center space-y-3">
-                <div class="w-10 h-10 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto text-lg">
-                    <i class="fa-solid fa-lock"></i>
+    <div id="mnt-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden perspective-1000">
+        <div id="mnt-modal-card" class="modal-flip-container modal-flip-hidden bg-cybercard border border-blue-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 text-xs">
+                        <i class="fa-solid fa-wrench"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-cyber font-bold text-blue-400 text-sm">CREW MNT / MAINTENANCE</h3>
+                        <p id="mnt-modal-date" class="text-[10px] font-mono text-slate-400 mt-0.5">Tanggal: -</p>
+                    </div>
                 </div>
-                <h3 id="pin-modal-title" class="font-cyber font-bold text-cyan-300 text-base">VERIFIKASI PIN</h3>
-                <p id="pin-modal-subtitle" class="text-xs text-slate-400">Masukkan PIN untuk melanjutkan.</p>
-                <div class="pt-2">
-                    <input type="password" id="pin-input" maxlength="6" placeholder="****" class="w-full text-center tracking-widest text-lg font-mono font-bold bg-slate-950 border border-cyan-500/40 text-cyan-300 py-2 rounded-xl outline-none focus:ring-2 focus:ring-cyan-400">
-                    <p id="pin-error-msg" class="text-xs text-pink-400 mt-2 font-medium hidden">PIN Salah! Akses ditolak.</p>
-                </div>
-                <div class="flex gap-2 pt-2">
-                    <button onclick="closePinModal()" class="flex-1 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
-                    <button onclick="verifyRolePin()" class="flex-1 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Konfirmasi</button>
-                </div>
+                <button type="button" onclick="closeMntModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition"><i class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+            <div id="mnt-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button type="button" onclick="closeMntModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-blue-500/30 text-blue-300 text-xs font-semibold hover:bg-slate-800 transition">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 4: EDIT PROGRAM -->
+    <!-- MODAL EDIT PROGRAM ASSIGNMENT -->
     <div id="edit-program-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -402,6 +893,7 @@
                         <option value="Hafiz Indonesia">📺 Hafiz Indonesia</option>
                         <option value="SIRNAS">🏸 SIRNAS</option>
                         <option value="DMD">📺 DMD</option>
+                        <option value="MNT">🔧 MNT (Maintenance)</option>
                         <option value="Standby">⏳ Standby</option>
                         <option value="OFF">😴 OFF (Libur)</option>
                         <option value="CUSTOM">✏️ Custom Text (Ketik Manual)</option>
@@ -432,7 +924,7 @@
         </div>
     </div>
 
-    <!-- MODAL 5: ADD CREW -->
+    <!-- MODAL ADD CREW -->
     <div id="crew-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -457,7 +949,7 @@
         </div>
     </div>
 
-    <!-- MODAL 6: GOOGLE SHEETS CONFIG -->
+    <!-- MODAL GOOGLE SHEETS CONFIG -->
     <div id="sheet-config-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-emerald-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-green space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -480,7 +972,7 @@
         </div>
     </div>
 
-    <!-- MODAL 7: CLEAR DATA -->
+    <!-- MODAL CLEAR DATA -->
     <div id="clear-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-pink-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-pink space-y-4">
             <div class="text-center space-y-2">
@@ -507,11 +999,12 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC DENGAN EXPORT XLSX DENGAN HEADER CYANN/HITAM & WRAP TEXT -->
+    <!-- CORE SYSTEM JS LOGIC -->
     <script>
         const ADMIN_PIN = "130723";
         const EDITOR_PIN = "8080";
-        
+        const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby9ZGF7vE06r2W51bMTAHQGMAHLEYYiV4BVjlS7SeWsZDFj4nhqkyxrj21VefN_m8IL/exec';
+
         let currentUserRole = "viewer";
         let targetPendingRole = "";
         
@@ -523,49 +1016,19 @@
 
         let crewsData = [];
         let scheduleData = {};
-
-        const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby9ZGF7vE06r2W51bMTAHQGMAHLEYYiV4BVjlS7SeWsZDFj4nhqkyxrj21VefN_m8IL/exec';
-
-        // WEB AUDIO API SOUND EFFECT
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playClickSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.05);
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
+        
+        // LocalStorage Data Initialization
+        window.registeredUsers = JSON.parse(localStorage.getItem('3tv_pr_users') || '[]');
+        if (window.registeredUsers.length === 0) {
+            window.registeredUsers = [
+                { name: 'Root Administrator 3TV', phone: '089680808008', user: 'root', pass: '130723', isRoot: true },
+                { name: 'Administrator 3TV', phone: '081391073330', user: 'admin', pass: '8080', isRoot: false }
+            ];
+            localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            localStorage.setItem('google_sheet_webhook_url', DEFAULT_WEBHOOK_URL);
-
-            document.addEventListener('click', (e) => {
-                if (e.target.closest('button, select, input[type="checkbox"], label, td, .cursor-pointer')) {
-                    playClickSound();
-                }
-            });
-
-            loadFromLocalStorage();
-            updateLiveClock();
-            setInterval(updateLiveClock, 1000);
-
-            initWeatherAndGPS();
-
-            document.getElementById('dashboard-date').value = getFormattedTodayDate();
-
-            applyRolePermissions();
-            renderDashboard();
-            renderMonthlyGrid();
-
-            await loadDataFromGoogleSheet();
-        });
+        window.loggedPRUser = JSON.parse(localStorage.getItem('3tv_pr_logged_user') || 'null');
+        window.personalReportsList = JSON.parse(localStorage.getItem('3tv_pr_reports') || '[]');
 
         function getFormattedTodayDate() {
             const now = new Date();
@@ -573,6 +1036,43 @@
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+
+        function updateLiveClock() {
+            const now = new Date();
+            const clockEl = document.getElementById('live-clock');
+            if (clockEl) {
+                clockEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            }
+        }
+
+        function initWeatherAndGPS() {
+            const infoEl = document.getElementById('weather-info');
+            if (!infoEl) return;
+            
+            if (!navigator.geolocation) {
+                infoEl.textContent = "Jakarta Studio 28°C";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                try {
+                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                    const data = await res.json();
+                    if (data && data.current_weather) {
+                        const temp = Math.round(data.current_weather.temperature);
+                        infoEl.textContent = `${temp}°C | Studio 3TV`;
+                    } else {
+                        infoEl.textContent = "Jakarta Studio 28°C";
+                    }
+                } catch (e) {
+                    infoEl.textContent = "Jakarta Studio 28°C";
+                }
+            }, () => {
+                infoEl.textContent = "Jakarta Studio 28°C";
+            });
         }
 
         function loadFromLocalStorage() {
@@ -592,67 +1092,187 @@
         function saveCrewsToLocalStorage() { localStorage.setItem('itb_crews', JSON.stringify(crewsData)); }
         function saveSchedulesToLocalStorage() { localStorage.setItem('itb_schedules', JSON.stringify(scheduleData)); }
 
-        function updateLiveClock() {
-            const now = new Date();
-            const clockEl = document.getElementById('live-clock');
-            if (clockEl) {
-                clockEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-            }
-        }
+        function applyRolePermissions() {
+            const badge = document.getElementById('role-badge');
+            const selectEl = document.getElementById('role-select');
+            
+            if (selectEl) selectEl.value = currentUserRole;
 
-        function initWeatherAndGPS() {
-            const infoEl = document.getElementById('weather-info');
-            if (!navigator.geolocation) {
-                infoEl.textContent = "GPS Tak Didukung";
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                try {
-                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                    const data = await res.json();
-                    if (data && data.current_weather) {
-                        const temp = Math.round(data.current_weather.temperature);
-                        infoEl.textContent = `${temp}°C | Lokasi Aktif`;
-                    } else {
-                        infoEl.textContent = "Cuaca Tak Tersedia";
-                    }
-                } catch (e) {
-                    infoEl.textContent = "Cisarua 26°C";
+            if (badge) {
+                if (currentUserRole === 'admin') {
+                    badge.textContent = "👑 Admin";
+                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-glow-amber";
+                } else if (currentUserRole === 'editor') {
+                    badge.textContent = "✏️ Editor";
+                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-glow-green";
+                } else {
+                    badge.textContent = "👁️ Viewer";
+                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-slate-500/20 text-slate-300 border border-slate-500/40";
                 }
-            }, (err) => {
-                infoEl.textContent = "Cisarua, West Java 26°C";
-            });
+            }
+
+            const isViewer = (currentUserRole === 'viewer');
+            const isAdmin = (currentUserRole === 'admin');
+
+            const btnImport = document.getElementById('btn-import-xlsx');
+            const btnTemplate = document.getElementById('btn-dl-template');
+            const btnExportXlsx = document.getElementById('btn-export-xlsx');
+            const btnExportPdf = document.getElementById('btn-export-pdf');
+            const btnAddCrew = document.getElementById('btn-add-crew');
+            const btnClear = document.getElementById('tab-clear-btn');
+            const navJobReport = document.getElementById('nav-jobreport');
+
+            if (btnImport) btnImport.style.display = isViewer ? "none" : "flex";
+            if (btnTemplate) btnTemplate.style.display = isViewer ? "none" : "flex";
+            if (btnExportXlsx) btnExportXlsx.style.display = isViewer ? "none" : "flex";
+            if (btnExportPdf) btnExportPdf.style.display = isViewer ? "none" : "flex";
+            if (btnAddCrew) btnAddCrew.style.display = isViewer ? "none" : "flex";
+            if (btnClear) btnClear.style.display = isAdmin ? "flex" : "none";
+            if (navJobReport) navJobReport.style.display = isAdmin ? "flex" : "none";
+
+            renderDashboard();
+            renderMonthlyGrid();
         }
 
-        function updateCloudPillStatus(status) {
-            const pill = document.getElementById('cloud-status-pill');
-            if (!pill) return;
+        function toggleSidebar(forceState) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (!sidebar) return;
 
-            if (status === 'online') {
-                pill.className = "cursor-pointer text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 shadow-glow-green";
-                pill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sheets Connected`;
-            } else if (status === 'syncing') {
-                pill.className = "cursor-pointer text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 flex items-center gap-1 shadow-glow-cyan";
-                pill.innerHTML = `<i class="fa-solid fa-rotate animate-spin text-[8px]"></i> Syncing...`;
+            const isMobile = window.innerWidth < 768;
+
+            if (isMobile) {
+                let expanded = sidebar.classList.contains('sidebar-expanded');
+                if (typeof forceState === 'boolean') expanded = !forceState;
+
+                if (expanded) {
+                    sidebar.classList.remove('sidebar-expanded');
+                    sidebar.classList.add('sidebar-collapsed');
+                    if (overlay) overlay.classList.add('hidden');
+                } else {
+                    sidebar.classList.remove('sidebar-collapsed');
+                    sidebar.classList.add('sidebar-expanded');
+                    if (overlay) overlay.classList.remove('hidden');
+                }
             } else {
-                pill.className = "cursor-pointer text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1";
-                pill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Local Only`;
+                let collapsed = sidebar.classList.contains('sidebar-collapsed');
+                if (collapsed) {
+                    sidebar.classList.remove('sidebar-collapsed');
+                    sidebar.classList.add('sidebar-expanded');
+                } else {
+                    sidebar.classList.remove('sidebar-expanded');
+                    sidebar.classList.add('sidebar-collapsed');
+                }
+            }
+        }
+
+        function handleRoleChange(newRole) {
+            if (newRole === currentUserRole) return;
+
+            if (newRole === 'viewer') {
+                currentUserRole = 'viewer';
+                applyRolePermissions();
+            } else {
+                targetPendingRole = newRole;
+                const pinInput = document.getElementById('pin-input');
+                const pinErr = document.getElementById('pin-error-msg');
+                const modalTitle = document.getElementById('pin-modal-title');
+                const modalSub = document.getElementById('pin-modal-subtitle');
+                const pinModal = document.getElementById('pin-modal');
+
+                if (pinInput) pinInput.value = "";
+                if (pinErr) pinErr.classList.add('hidden');
+
+                if (newRole === 'editor' && modalTitle && modalSub) {
+                    modalTitle.textContent = "VERIFIKASI PIN EDITOR";
+                    modalSub.textContent = "Masukkan 4 digit PIN Editor (8080)";
+                } else if (newRole === 'admin' && modalTitle && modalSub) {
+                    modalTitle.textContent = "VERIFIKASI PIN ADMIN";
+                    modalSub.textContent = "Masukkan 6 digit PIN Admin";
+                }
+
+                if (pinModal) pinModal.classList.remove('hidden');
+            }
+        }
+
+        function verifyRolePin() {
+            const inputVal = document.getElementById('pin-input')?.value.trim() || "";
+            const pinModal = document.getElementById('pin-modal');
+            const pinErr = document.getElementById('pin-error-msg');
+
+            if (targetPendingRole === 'editor' && inputVal === EDITOR_PIN) {
+                currentUserRole = 'editor';
+                if (pinModal) pinModal.classList.add('hidden');
+                applyRolePermissions();
+            } else if (targetPendingRole === 'admin' && inputVal === ADMIN_PIN) {
+                currentUserRole = 'admin';
+                if (pinModal) pinModal.classList.add('hidden');
+                applyRolePermissions();
+            } else {
+                if (pinErr) pinErr.classList.remove('hidden');
+                const selectEl = document.getElementById('role-select');
+                if (selectEl) selectEl.value = currentUserRole;
+            }
+        }
+
+        function closePinModal() {
+            const pinModal = document.getElementById('pin-modal');
+            if (pinModal) pinModal.classList.add('hidden');
+            const selectEl = document.getElementById('role-select');
+            if (selectEl) selectEl.value = currentUserRole;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('text-slate-950', 'bg-gradient-to-r', 'from-cyan-400', 'to-cyan-500', 'shadow-glow-cyan');
+                el.classList.add('text-slate-400', 'hover:text-cyan-300', 'hover:bg-cyan-950/30');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('text-slate-950', 'bg-gradient-to-r', 'from-cyan-400', 'to-cyan-500', 'shadow-glow-cyan');
+                activeBtn.classList.remove('text-slate-400', 'hover:text-cyan-300', 'hover:bg-cyan-950/30');
+            }
+
+            document.getElementById('tab-dashboard').classList.add('hidden');
+            document.getElementById('tab-monthly').classList.add('hidden');
+            document.getElementById('tab-jobreport').classList.add('hidden');
+            document.getElementById('tab-personalreport').classList.add('hidden');
+
+            if (tabName === 'dashboard') {
+                document.getElementById('tab-dashboard').classList.remove('hidden');
+                document.getElementById('page-subtitle').textContent = "Broadcast Control Matrix";
+                renderDashboard();
+            } else if (tabName === 'monthly') {
+                document.getElementById('tab-monthly').classList.remove('hidden');
+                document.getElementById('page-subtitle').textContent = "Grid Matriks Scheduling";
+                renderMonthlyGrid();
+            } else if (tabName === 'jobreport') {
+                if (currentUserRole !== 'admin') {
+                    alert("Akses Ditolak! Job Report hanya dapat diakses oleh Role Admin.");
+                    switchTab('dashboard');
+                    return;
+                }
+                document.getElementById('tab-jobreport').classList.remove('hidden');
+                document.getElementById('page-subtitle').textContent = "Job Report & Broadcast Operational Audit";
+                renderJobReport();
+            } else if (tabName === 'personalreport') {
+                document.getElementById('tab-personalreport').classList.remove('hidden');
+                document.getElementById('page-subtitle').textContent = "Personal Operational Report & Audit Logs";
+                updatePRViewState();
+            }
+
+            if (window.innerWidth < 768) {
+                toggleSidebar(false);
             }
         }
 
         async function loadDataFromGoogleSheet() {
             const webhookUrl = localStorage.getItem('google_sheet_webhook_url') || DEFAULT_WEBHOOK_URL;
-            if (!webhookUrl) {
-                updateCloudPillStatus('local');
-                return;
-            }
+            if (!webhookUrl) return;
 
             const syncIcon = document.getElementById('sync-icon');
             if (syncIcon) syncIcon.classList.add('animate-spin');
-            updateCloudPillStatus('syncing');
 
             try {
                 const response = await fetch(webhookUrl);
@@ -699,19 +1319,15 @@
                     saveSchedulesToLocalStorage();
                     renderDashboard();
                     renderMonthlyGrid();
-                    updateCloudPillStatus('online');
                 }
             } catch (err) {
-                console.error("Gagal sinkronisasi dari Google Sheets:", err);
-                updateCloudPillStatus('local');
+                console.error("Gagal sinkronisasi Google Sheets:", err);
             } finally {
                 if (syncIcon) syncIcon.classList.remove('animate-spin');
             }
         }
 
-        async function forceSyncFromSheet() {
-            await loadDataFromGoogleSheet();
-        }
+        async function forceSyncFromSheet() { await loadDataFromGoogleSheet(); }
 
         function getFormattedWaLink(phone) {
             if (!phone) return null;
@@ -721,139 +1337,69 @@
             return `https://wa.me/${clean}`;
         }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
+        function openActiveProgramsModal() {
+            const dateInput = document.getElementById('dashboard-date').value;
+            if (!dateInput) return;
 
-            if (!sidebar || !overlay) return;
+            const selectedDate = new Date(dateInput);
+            const day = selectedDate.getDate();
+            const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
+            const monthSchedule = scheduleData[monthKey] || {};
 
-            if (window.innerWidth < 768) {
-                const isHidden = sidebar.classList.contains('-translate-x-full');
-                if (isHidden) {
-                    sidebar.classList.remove('-translate-x-full');
-                    overlay.classList.remove('hidden');
-                } else {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
+            document.getElementById('programs-modal-date').textContent = `Tanggal: ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
+            const container = document.getElementById('programs-list-container');
+            container.innerHTML = "";
+
+            let count = 0;
+            crewsData.forEach(crew => {
+                const programName = monthSchedule[crew.id]?.[day] || "";
+                const isOff = !programName || programName.trim().toUpperCase() === "OFF";
+                const isMnt = programName.trim().toUpperCase() === "MNT" || programName.trim().toUpperCase() === "MAINTENANCE";
+
+                if (!isOff && !isMnt) {
+                    count++;
+                    const waUrl = getFormattedWaLink(crew.phone);
+                    const phoneHtml = waUrl 
+                        ? `<a href="${waUrl}" target="_blank" class="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 ml-2 inline-flex items-center gap-1 transition"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>`
+                        : '';
+
+                    const item = document.createElement('div');
+                    item.className = "p-2.5 rounded-xl bg-slate-950/80 border border-emerald-500/30 flex items-center justify-between gap-2";
+                    item.innerHTML = `
+                        <div>
+                            <p class="text-xs font-cyber font-bold text-emerald-300 tracking-wide">${programName}</p>
+                            <p class="text-[11px] text-slate-300 mt-0.5"><i class="fa-solid fa-user-astronaut text-[10px] mr-1 text-cyan-400"></i> ${crew.fullname} ${phoneHtml}</p>
+                        </div>
+                        <span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green whitespace-nowrap">ON AIR</span>
+                    `;
+                    container.appendChild(item);
                 }
-            } else {
-                sidebar.classList.toggle('-translate-x-full');
-            }
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.remove('text-slate-950', 'bg-gradient-to-r', 'from-cyan-400', 'to-cyan-500', 'shadow-glow-cyan');
-                el.classList.add('text-slate-400', 'hover:text-cyan-300', 'hover:bg-cyan-950/30');
             });
 
-            const activeBtn = document.getElementById(`nav-${tabName}`);
-            if (activeBtn) {
-                activeBtn.classList.add('text-slate-950', 'bg-gradient-to-r', 'from-cyan-400', 'to-cyan-500', 'shadow-glow-cyan');
-                activeBtn.classList.remove('text-slate-400', 'hover:text-cyan-300', 'hover:bg-cyan-950/30');
+            if (count === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">TIDAK ADA PROGRAM SIARAN BERJALAN</p>`;
             }
 
-            document.getElementById('tab-dashboard').classList.add('hidden');
-            document.getElementById('tab-monthly').classList.add('hidden');
-
-            if (tabName === 'dashboard') {
-                document.getElementById('tab-dashboard').classList.remove('hidden');
-                document.getElementById('page-subtitle').textContent = "Real-Time Cloud Control";
-                document.getElementById('dashboard-date').value = getFormattedTodayDate();
-                renderDashboard();
-            } else {
-                goToCurrentMonth();
-                document.getElementById('tab-monthly').classList.remove('hidden');
-                document.getElementById('page-subtitle').textContent = "Grid Matriks Scheduling";
-            }
-
-            if (window.innerWidth < 768) {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('sidebar-overlay');
-                if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
+            const modal = document.getElementById('programs-modal');
+            const card = document.getElementById('programs-modal-card');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                if (card) {
+                    card.classList.remove('modal-flip-hidden');
+                    card.classList.add('modal-flip-visible');
                 }
-            }
+            });
         }
 
-        function handleRoleChange(newRole) {
-            if (newRole === currentUserRole) return;
-
-            if (newRole === 'viewer') {
-                currentUserRole = 'viewer';
-                applyRolePermissions();
-            } else {
-                targetPendingRole = newRole;
-                document.getElementById('pin-input').value = "";
-                document.getElementById('pin-error-msg').classList.add('hidden');
-
-                if (newRole === 'editor') {
-                    document.getElementById('pin-modal-title').textContent = "VERIFIKASI PIN EDITOR";
-                    document.getElementById('pin-modal-subtitle').textContent = "Masukkan 4 digit PIN Editor (8080)";
-                } else if (newRole === 'admin') {
-                    document.getElementById('pin-modal-title').textContent = "VERIFIKASI PIN ADMIN";
-                    document.getElementById('pin-modal-subtitle').textContent = "Masukkan 6 digit PIN Admin";
-                }
-
-                document.getElementById('pin-modal').classList.remove('hidden');
+        function closeActiveProgramsModal() {
+            const modal = document.getElementById('programs-modal');
+            const card = document.getElementById('programs-modal-card');
+            if (card) {
+                card.classList.remove('modal-flip-visible');
+                card.classList.add('modal-flip-hidden');
             }
-        }
-
-        function verifyRolePin() {
-            const inputVal = document.getElementById('pin-input').value.trim();
-
-            if (targetPendingRole === 'editor' && inputVal === EDITOR_PIN) {
-                currentUserRole = 'editor';
-                document.getElementById('pin-modal').classList.add('hidden');
-                applyRolePermissions();
-            } else if (targetPendingRole === 'admin' && inputVal === ADMIN_PIN) {
-                currentUserRole = 'admin';
-                document.getElementById('pin-modal').classList.add('hidden');
-                applyRolePermissions();
-            } else {
-                document.getElementById('pin-error-msg').classList.remove('hidden');
-                document.getElementById('role-select').value = currentUserRole;
-            }
-        }
-
-        function closePinModal() {
-            document.getElementById('pin-modal').classList.add('hidden');
-            document.getElementById('role-select').value = currentUserRole;
-        }
-
-        function applyRolePermissions() {
-            const badge = document.getElementById('role-badge');
-            const selectEl = document.getElementById('role-select');
-            
-            if (selectEl) selectEl.value = currentUserRole;
-
-            if (badge) {
-                if (currentUserRole === 'admin') {
-                    badge.textContent = "👑 Admin";
-                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-glow-amber";
-                } else if (currentUserRole === 'editor') {
-                    badge.textContent = "✏️ Editor";
-                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-glow-green";
-                } else {
-                    badge.textContent = "👁️ Viewer";
-                    badge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-slate-500/20 text-slate-300 border border-slate-500/40";
-                }
-            }
-
-            const isViewer = (currentUserRole === 'viewer');
-            const isAdmin = (currentUserRole === 'admin');
-
-            document.getElementById('btn-import-xlsx').style.display = isViewer ? "none" : "flex";
-            document.getElementById('btn-dl-template').style.display = isViewer ? "none" : "flex";
-            document.getElementById('btn-export-xlsx').style.display = isViewer ? "none" : "flex";
-            document.getElementById('btn-export-pdf').style.display = isViewer ? "none" : "flex";
-            document.getElementById('btn-add-crew').style.display = isViewer ? "none" : "flex";
-            
-            document.getElementById('tab-clear-btn').style.display = isAdmin ? "flex" : "none";
-
-            renderDashboard();
-            renderMonthlyGrid();
+            setTimeout(() => { if (modal) modal.classList.add('hidden'); }, 300);
         }
 
         function openOffDutyModal() {
@@ -902,14 +1448,28 @@
                 container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">ALL CREW ON DUTY (0 OFF)</p>`;
             }
 
-            document.getElementById('offduty-modal').classList.remove('hidden');
+            const modal = document.getElementById('offduty-modal');
+            const card = document.getElementById('offduty-modal-card');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                if (card) {
+                    card.classList.remove('modal-flip-hidden');
+                    card.classList.add('modal-flip-visible');
+                }
+            });
         }
 
         function closeOffDutyModal() {
-            document.getElementById('offduty-modal').classList.add('hidden');
+            const modal = document.getElementById('offduty-modal');
+            const card = document.getElementById('offduty-modal-card');
+            if (card) {
+                card.classList.remove('modal-flip-visible');
+                card.classList.add('modal-flip-hidden');
+            }
+            setTimeout(() => { if (modal) modal.classList.add('hidden'); }, 300);
         }
 
-        function openActiveProgramsModal() {
+        function openMntModal() {
             const dateInput = document.getElementById('dashboard-date').value;
             if (!dateInput) return;
 
@@ -918,46 +1478,62 @@
             const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
             const monthSchedule = scheduleData[monthKey] || {};
 
-            document.getElementById('programs-modal-date').textContent = `Tanggal: ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+            document.getElementById('mnt-modal-date').textContent = `Tanggal: ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
 
-            const container = document.getElementById('programs-list-container');
+            const container = document.getElementById('mnt-list-container');
             container.innerHTML = "";
 
             let count = 0;
             crewsData.forEach(crew => {
                 const programName = monthSchedule[crew.id]?.[day] || "";
-                const isOff = !programName || programName.trim().toUpperCase() === "OFF";
+                const isMnt = programName.trim().toUpperCase() === "MNT" || programName.trim().toUpperCase() === "MAINTENANCE";
 
-                if (!isOff) {
+                if (isMnt) {
                     count++;
                     const waUrl = getFormattedWaLink(crew.phone);
                     const phoneHtml = waUrl 
-                        ? `<a href="${waUrl}" target="_blank" class="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 ml-2 inline-flex items-center gap-1 transition"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>`
+                        ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>`
                         : '';
 
                     const item = document.createElement('div');
-                    item.className = "p-2.5 rounded-xl bg-slate-950/80 border border-fuchsia-500/30 flex items-center justify-between gap-2";
+                    item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-blue-500/30";
                     item.innerHTML = `
-                        <div>
-                            <p class="text-xs font-cyber font-bold text-fuchsia-400 tracking-wide">${programName}</p>
-                            <p class="text-[11px] text-slate-300 mt-0.5"><i class="fa-solid fa-user-astronaut text-[10px] mr-1 text-cyan-400"></i> ${crew.fullname} ${phoneHtml}</p>
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-400 shadow-glow-cyan"></div>
+                            <div>
+                                <p class="text-xs font-semibold text-slate-200">${crew.fullname}</p>
+                                ${phoneHtml}
+                            </div>
                         </div>
-                        <span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/30 shadow-glow-pink whitespace-nowrap">ACTIVE</span>
+                        <span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">MNT</span>
                     `;
                     container.appendChild(item);
                 }
             });
 
             if (count === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">TIDAK ADA PROGRAM SIARAN BERJALAN</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">TIDAK ADA CREW MAINTENANCE (0 MNT)</p>`;
             }
 
-            document.getElementById('programs-modal').classList.remove('hidden');
+            const modal = document.getElementById('mnt-modal');
+            const card = document.getElementById('mnt-modal-card');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                if (card) {
+                    card.classList.remove('modal-flip-hidden');
+                    card.classList.add('modal-flip-visible');
+                }
+            });
         }
 
-        function closeActiveProgramsModal() {
-            const modal = document.getElementById('programs-modal');
-            if (modal) modal.classList.add('hidden');
+        function closeMntModal() {
+            const modal = document.getElementById('mnt-modal');
+            const card = document.getElementById('mnt-modal-card');
+            if (card) {
+                card.classList.remove('modal-flip-visible');
+                card.classList.add('modal-flip-hidden');
+            }
+            setTimeout(() => { if (modal) modal.classList.add('hidden'); }, 300);
         }
 
         function renderDashboard() {
@@ -972,20 +1548,51 @@
             cardsContainer.innerHTML = "";
             let onDutyCount = 0;
             let offDutyCount = 0;
+            let mntCount = 0;
+            let programCount = 0;
 
             crewsData.forEach(crew => {
                 if (searchQuery && !crew.fullname.toLowerCase().includes(searchQuery.toLowerCase())) return;
                 const programName = monthSchedule[crew.id]?.[day] || "";
                 const isOff = !programName || programName.trim().toUpperCase() === "OFF";
+                const isMnt = programName.trim().toUpperCase() === "MNT" || programName.trim().toUpperCase() === "MAINTENANCE";
 
                 if (isOff) {
                     offDutyCount++;
-                } else {
+                } else if (isMnt) {
                     onDutyCount++;
+                    mntCount++;
                     const waUrl = getFormattedWaLink(crew.phone);
                     const phoneHtml = waUrl 
                         ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-xs"></i> ${crew.phone}</a>`
                         : `<span class="text-[10px] text-slate-500 font-mono">3TV IT Broadcast</span>`;
+
+                    const card = document.createElement('div');
+                    card.className = "bg-cybercard border border-blue-500/40 rounded-2xl p-3.5 shadow-xl hover:border-blue-400 transition flex flex-col justify-between space-y-2.5 relative overflow-hidden group";
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-start justify-between gap-2">
+                                <h4 class="font-bold text-white text-xs sm:text-sm tracking-wide">${crew.fullname}</h4>
+                                <span class="px-2 py-0.5 text-[8px] sm:text-[9px] font-cyber font-bold rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">MNT DUTY</span>
+                            </div>
+                            <div class="mt-2 p-2 rounded-xl bg-slate-950/80 border border-blue-500/20">
+                                <p class="text-[8px] text-blue-400 font-cyber font-semibold tracking-wider uppercase">MAINTENANCE / MNT</p>
+                                <p class="text-xs font-semibold text-white mt-0.5">${programName}</p>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                            ${phoneHtml}
+                            ${currentUserRole !== 'viewer' ? `<button onclick="openProgramModal('${crew.id}', ${day})" class="text-cyan-400 hover:text-cyan-300 font-medium p-1 ml-auto"><i class="fa-solid fa-pen-to-square"></i></button>` : ''}
+                        </div>
+                    `;
+                    cardsContainer.appendChild(card);
+                } else {
+                    onDutyCount++;
+                    programCount++;
+                    const waUrl = getFormattedWaLink(crew.phone);
+                    const phoneHtml = waUrl 
+                        ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-xs"></i> ${crew.phone}</a>`
+                        : `<span class="text-[10px] text-slate-500 font-mono">3TV Broadcast</span>`;
 
                     const card = document.createElement('div');
                     card.className = "bg-cybercard border border-cyan-500/30 rounded-2xl p-3.5 shadow-xl hover:border-cyan-400 transition flex flex-col justify-between space-y-2.5 relative overflow-hidden group";
@@ -1011,7 +1618,8 @@
 
             document.getElementById('metric-onduty').textContent = onDutyCount;
             document.getElementById('metric-offduty').textContent = offDutyCount;
-            document.getElementById('metric-programs').textContent = onDutyCount;
+            document.getElementById('metric-mnt').textContent = mntCount;
+            document.getElementById('metric-programs').textContent = programCount;
             document.getElementById('metric-totalcrew').textContent = crewsData.length;
             document.getElementById('no-crew-duty-msg').classList.toggle('hidden', onDutyCount > 0);
         }
@@ -1019,18 +1627,24 @@
         function renderMonthlyGrid() {
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const dayNamesShort = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+            
             document.getElementById('current-month-display').textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
             const now = new Date();
             const isCurrentRealMonth = (now.getMonth() === currentMonth && now.getFullYear() === currentYear);
             const realTodayDay = now.getDate();
 
-            let headerHTML = `<th class="p-2 w-10 text-center border-b border-r border-cyan-500/20 sticky-col-1 bg-slate-950">No</th><th class="p-2 w-36 sm:w-48 text-left border-b border-r border-cyan-500/20 sticky-col-2 bg-slate-950">NAMA CREW</th>`;
+            let headerHTML = `<th class="p-2.5 w-10 text-center border-b border-r border-cyan-500/20 sticky-col-1 bg-slate-950">No</th><th class="p-2.5 w-40 sm:w-52 text-left border-b border-r border-cyan-500/20 sticky-col-2 bg-slate-950">NAMA CREW</th>`;
             for (let d = 1; d <= daysInMonth; d++) {
-                const isWeekend = [0, 6].includes(new Date(currentYear, currentMonth, d).getDay());
+                const dateObj = new Date(currentYear, currentMonth, d);
+                const dayOfWeek = dateObj.getDay();
+                const dayNameStr = dayNamesShort[dayOfWeek];
+                const isWeekend = [0, 6].includes(dayOfWeek);
                 const isTodayCell = isCurrentRealMonth && (d === realTodayDay);
                 
-                headerHTML += `<th class="p-1.5 min-w-[70px] sm:min-w-[85px] text-center border-b border-r border-cyan-500/20 ${isTodayCell ? 'bg-cyan-500/30 text-cyan-300 shadow-glow-cyan font-black ring-1 ring-cyan-400' : (isWeekend ? 'bg-amber-500/10 text-amber-400' : '')}">
+                headerHTML += `<th class="p-2 min-w-[90px] sm:min-w-[105px] text-center border-b border-r border-cyan-500/20 ${isTodayCell ? 'bg-cyan-500/30 text-cyan-300 shadow-glow-cyan font-black ring-1 ring-cyan-400' : (isWeekend ? 'bg-amber-500/10 text-amber-400' : '')}">
+                    <span class="block text-[10px] text-fuchsia-400 font-mono font-semibold uppercase">${dayNameStr}</span>
                     <span class="block text-xs font-bold font-mono">${d} ${isTodayCell ? '📌' : ''}</span>
                 </th>`;
             }
@@ -1042,18 +1656,470 @@
 
             crewsData.forEach((crew, idx) => {
                 if (searchQuery && !crew.fullname.toLowerCase().includes(searchQuery.toLowerCase())) return;
-                bodyHTML += `<tr class="hover:bg-cyan-950/20 transition"><td class="p-2 text-center border-b border-r border-slate-800 text-slate-400 sticky-col-1 bg-cybercard font-mono text-[11px]">${idx + 1}</td><td class="p-2 border-b border-r border-slate-800 sticky-col-2 bg-cybercard font-bold text-white text-[11px] truncate max-w-[120px]">${crew.fullname}</td>`;
+                bodyHTML += `<tr class="hover:bg-cyan-950/20 transition"><td class="p-2.5 text-center border-b border-r border-slate-800 text-slate-400 sticky-col-1 bg-cybercard font-mono text-[11px]">${idx + 1}</td><td class="p-2.5 border-b border-r border-slate-800 sticky-col-2 bg-cybercard font-bold text-white text-[11px]">${crew.fullname}</td>`;
                 for (let d = 1; d <= daysInMonth; d++) {
                     const progName = monthSchedule[crew.id]?.[d] || "";
                     const isOff = progName.toUpperCase() === "OFF";
+                    const isMnt = progName.toUpperCase() === "MNT" || progName.toUpperCase() === "MAINTENANCE";
                     const isTodayCell = isCurrentRealMonth && (d === realTodayDay);
 
-                    const cellContent = progName ? (isOff ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-900 text-slate-500 border border-slate-800">OFF</span>` : `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 block truncate max-w-[70px]">${progName}</span>`) : `<span class="text-slate-600 text-[9px]">-</span>`;
-                    bodyHTML += `<td ${currentUserRole !== 'viewer' ? `onclick="openProgramModal('${crew.id}', ${d})"` : ''} class="p-1 border-b border-r border-slate-800 text-center ${isTodayCell ? 'bg-cyan-500/5' : ''} ${currentUserRole !== 'viewer' ? 'cursor-pointer hover:bg-cyan-900/30' : ''}">${cellContent}</td>`;
+                    let cellContent = `<span class="text-slate-600 text-[10px]">-</span>`;
+                    if (progName) {
+                        if (isOff) {
+                            cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 shadow-glow-red block w-full text-center">OFF</span>`;
+                        } else if (isMnt) {
+                            cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-glow-cyan block w-full text-center">${progName}</span>`;
+                        } else {
+                            cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-glow-green block w-full text-center">${progName}</span>`;
+                        }
+                    }
+
+                    bodyHTML += `<td ${currentUserRole !== 'viewer' ? `onclick="openProgramModal('${crew.id}', ${d})"` : ''} class="p-1.5 border-b border-r border-slate-800 text-center schedule-cell ${isTodayCell ? 'bg-cyan-500/5' : ''} ${currentUserRole !== 'viewer' ? 'cursor-pointer hover:bg-cyan-900/30' : ''}">${cellContent}</td>`;
                 }
                 bodyHTML += `</tr>`;
             });
             document.getElementById('matrix-tbody').innerHTML = bodyHTML;
+        }
+
+        function renderJobReport() {
+            const periodFilter = document.getElementById('report-period-filter')?.value || 'month';
+            const currentKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            
+            let logEntries = [];
+            let totalTasks = 0;
+            let crewTaskMap = {};
+            let programTaskMap = {};
+            let onAirDutyCount = 0;
+
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            if (periodFilter === 'month') {
+                const monthSchedule = scheduleData[currentKey] || {};
+                crewsData.forEach(crew => {
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const prog = monthSchedule[crew.id]?.[d];
+                        if (prog && prog.trim().toUpperCase() !== 'OFF') {
+                            totalTasks++;
+                            crewTaskMap[crew.fullname] = (crewTaskMap[crew.fullname] || 0) + 1;
+                            programTaskMap[prog] = (programTaskMap[prog] || 0) + 1;
+                            if (prog.toUpperCase() !== 'MNT' && prog.toUpperCase() !== 'MAINTENANCE') {
+                                onAirDutyCount++;
+                            }
+                            logEntries.push({
+                                date: `${d}/${currentMonth + 1}/${currentYear}`,
+                                crewName: crew.fullname,
+                                program: prog,
+                                category: (prog.toUpperCase() === 'MNT' || prog.toUpperCase() === 'MAINTENANCE') ? 'Maintenance' : 'Program Siaran'
+                            });
+                        }
+                    }
+                });
+            } else {
+                Object.keys(scheduleData).forEach(mKey => {
+                    const monthSchedule = scheduleData[mKey];
+                    crewsData.forEach(crew => {
+                        const crewAssignments = monthSchedule[crew.id] || {};
+                        Object.keys(crewAssignments).forEach(dayNum => {
+                            const prog = crewAssignments[dayNum];
+                            if (prog && prog.trim().toUpperCase() !== 'OFF') {
+                                totalTasks++;
+                                crewTaskMap[crew.fullname] = (crewTaskMap[crew.fullname] || 0) + 1;
+                                programTaskMap[prog] = (programTaskMap[prog] || 0) + 1;
+                                if (prog.toUpperCase() !== 'MNT' && prog.toUpperCase() !== 'MAINTENANCE') {
+                                    onAirDutyCount++;
+                                }
+                                logEntries.push({
+                                    date: `${dayNum} (${mKey})`,
+                                    crewName: crew.fullname,
+                                    program: prog,
+                                    category: (prog.toUpperCase() === 'MNT' || prog.toUpperCase() === 'MAINTENANCE') ? 'Maintenance' : 'Program Siaran'
+                                });
+                            }
+                        });
+                    });
+                });
+            }
+
+            document.getElementById('jr-total-tasks').textContent = totalTasks;
+
+            let topCrew = "-";
+            let maxCrewTasks = 0;
+            Object.keys(crewTaskMap).forEach(cName => {
+                if (crewTaskMap[cName] > maxCrewTasks) {
+                    maxCrewTasks = crewTaskMap[cName];
+                    topCrew = cName;
+                }
+            });
+            document.getElementById('jr-top-crew').textContent = topCrew;
+            document.getElementById('jr-top-crew-count').textContent = `${maxCrewTasks} Sesi Tugas`;
+
+            const dutyRatio = totalTasks > 0 ? Math.round((onAirDutyCount / totalTasks) * 100) : 0;
+            document.getElementById('jr-duty-ratio').textContent = `${dutyRatio}%`;
+
+            let topProg = "-";
+            let maxProgCount = 0;
+            Object.keys(programTaskMap).forEach(pName => {
+                if (programTaskMap[pName] > maxProgCount) {
+                    maxProgCount = programTaskMap[pName];
+                    topProg = pName;
+                }
+            });
+            document.getElementById('jr-top-program').textContent = topProg;
+            document.getElementById('jr-top-program-count').textContent = `${maxProgCount} Penayangan`;
+
+            const rankingContainer = document.getElementById('jr-crew-ranking-list');
+            rankingContainer.innerHTML = "";
+
+            const sortedCrews = Object.keys(crewTaskMap).sort((a, b) => crewTaskMap[b] - crewTaskMap[a]);
+
+            if (sortedCrews.length === 0) {
+                rankingContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">Belum ada data tugas terlaksana.</p>`;
+            } else {
+                sortedCrews.forEach((cName, rank) => {
+                    const taskCnt = crewTaskMap[cName];
+                    const percentage = Math.min(100, Math.round((taskCnt / (totalTasks || 1)) * 100));
+
+                    const rankCard = document.createElement('div');
+                    rankCard.className = "bg-slate-950/80 border border-slate-800 p-2.5 rounded-xl space-y-1.5";
+                    rankCard.innerHTML = `
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-slate-200 flex items-center gap-1.5 leading-tight break-words max-w-[180px]">
+                                <span class="w-4 h-4 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-mono flex items-center justify-center shrink-0">${rank + 1}</span>
+                                ${cName}
+                            </span>
+                            <span class="font-mono text-amber-400 font-bold shrink-0 ml-1">${taskCnt} Tugas</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                    `;
+                    rankingContainer.appendChild(rankCard);
+                });
+            }
+
+            const auditTbody = document.getElementById('jr-audit-table-body');
+            document.getElementById('jr-log-count-badge').textContent = `${logEntries.length} Entri`;
+            auditTbody.innerHTML = "";
+
+            if (logEntries.length === 0) {
+                auditTbody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-slate-500 font-mono">Tidak ada riwayat log penugasan.</td></tr>`;
+            } else {
+                logEntries.slice(0, 50).forEach(log => {
+                    const catBadge = log.category === 'Maintenance' 
+                        ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
+                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-800/40 transition";
+                    row.innerHTML = `
+                        <td class="p-2.5 font-mono text-slate-400">${log.date}</td>
+                        <td class="p-2.5 font-bold text-white">${log.crewName}</td>
+                        <td class="p-2.5 text-cyan-300 font-medium">${log.program}</td>
+                        <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded text-[9px] font-cyber font-bold border ${catBadge}">${log.category}</span></td>
+                    `;
+                    auditTbody.appendChild(row);
+                });
+            }
+        }
+
+        function exportJobReportPDF() {
+            if (!window.jspdf || !window.jspdf.jsPDF) return alert("Pustaka PDF belum siap.");
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(255, 184, 0);
+            doc.text("3TV BROADCAST - EXECUTIVE JOB REPORT & AUDIT", 14, 15);
+
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(140, 140, 140);
+            doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 21);
+
+            const totalTasks = document.getElementById('jr-total-tasks').textContent;
+            const topCrew = document.getElementById('jr-top-crew').textContent;
+            const dutyRatio = document.getElementById('jr-duty-ratio').textContent;
+            const topProg = document.getElementById('jr-top-program').textContent;
+
+            doc.autoTable({
+                head: [["Ringkasan Eksekutif", "Nilai Meter"]],
+                body: [
+                    ["Total Sesi Tugas Terlaksana", totalTasks],
+                    ["Crew Teraktif (Duty Rank #1)", topCrew],
+                    ["Rasio Penayangan On-Air", dutyRatio],
+                    ["Program Paling Sering Tayang", topProg]
+                ],
+                startY: 26,
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 2.5 },
+                headStyles: { fillColor: [13, 19, 34], textColor: [255, 184, 0] }
+            });
+
+            doc.save(`Job_Report_3TV_${getFormattedTodayDate()}.pdf`);
+        }
+
+        function populatePRProgramDropdown() {
+            const selectEl = document.getElementById('pr-program-select');
+            if (!selectEl) return;
+
+            selectEl.innerHTML = `<option value="">-- Pilih dari Jadwal Siaran Hari Ini --</option>`;
+
+            const now = new Date();
+            const todayDay = now.getDate();
+            const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const todaySchedule = scheduleData[monthKey] || {};
+
+            const programSet = new Set();
+
+            Object.values(todaySchedule).forEach(crewDayMap => {
+                const prog = crewDayMap[todayDay];
+                if (prog && prog.trim().toUpperCase() !== 'OFF') {
+                    programSet.add(prog.trim());
+                }
+            });
+
+            if (programSet.size > 0) {
+                programSet.forEach(pName => {
+                    const opt = document.createElement('option');
+                    opt.value = pName;
+                    opt.textContent = `📺 ${pName}`;
+                    selectEl.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.disabled = true;
+                opt.textContent = "(Tidak ada program siaran terjadwal hari ini)";
+                selectEl.appendChild(opt);
+            }
+        }
+
+        function applyPRProgramSelection(val) {
+            if (val) {
+                document.getElementById('pr-program-name').value = val;
+            }
+        }
+
+        function updatePRViewState() {
+            const authCard = document.getElementById('pr-auth-card');
+            const mainContainer = document.getElementById('pr-main-container');
+
+            if (!window.loggedPRUser) {
+                authCard.classList.remove('hidden');
+                mainContainer.classList.add('hidden');
+                document.getElementById('pr-login-user').value = "";
+                document.getElementById('pr-login-pass').value = "";
+            } else {
+                authCard.classList.add('hidden');
+                mainContainer.classList.remove('hidden');
+
+                const isRootAdmin = (window.loggedPRUser.isRoot || window.loggedPRUser.user.toLowerCase() === 'root');
+                const isAdminRole = (currentUserRole === 'admin') || (window.loggedPRUser.user.toLowerCase() === 'admin');
+
+                const roleBadge = document.getElementById('pr-logged-role-badge');
+                if (isRootAdmin) {
+                    roleBadge.textContent = "Root Admin";
+                    roleBadge.className = "px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase shadow-glow-amber";
+                } else if (isAdminRole) {
+                    roleBadge.textContent = "Administrator";
+                    roleBadge.className = "px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase shadow-glow-cyan";
+                } else {
+                    roleBadge.textContent = "Crew Account";
+                    roleBadge.className = "px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-slate-800 text-slate-300 border border-slate-700 uppercase";
+                }
+
+                document.getElementById('pr-logged-user-name').textContent = window.loggedPRUser.name;
+                document.getElementById('pr-logged-user-phone').textContent = `HP: ${window.loggedPRUser.phone}`;
+
+                const manageBtn = document.getElementById('manage-accounts-btn');
+                const formToggleBtn = document.getElementById('pr-form-toggle-btn');
+                const formEl = document.getElementById('personal-report-form');
+
+                if (manageBtn) {
+                    if (isRootAdmin) manageBtn.classList.remove('hidden');
+                    else manageBtn.classList.add('hidden');
+                }
+
+                if (formToggleBtn && formEl) {
+                    if (isRootAdmin || isAdminRole) {
+                        formToggleBtn.classList.remove('hidden');
+                        isPRFormVisible = false;
+                        formEl.classList.add('hidden');
+                        const toggleIcon = document.getElementById('pr-form-toggle-icon');
+                        const toggleText = document.getElementById('pr-form-toggle-text');
+                        if (toggleIcon) toggleIcon.className = "fa-solid fa-eye text-[10px]";
+                        if (toggleText) toggleText.textContent = "Tampilkan Form";
+                    } else {
+                        formToggleBtn.classList.add('hidden');
+                        isPRFormVisible = true;
+                        formEl.classList.remove('hidden');
+                    }
+                }
+
+                populatePRProgramDropdown();
+                resetPersonalReportForm();
+                renderPRHistoryList();
+            }
+        }
+
+        let isPRFormVisible = true;
+        function togglePRFormVisibility() {
+            const formEl = document.getElementById('personal-report-form');
+            const toggleIcon = document.getElementById('pr-form-toggle-icon');
+            const toggleText = document.getElementById('pr-form-toggle-text');
+            if (!formEl) return;
+
+            isPRFormVisible = !isPRFormVisible;
+            if (isPRFormVisible) {
+                formEl.classList.remove('hidden');
+                if (toggleIcon) toggleIcon.className = "fa-solid fa-eye-slash text-[10px]";
+                if (toggleText) toggleText.textContent = "Sembunyikan Form";
+            } else {
+                formEl.classList.add('hidden');
+                if (toggleIcon) toggleIcon.className = "fa-solid fa-eye text-[10px]";
+                if (toggleText) toggleText.textContent = "Tampilkan Form";
+            }
+        }
+
+        function handlePRLogin(e) {
+            e.preventDefault();
+            const userVal = document.getElementById('pr-login-user').value.trim();
+            const passVal = document.getElementById('pr-login-pass').value.trim();
+
+            const foundUser = window.registeredUsers.find(u => u.user.toLowerCase() === userVal.toLowerCase() && String(u.pass) === passVal);
+
+            if (foundUser) {
+                window.loggedPRUser = foundUser;
+                localStorage.setItem('3tv_pr_logged_user', JSON.stringify(window.loggedPRUser));
+                document.getElementById('pr-login-user').value = "";
+                document.getElementById('pr-login-pass').value = "";
+                updatePRViewState();
+            } else {
+                alert("Kredensial Login Salah! Silakan periksa Username dan Password.");
+            }
+        }
+
+        function logoutPRUser() {
+            window.loggedPRUser = null;
+            localStorage.removeItem('3tv_pr_logged_user');
+            updatePRViewState();
+        }
+
+        function toggleManageAccountsModal(show = true) {
+            const modal = document.getElementById('manage-accounts-modal');
+            if (!modal) return;
+
+            if (show) {
+                if (!window.loggedPRUser || (!window.loggedPRUser.isRoot && window.loggedPRUser.user.toLowerCase() !== 'root')) {
+                    alert("Akses Ditolak! Hanya Root Admin yang dapat mengelola akun.");
+                    return;
+                }
+                renderManageAccountsList();
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function renderManageAccountsList() {
+            const listContainer = document.getElementById('manage-accounts-list');
+            if (!listContainer) return;
+            listContainer.innerHTML = "";
+
+            window.registeredUsers.forEach(acc => {
+                const isRoot = acc.isRoot || acc.user.toLowerCase() === 'root';
+                const card = document.createElement('div');
+                card.className = "p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-2";
+                card.innerHTML = `
+                    <div>
+                        <p class="text-xs font-bold text-slate-200">${acc.name} ${isRoot ? '<span class="text-[9px] text-amber-400 font-mono">(Root)</span>' : ''}</p>
+                        <p class="text-[10px] text-slate-400 font-mono">User: ${acc.user} | HP: ${acc.phone} | Pass: <span class="text-cyan-400">${acc.pass}</span></p>
+                    </div>
+                    ${!isRoot ? `
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="rootResetUserPassword('${acc.user}')" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-semibold">
+                                Reset Pass
+                            </button>
+                            <button onclick="rootDeleteUser('${acc.user}')" class="px-2 py-1 rounded bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-[10px] font-semibold">
+                                Hapus
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function rootResetUserPassword(username) {
+            const newPass = prompt(`Masukkan password baru untuk user ${username}:`);
+            if (newPass && newPass.trim().length >= 4) {
+                const idx = window.registeredUsers.findIndex(u => u.user.toLowerCase() === username.toLowerCase());
+                if (idx >= 0) {
+                    window.registeredUsers[idx].pass = newPass.trim();
+                    localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
+                    renderManageAccountsList();
+                    alert(`Password user ${username} berhasil diperbarui!`);
+                }
+            }
+        }
+
+        function rootDeleteUser(username) {
+            if (confirm(`Apakah Anda yakin ingin menghapus akun ${username}?`)) {
+                window.registeredUsers = window.registeredUsers.filter(u => u.user.toLowerCase() !== username.toLowerCase());
+                localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
+                renderManageAccountsList();
+            }
+        }
+
+        function addEquipmentItemRow(name = '', qty = '1', cond = 'OK') {
+            const container = document.getElementById('equipment-items-container');
+            const row = document.createElement('div');
+            row.className = "flex items-center gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-800";
+            row.innerHTML = `
+                <input type="text" placeholder="Nama Alat (e.g. CAM 1)" value="${name}" oninput="this.value = this.value.toUpperCase()" onkeydown="handleEquipmentEnter(event)" class="eq-name-input uppercase flex-1 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-amber-400">
+                <input type="number" min="1" value="${qty}" onkeydown="handleEquipmentEnter(event)" class="eq-qty-input w-16 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2 py-1.5 text-center outline-none">
+                <select class="eq-cond-select bg-slate-950 border border-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none">
+                    <option value="OK" ${cond === 'OK' ? 'selected' : ''}>OK (Normal)</option>
+                    <option value="Trouble" ${cond === 'Trouble' ? 'selected' : ''}>Trouble</option>
+                    <option value="Ganti" ${cond === 'Ganti' ? 'selected' : ''}>Perlu Ganti</option>
+                </select>
+                <button type="button" onclick="this.parentElement.remove()" class="text-pink-400 hover:text-pink-300 p-1.5"><i class="fa-solid fa-trash-can text-xs"></i></button>
+            `;
+            container.appendChild(row);
+
+            const newNameInput = row.querySelector('.eq-name-input');
+            if (newNameInput && name === '') {
+                setTimeout(() => newNameInput.focus(), 50);
+            }
+        }
+
+        function handleEquipmentEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addEquipmentItemRow();
+            }
+        }
+
+        function addCrewTagRow(name = '', isSelf = false) {
+            const container = document.getElementById('crew-tags-container');
+            const row = document.createElement('div');
+            row.className = "flex items-center gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-800";
+
+            let optionsHtml = `<option value="">-- Pilih dari Master Crew --</option>`;
+            crewsData.forEach(c => {
+                optionsHtml += `<option value="${c.fullname}" ${c.fullname === name ? 'selected' : ''}>${c.fullname}</option>`;
+            });
+
+            row.innerHTML = `
+                <select onchange="this.nextElementSibling.value=this.value" class="bg-slate-950 border border-slate-700 text-cyan-300 text-xs rounded-lg px-2 py-1.5 outline-none flex-1">
+                    ${optionsHtml}
+                </select>
+                <input type="text" placeholder="Nama Crew Bertugas" value="${name}" class="crew-manual-input flex-1 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-cyan-400">
+                ${!isSelf ? `<button type="button" onclick="this.parentElement.remove()" class="text-pink-400 hover:text-pink-300 p-1.5"><i class="fa-solid fa-trash-can text-xs"></i></button>` : '<span class="text-[9px] text-amber-400 font-mono px-1">(You)</span>'}
+            `;
+            container.appendChild(row);
         }
 
         function changeMonth(delta) {
@@ -1067,6 +2133,12 @@
             const now = new Date();
             currentMonth = now.getMonth();
             currentYear = now.getFullYear();
+            renderMonthlyGrid();
+        }
+
+        function handleGlobalSearch(val) {
+            searchQuery = val.trim();
+            renderDashboard();
             renderMonthlyGrid();
         }
 
@@ -1091,7 +2163,7 @@
             selectedCell = null;
         }
 
-        async function saveProgramAssignment(clearCell = false) {
+        function saveProgramAssignment(clearCell = false) {
             if (!selectedCell) return;
             const { crewId, dayIndex, month, year } = selectedCell;
             const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
@@ -1122,8 +2194,6 @@
 
             const webhookUrl = localStorage.getItem('google_sheet_webhook_url') || DEFAULT_WEBHOOK_URL;
             if (webhookUrl) {
-                updateCloudPillStatus('syncing');
-                
                 const payload = JSON.stringify({
                     crewName: crew.fullname,
                     day: dayIndex,
@@ -1135,11 +2205,8 @@
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: payload
-                }).then(() => {
-                    setTimeout(() => updateCloudPillStatus('online'), 600);
                 }).catch(err => {
-                    console.error("Gagal update cloud:", err);
-                    updateCloudPillStatus('online');
+                    console.error("Gagal update cloud sheet:", err);
                 });
             }
 
@@ -1148,22 +2215,15 @@
                 const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                 const dateFormatted = `${dayIndex} ${monthNames[month]} ${year}`;
                 const programText = newProgVal ? newProgVal : "TIDAK ADA TUGAS / OFF";
-                triggerWhatsAppNotification(crew.fullname, crew.phone, programText, dateFormatted);
+                const message = `Halo *${crew.fullname}*,\n\nPembaruan jadwal tugas 3TV Broadcast:\n🗓 *Tanggal:* ${dateFormatted}\n📺 *Program:* ${programText}\n\nTerima kasih!\n- *3TV Media Operations*`;
+                let cleanPhone = String(crew.phone).replace(/[^0-9]/g, '');
+                if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
             }
 
             closeProgramModal();
             renderMonthlyGrid();
             renderDashboard();
-        }
-
-        async function triggerWhatsAppNotification(crewName, crewPhone, programName, dateString) {
-            const message = `Halo *${crewName}*,\n\nPembaruan jadwal tugas Anda:\n🗓 *Tanggal:* ${dateString}\n📺 *Program:* ${programName}\n\nTerima kasih!\n- *IT Broadcast 3TV*`;
-
-            let cleanPhone = String(crewPhone).replace(/[^0-9]/g, '');
-            if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
-
-            const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-            window.open(waLink, '_blank');
         }
 
         function openAddCrewModal() {
@@ -1188,26 +2248,21 @@
             renderDashboard();
         }
 
-        function openSheetConfigModal() {
-            const currentUrl = localStorage.getItem('google_sheet_webhook_url') || DEFAULT_WEBHOOK_URL;
-            document.getElementById('sheet-webhook-input').value = currentUrl;
-            document.getElementById('sheet-config-modal').classList.remove('hidden');
-        }
+        function openClearDataModal() { document.getElementById('clear-modal').classList.remove('hidden'); }
+        function closeClearDataModal() { document.getElementById('clear-modal').classList.add('hidden'); }
 
-        function closeSheetConfigModal() {
-            document.getElementById('sheet-config-modal').classList.add('hidden');
-        }
-
-        async function saveSheetConfig() {
-            const val = document.getElementById('sheet-webhook-input').value.trim();
-            if (val) {
-                localStorage.setItem('google_sheet_webhook_url', val);
-                closeSheetConfigModal();
-                await loadDataFromGoogleSheet();
-                alert("URL Google Sheets Webhook terhubung!");
+        function executeClearData(type) {
+            if (type === 'active_month') {
+                delete scheduleData[`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`];
             } else {
-                alert("Masukkan URL Webhook!");
+                crewsData = [];
+                scheduleData = {};
+                localStorage.clear();
             }
+            saveSchedulesToLocalStorage();
+            closeClearDataModal();
+            renderMonthlyGrid();
+            renderDashboard();
         }
 
         function importXLSX(event) {
@@ -1274,132 +2329,38 @@
             XLSX.writeFile(wb, `Template_Jadwal_3TV_${currentMonth + 1}_${currentYear}.xlsx`);
         }
 
-        // FUNGSI EXPORT XLSX TERPERBAIKI DENGAN STYLING CYAAN/HITAM, HEADER DAN WRAP TEXT
         function exportToXLSX() {
-            if (typeof XLSX === 'undefined' || !XLSX.utils) {
-                alert("Pustaka XLSX-Style belum siap, silakan refresh halaman.");
-                return;
-            }
+            if (typeof XLSX === 'undefined' || !XLSX.utils) return alert("Pustaka XLSX-Style belum siap.");
 
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const monthTitle = document.getElementById('current-month-display').textContent;
             const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
 
-            // 1. BARIS 1 & 2: TITLE HEADER DENGAN FONT BIRU MUDA (LIGHT CYAN)
-            const titleRow1 = [`JADWAL MATRIKS BULANAN 3TV BROADCAST`];
-            const titleRow2 = [`Periode: ${monthTitle}`];
+            const allRows = [
+                [`JADWAL MATRIKS BULANAN 3TV BROADCAST`],
+                [`Periode: ${monthTitle}`]
+            ];
 
-            // 2. BARIS 3: HEADER KOLOM UTAMA
             const colHeaders = ["No", "NAMA CREW", "NO HP / WHATSAPP"];
             for (let d = 1; d <= daysInMonth; d++) colHeaders.push(d);
+            allRows.push(colHeaders);
 
-            const allRows = [titleRow1, titleRow2, colHeaders];
-
-            // 3. BARIS DATA CREW
             crewsData.forEach((crew, idx) => {
                 const row = [idx + 1, crew.fullname, crew.phone || '-'];
                 for (let d = 1; d <= daysInMonth; d++) {
-                    const prog = scheduleData[monthKey]?.[crew.id]?.[d] || '-';
-                    row.push(prog);
+                    row.push(scheduleData[monthKey]?.[crew.id]?.[d] || '-');
                 }
                 allRows.push(row);
             });
 
-            // TERJEMAHKAN ARRAY DUA DIMENSI KE WORKSHEET
             const ws = XLSX.utils.aoa_to_sheet(allRows);
-
-            // STYLING KHUSUS CELL DEMI CELL DENGAN XLSX-JS-STYLE
-            const borderThin = {
-                top: { style: "thin", color: { rgb: "1E293B" } },
-                bottom: { style: "thin", color: { rgb: "1E293B" } },
-                left: { style: "thin", color: { rgb: "1E293B" } },
-                right: { style: "thin", color: { rgb: "1E293B" } }
-            };
-
-            // TITLE HEADER STYLES (BIRU MUDA / LIGHT CYAN)
-            const titleStyle = {
-                font: { name: "Calibri", sz: 14, bold: true, color: { rgb: "00C8FF" } },
-                alignment: { horizontal: "left", vertical: "center" }
-            };
-            const subtitleStyle = {
-                font: { name: "Calibri", sz: 11, italic: true, color: { rgb: "38BDF8" } },
-                alignment: { horizontal: "left", vertical: "center" }
-            };
-
-            // HEADER TABLE STYLES (FONT CYAN + BG HITAM + CENTER)
-            const headerColStyle = {
-                font: { name: "Calibri", sz: 11, bold: true, color: { rgb: "00F0FF" } },
-                fill: { fgColor: { rgb: "000000" } },
-                alignment: { horizontal: "center", vertical: "center", wrapText: true },
-                border: borderThin
-            };
-
-            // DATA CELLS STYLES (WRAP TEXT VERTIKAL & CENTER RAPI)
-            const dataCenterStyle = {
-                font: { name: "Calibri", sz: 10 },
-                alignment: { horizontal: "center", vertical: "center", wrapText: true },
-                border: borderThin
-            };
-            const dataLeftBoldStyle = {
-                font: { name: "Calibri", sz: 10, bold: true },
-                alignment: { horizontal: "left", vertical: "center", wrapText: true },
-                border: borderThin
-            };
-
-            // TERAPKAN STYLING KE SETIAP SEL
-            if (ws['A1']) ws['A1'].s = titleStyle;
-            if (ws['A2']) ws['A2'].s = subtitleStyle;
-
-            const totalCols = daysInMonth + 3;
-            const totalRows = crewsData.length + 3;
-
-            for (let R = 2; R < totalRows; R++) { // Baris 3 ke bawah
-                for (let C = 0; C < totalCols; C++) {
-                    const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
-                    if (!ws[cellRef]) continue;
-
-                    if (R === 2) {
-                        // BARIS HEADER KOLOM (R=2 / Baris 3 di Excel)
-                        ws[cellRef].s = headerColStyle;
-                    } else {
-                        // BARIS DATA (R > 2)
-                        if (C === 1) { // Nama Crew
-                            ws[cellRef].s = dataLeftBoldStyle;
-                        } else {
-                            ws[cellRef].s = dataCenterStyle;
-                        }
-                    }
-                }
-            }
-
-            // ATUR LEBAR KOLOM KHUSUS (COL WIDTHS)
-            const colWidths = [
-                { wch: 6 },  // No
-                { wch: 25 }, // Nama Crew
-                { wch: 18 }  // No HP / WhatsApp
-            ];
-            for (let d = 1; d <= daysInMonth; d++) {
-                colWidths.push({ wch: 14 }); // Kolom tanggal presisi untuk Wrap Text
-            }
-            ws['!cols'] = colWidths;
-
-            // DUKUNGAN MERGE CELL UNTUK TITLE HEADER
-            ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } },
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } }
-            ];
-
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Jadwal_Matriks_3TV");
             XLSX.writeFile(wb, `Jadwal_3TV_${currentMonth + 1}_${currentYear}.xlsx`);
         }
 
-        // FUNGSI EXPORT MULTI-PAGE PDF: MENCETAK SAMPAI AKHIR BULAN DENGAN RAPI BANYAK HALAMAN
         function exportToPDF() {
-            if (!window.jspdf || !window.jspdf.jsPDF) {
-                alert("Pustaka PDF belum siap, coba refresh halaman.");
-                return;
-            }
+            if (!window.jspdf || !window.jspdf.jsPDF) return alert("Pustaka PDF belum siap.");
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
@@ -1408,13 +2369,11 @@
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
 
-            const DAYS_PER_PAGE = 16;
+            const DAYS_PER_PAGE = 15;
             const totalChunks = Math.ceil(daysInMonth / DAYS_PER_PAGE);
 
             for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
-                if (chunkIdx > 0) {
-                    doc.addPage();
-                }
+                if (chunkIdx > 0) doc.addPage();
 
                 const startDay = (chunkIdx * DAYS_PER_PAGE) + 1;
                 const endDay = Math.min((chunkIdx + 1) * DAYS_PER_PAGE, daysInMonth);
@@ -1429,84 +2388,728 @@
                 doc.text(`Periode: ${monthTitle} (Tanggal ${startDay} - ${endDay}) - Hal ${chunkIdx + 1}/${totalChunks}`, 10, 15);
 
                 const tableHeaders = ["No", "Nama Crew"];
-                for (let d = startDay; d <= endDay; d++) {
-                    tableHeaders.push(String(d));
-                }
+                for (let d = startDay; d <= endDay; d++) tableHeaders.push(String(d));
 
-                const tableData = [];
-                crewsData.forEach((crew, idx) => {
+                const tableData = crewsData.map((crew, idx) => {
                     const row = [String(idx + 1), crew.fullname];
                     for (let d = startDay; d <= endDay; d++) {
-                        const prog = scheduleData[monthKey]?.[crew.id]?.[d] || "";
-                        row.push(prog ? prog : "-");
+                        row.push(scheduleData[monthKey]?.[crew.id]?.[d] || "-");
                     }
-                    tableData.push(row);
+                    return row;
                 });
-
-                const colStyles = {
-                    0: { cellWidth: 8, halign: 'center' },
-                    1: { cellWidth: 32, halign: 'left', fontStyle: 'bold' }
-                };
-
-                const activeDaysInChunk = (endDay - startDay) + 1;
-                const flexDayWidth = (280 - 40) / activeDaysInChunk;
-
-                for (let i = 2; i <= activeDaysInChunk + 1; i++) {
-                    colStyles[i] = { cellWidth: flexDayWidth, halign: 'center' };
-                }
 
                 doc.autoTable({
                     head: [tableHeaders],
                     body: tableData,
                     startY: 18,
                     theme: 'grid',
-                    styles: {
-                        fontSize: 7,
-                        cellPadding: 1.5,
-                        overflow: 'linebreak',
-                        valign: 'middle'
-                    },
-                    headStyles: {
-                        fillColor: [13, 19, 34],
-                        textColor: [0, 240, 255],
-                        fontStyle: 'bold',
-                        halign: 'center',
-                        lineWidth: 0.1,
-                        lineColor: [30, 41, 59]
-                    },
-                    columnStyles: colStyles,
-                    alternateRowStyles: {
-                        fillColor: [248, 250, 252]
-                    },
-                    margin: { top: 18, left: 8, right: 8, bottom: 8 }
+                    styles: { fontSize: 7, cellPadding: 1.5, valign: 'middle' },
+                    headStyles: { fillColor: [13, 19, 34], textColor: [0, 240, 255] }
                 });
             }
 
             doc.save(`Jadwal_3TV_${currentMonth + 1}_${currentYear}.pdf`);
         }
 
-        function openClearDataModal() { document.getElementById('clear-modal').classList.remove('hidden'); }
-        function closeClearDataModal() { document.getElementById('clear-modal').classList.add('hidden'); }
-
-        function executeClearData(type) {
-            if (type === 'active_month') {
-                delete scheduleData[`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`];
+        function toggleChangePasswordModal(show = true) {
+            const modal = document.getElementById('change-pass-modal');
+            if (!modal) return;
+            if (show) {
+                document.getElementById('pr-old-pass').value = "";
+                document.getElementById('pr-new-pass').value = "";
+                document.getElementById('pr-confirm-pass').value = "";
+                modal.classList.remove('hidden');
             } else {
-                crewsData = [];
-                scheduleData = {};
-                localStorage.clear();
+                modal.classList.add('hidden');
             }
-            saveSchedulesToLocalStorage();
-            closeClearDataModal();
-            renderMonthlyGrid();
-            renderDashboard();
         }
 
-        function handleGlobalSearch(val) {
-            searchQuery = val.trim();
+        function handleChangePasswordSubmit(e) {
+            e.preventDefault();
+            if (!window.loggedPRUser) return alert("Silakan login terlebih dahulu.");
+
+            const oldPass = document.getElementById('pr-old-pass').value.trim();
+            const newPass = document.getElementById('pr-new-pass').value.trim();
+            const confirmPass = document.getElementById('pr-confirm-pass').value.trim();
+
+            if (String(window.loggedPRUser.pass) !== oldPass) {
+                return alert("Password lama salah!");
+            }
+            if (newPass.length < 4) {
+                return alert("Password baru minimal 4 karakter.");
+            }
+            if (newPass !== confirmPass) {
+                return alert("Konfirmasi password baru tidak cocok!");
+            }
+
+            window.loggedPRUser.pass = newPass;
+            localStorage.setItem('3tv_pr_logged_user', JSON.stringify(window.loggedPRUser));
+
+            let idx = window.registeredUsers.findIndex(u => u.user.toLowerCase() === window.loggedPRUser.user.toLowerCase());
+            if (idx >= 0) {
+                window.registeredUsers[idx].pass = newPass;
+                localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
+            }
+
+            toggleChangePasswordModal(false);
+            alert("Password akun berhasil diperbarui!");
+        }
+
+        function togglePRAuthMode(mode) {
+            const loginForm = document.getElementById('pr-login-form');
+            const regForm = document.getElementById('pr-register-form');
+            const title = document.getElementById('pr-auth-title');
+            const sub = document.getElementById('pr-auth-subtitle');
+
+            if (mode === 'register') {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                document.getElementById('pr-reg-name').value = "";
+                document.getElementById('pr-reg-phone').value = "";
+                document.getElementById('pr-reg-user').value = "";
+                document.getElementById('pr-reg-pass').value = "";
+                if (title) title.textContent = "REGISTRASI AKUN ITB 3TV";
+                if (sub) sub.textContent = "Lengkapi formulir untuk pendaftaran akun laporan siaran.";
+            } else {
+                regForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                document.getElementById('pr-login-user').value = "";
+                document.getElementById('pr-login-pass').value = "";
+                if (title) title.textContent = "IT BROADCAST 3TV";
+                if (sub) sub.textContent = "Masukan Username Anda";
+            }
+        }
+
+        function handlePRRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('pr-reg-name').value.trim();
+            const phone = document.getElementById('pr-reg-phone').value.trim();
+            const user = document.getElementById('pr-reg-user').value.trim();
+            const pass = document.getElementById('pr-reg-pass').value.trim();
+
+            if (window.registeredUsers.some(u => u.user.toLowerCase() === user.toLowerCase())) {
+                return alert("Username sudah terdaftar! Gunakan username lain.");
+            }
+
+            const newUser = { name, phone, user, pass, isRoot: false };
+            window.registeredUsers.push(newUser);
+            localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
+
+            alert("Registrasi berhasil! Silakan login dengan akun baru Anda.");
+            togglePRAuthMode('login');
+        }
+
+        function resetPersonalReportForm() {
+            document.getElementById('pr-editing-report-id').value = "";
+            document.getElementById('pr-program-name').value = "";
+            document.getElementById('pr-program-select').value = "";
+            document.getElementById('pr-location').value = "";
+            document.getElementById('pr-time-on').value = "";
+            document.getElementById('pr-time-off').value = "";
+            document.getElementById('pr-work-hours').value = "";
+            document.getElementById('pr-program-status').value = "Live";
+            document.getElementById('pr-notes').value = "";
+
+            document.getElementById('equipment-items-container').innerHTML = "";
+            document.getElementById('crew-tags-container').innerHTML = "";
+
+            addEquipmentItemRow('', '1', 'OK');
+            if (window.loggedPRUser) {
+                addCrewTagRow(window.loggedPRUser.name, true);
+            }
+
+            const cancelBtn = document.getElementById('pr-cancel-edit-btn');
+            if (cancelBtn) cancelBtn.classList.add('hidden');
+
+            const titleEl = document.getElementById('pr-form-header-title');
+            if (titleEl) {
+                titleEl.innerHTML = `<i class="fa-solid fa-file-signature text-amber-400"></i> FORM INPUT PERSONAL REPORT SIARAN`;
+            }
+        }
+
+        function calculateWorkHours() {
+            const timeOn = document.getElementById('pr-time-on').value;
+            const timeOff = document.getElementById('pr-time-off').value;
+            
+            if (!timeOn || !timeOff) return;
+
+            const [onH, onM] = timeOn.split(':').map(Number);
+            const [offH, offM] = timeOff.split(':').map(Number);
+
+            let startMinutes = onH * 60 + onM;
+            let endMinutes = offH * 60 + offM;
+
+            if (endMinutes < startMinutes) {
+                endMinutes += 24 * 60;
+            }
+
+            const diffMinutes = endMinutes - startMinutes;
+            const hours = Math.floor(diffMinutes / 60);
+            const minutes = diffMinutes % 60;
+
+            let resultText = "";
+            if (minutes === 0) {
+                resultText = `${hours} Jam`;
+            } else {
+                resultText = `${hours} Jam ${minutes} Mnt`;
+            }
+
+            document.getElementById('pr-work-hours').value = resultText;
+        }
+
+        function handlePersonalReportSubmit(e) {
+            e.preventDefault();
+            if (!window.loggedPRUser) return alert("Silakan login terlebih dahulu.");
+
+            const editingId = document.getElementById('pr-editing-report-id').value;
+            const programName = document.getElementById('pr-program-name').value.trim();
+            const location = document.getElementById('pr-location').value.trim();
+            const timeOn = document.getElementById('pr-time-on').value;
+            const timeOff = document.getElementById('pr-time-off').value;
+            const workHours = document.getElementById('pr-work-hours').value.trim();
+            const status = document.getElementById('pr-program-status').value;
+            const notes = document.getElementById('pr-notes').value.trim();
+
+            const eqItems = [];
+            document.querySelectorAll('#equipment-items-container > div').forEach(row => {
+                const name = row.querySelector('.eq-name-input')?.value.trim();
+                const qty = row.querySelector('.eq-qty-input')?.value || '1';
+                const cond = row.querySelector('.eq-cond-select')?.value || 'OK';
+                if (name) eqItems.push({ name, qty, cond });
+            });
+
+            const crewTags = [];
+            document.querySelectorAll('#crew-tags-container > div').forEach(row => {
+                const name = row.querySelector('.crew-manual-input')?.value.trim();
+                if (name && !crewTags.includes(name)) crewTags.push(name);
+            });
+
+            if (editingId) {
+                let idx = window.personalReportsList.findIndex(r => r.id === editingId);
+                if (idx >= 0) {
+                    window.personalReportsList[idx] = {
+                        ...window.personalReportsList[idx],
+                        programName,
+                        location,
+                        timeOn,
+                        timeOff,
+                        workHours,
+                        status,
+                        notes,
+                        eqItems,
+                        crewTags,
+                        updatedAt: new Date().toISOString()
+                    };
+                }
+            } else {
+                const reportObject = {
+                    id: 'pr_' + Date.now(),
+                    authorUser: window.loggedPRUser.user,
+                    authorName: window.loggedPRUser.name,
+                    authorPhone: window.loggedPRUser.phone,
+                    date: getFormattedTodayDate(),
+                    timestamp: new Date().toLocaleString('id-ID'),
+                    programName,
+                    location,
+                    timeOn,
+                    timeOff,
+                    workHours,
+                    status,
+                    notes,
+                    eqItems,
+                    crewTags
+                };
+                window.personalReportsList.unshift(reportObject);
+            }
+
+            localStorage.setItem('3tv_pr_reports', JSON.stringify(window.personalReportsList));
+            resetPersonalReportForm();
+            renderPRHistoryList();
+            alert("Laporan Personal Siaran berhasil tersimpan!");
+        }
+
+        function renderPRHistoryList() {
+            const container = document.getElementById('pr-history-list');
+            const countBadge = document.getElementById('pr-history-count');
+            const adminExportTools = document.getElementById('pr-admin-export-tools');
+
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (!window.loggedPRUser) return;
+
+            const isRootAdmin = (window.loggedPRUser.isRoot || window.loggedPRUser.user.toLowerCase() === 'root');
+            const isAdminRole = (currentUserRole === 'admin') || (window.loggedPRUser.user.toLowerCase() === 'admin');
+
+            if (adminExportTools) {
+                if (isRootAdmin || isAdminRole) adminExportTools.classList.remove('hidden');
+                else adminExportTools.classList.add('hidden');
+            }
+
+            let filteredList = window.personalReportsList;
+            if (!isRootAdmin && !isAdminRole) {
+                filteredList = window.personalReportsList.filter(r => {
+                    const isAuthor = (r.authorUser === window.loggedPRUser.user || r.authorName.toLowerCase() === window.loggedPRUser.name.toLowerCase());
+                    const isTagged = r.crewTags && r.crewTags.some(tag => tag.toLowerCase() === window.loggedPRUser.name.toLowerCase());
+                    return isAuthor || isTagged;
+                });
+            }
+
+            if (countBadge) countBadge.textContent = `${filteredList.length} Laporan`;
+
+            if (filteredList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-8 font-mono">Belum ada riwayat Personal Report.</p>`;
+                return;
+            }
+
+            filteredList.forEach(report => {
+                const statusBadge = report.status === 'Live' 
+                    ? 'bg-red-500/20 text-red-400 border-red-500/40 shadow-glow-red' 
+                    : (report.status === 'Taping' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40');
+
+                const canDelete = isRootAdmin || isAdminRole;
+
+                const card = document.createElement('div');
+                card.className = "bg-slate-950/80 border border-slate-800 p-3.5 rounded-xl space-y-2.5 hover:border-amber-500/30 transition";
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                        <div>
+                            <span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded border ${statusBadge}">${report.status}</span>
+                            <h5 class="text-sm font-bold text-white mt-1.5">${report.programName}</h5>
+                            <p class="text-[10px] text-slate-400 font-mono">Pelapor: <span class="text-amber-300">${report.authorName}</span> &bull; ${report.timestamp || report.date}</p>
+                        </div>
+                        <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                            <button onclick="previewPRReport('${report.id}')" class="px-2 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-eye"></i> Preview
+                            </button>
+                            <button onclick="downloadSingleReportPDF('${report.id}')" class="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-file-pdf"></i> PDF
+                            </button>
+                            <button onclick="editPRReport('${report.id}')" class="px-2 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </button>
+                            ${canDelete ? `
+                                <button onclick="deletePRReport('${report.id}')" class="px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-semibold flex items-center gap-1">
+                                    <i class="fa-solid fa-trash-can"></i> Hapus
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-slate-300">
+                        <div><span class="text-slate-500 block text-[9px]">Lokasi / Studio:</span> ${report.location}</div>
+                        <div><span class="text-slate-500 block text-[9px]">Jam On System:</span> ${report.timeOn}</div>
+                        <div><span class="text-slate-500 block text-[9px]">Jam Off System:</span> ${report.timeOff}</div>
+                        <div><span class="text-slate-500 block text-[9px]">Total Jam Kerja:</span> <span class="text-amber-300 font-bold">${report.workHours || '-'}</span></div>
+                    </div>
+                    ${report.crewTags && report.crewTags.length > 0 ? `
+                        <div class="text-[10px] text-slate-400">
+                            <span class="text-slate-500 font-mono">Crew Bertugas:</span> ${report.crewTags.join(', ')}
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function editPRReport(id) {
+            const report = window.personalReportsList.find(r => r.id === id);
+            if (!report) return;
+
+            document.getElementById('pr-editing-report-id').value = report.id;
+            document.getElementById('pr-program-name').value = report.programName || '';
+            document.getElementById('pr-location').value = report.location || '';
+            document.getElementById('pr-time-on').value = report.timeOn || '';
+            document.getElementById('pr-time-off').value = report.timeOff || '';
+            document.getElementById('pr-work-hours').value = report.workHours || '';
+            document.getElementById('pr-program-status').value = report.status || 'Live';
+            document.getElementById('pr-notes').value = report.notes || '';
+
+            const eqContainer = document.getElementById('equipment-items-container');
+            eqContainer.innerHTML = "";
+            if (report.eqItems && report.eqItems.length > 0) {
+                report.eqItems.forEach(item => addEquipmentItemRow(item.name, item.qty, item.cond));
+            } else {
+                addEquipmentItemRow('', '1', 'OK');
+            }
+
+            const crewContainer = document.getElementById('crew-tags-container');
+            crewContainer.innerHTML = "";
+            if (report.crewTags && report.crewTags.length > 0) {
+                report.crewTags.forEach((cName, i) => addCrewTagRow(cName, i === 0 && cName === report.authorName));
+            } else {
+                if (window.loggedPRUser) addCrewTagRow(window.loggedPRUser.name, true);
+            }
+
+            document.getElementById('pr-cancel-edit-btn')?.classList.remove('hidden');
+            const titleEl = document.getElementById('pr-form-header-title');
+            if (titleEl) {
+                titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> EDIT PERSONAL REPORT SIARAN`;
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function downloadSingleReportPDF(id) {
+            if (!window.jspdf || !window.jspdf.jsPDF) return alert("Pustaka PDF belum siap.");
+            const report = window.personalReportsList.find(r => r.id === id);
+            if (!report) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(255, 184, 0);
+            doc.text("3TV BROADCAST - PERSONAL OPERATIONAL REPORT", 14, 15);
+
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(140, 140, 140);
+            doc.text(`Pelapor: ${report.authorName} (${report.authorPhone || '-'}) | Tanggal: ${report.timestamp || report.date}`, 14, 21);
+
+            const eqBody = (report.eqItems || []).map(item => [item.name, String(item.qty), item.cond]);
+
+            doc.autoTable({
+                head: [["Atribut Siaran", "Keterangan Detail"]],
+                body: [
+                    ["Nama Program", report.programName],
+                    ["Lokasi / Studio", report.location],
+                    ["Status Program", report.status],
+                    ["Jam On / Off System", `${report.timeOn} - ${report.timeOff}`],
+                    ["Total Jam Kerja", report.workHours || '-'],
+                    ["Crew IT On Duty", report.crewTags ? report.crewTags.join(', ') : '-'],
+                    ["Catatan Operasional", report.notes || '-']
+                ],
+                startY: 26,
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 2.5 },
+                headStyles: { fillColor: [13, 19, 34], textColor: [255, 184, 0] }
+            });
+
+            if (eqBody.length > 0) {
+                doc.autoTable({
+                    head: [["Nama Peralatan", "Jumlah", "Kondisi"]],
+                    body: eqBody,
+                    startY: doc.lastAutoTable.finalY + 6,
+                    theme: 'grid',
+                    styles: { fontSize: 8, cellPadding: 2 },
+                    headStyles: { fillColor: [13, 19, 34], textColor: [0, 240, 255] }
+                });
+            }
+
+            doc.save(`Personal_Report_${report.programName.replace(/[^a-zA-Z0-9]/g, '_')}_${report.date}.pdf`);
+        }
+
+        function previewPRReport(id) {
+            const report = window.personalReportsList.find(r => r.id === id);
+            if (!report) return;
+
+            const modalBody = document.getElementById('pr-preview-modal-body');
+            if (!modalBody) return;
+
+            const eqListHtml = (report.eqItems || []).map(item => `
+                <tr class="border-b border-slate-800 text-[11px]">
+                    <td class="p-2 font-medium text-slate-200">${item.name}</td>
+                    <td class="p-2 text-center text-slate-300">${item.qty}</td>
+                    <td class="p-2 text-center">
+                        <span class="px-1.5 py-0.5 text-[9px] font-bold rounded ${item.cond === 'OK' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-pink-500/10 text-pink-400 border border-pink-500/30'}">${item.cond}</span>
+                    </td>
+                </tr>
+            `).join('');
+
+            modalBody.innerHTML = `
+                <div class="space-y-3 bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 font-mono">
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-amber-400 font-bold font-cyber">${report.programName}</span>
+                        <span class="text-slate-400">${report.date}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <div><span class="text-slate-500 block">Pelapor:</span> ${report.authorName} (${report.authorPhone || '-'})</div>
+                        <div><span class="text-slate-500 block">Lokasi:</span> ${report.location}</div>
+                        <div><span class="text-slate-500 block">Waktu On System:</span> ${report.timeOn} - ${report.timeOff}</div>
+                        <div><span class="text-slate-500 block">Total Jam Kerja:</span> ${report.workHours || '-'}</div>
+                        <div><span class="text-slate-500 block">Status:</span> ${report.status}</div>
+                    </div>
+                    ${report.crewTags && report.crewTags.length > 0 ? `
+                        <div class="border-t border-slate-800 pt-2 text-[10px]">
+                            <span class="text-slate-500 block">Crew On Duty:</span> ${report.crewTags.join(', ')}
+                        </div>
+                    ` : ''}
+                    ${report.notes ? `
+                        <div class="border-t border-slate-800 pt-2 text-[10px] text-slate-400">
+                            <span class="text-slate-500 block">Catatan Operasional:</span> ${report.notes}
+                        </div>
+                    ` : ''}
+                </div>
+                ${eqListHtml ? `
+                    <div class="space-y-1.5">
+                        <h6 class="text-[10px] font-cyber font-bold text-cyan-400 uppercase">Daftar Peralatan</h6>
+                        <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/60">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-900 text-slate-400 text-[10px]">
+                                    <tr>
+                                        <th class="p-2">Alat</th>
+                                        <th class="p-2 text-center">Qty</th>
+                                        <th class="p-2 text-center">Kondisi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${eqListHtml}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('pr-preview-modal')?.classList.remove('hidden');
+        }
+
+        function closePRPreviewModal() {
+            const modal = document.getElementById('pr-preview-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function cancelReportEdit() {
+            resetPersonalReportForm();
+        }
+
+        function deletePRReport(id) {
+            if (!confirm("Apakah Anda yakin ingin menghapus Personal Report ini?")) return;
+            window.personalReportsList = window.personalReportsList.filter(r => r.id !== id);
+            localStorage.setItem('3tv_pr_reports', JSON.stringify(window.personalReportsList));
+            renderPRHistoryList();
+        }
+
+        function exportPRHistoryXLSX() {
+            if (typeof XLSX === 'undefined' || !XLSX.utils) return alert("Pustaka XLSX-Style belum siap.");
+
+            const rawData = [
+                ["REKAPITULASI LAPORAN KERJA CREW IT BROADCAST 3TV"],
+                [`Dicetak pada: ${new Date().toLocaleString('id-ID')}`],
+                [],
+                ["Nomor", "Tanggal", "Nama Program", "Pelapor", "No HP Pelapor", "Lokasi", "Jam On", "Jam Off", "Total Jam Kerja", "Status", "Crew On Duty", "Daftar Alat", "Catatan"]
+            ];
+
+            window.personalReportsList.forEach((r, idx) => {
+                const eqStr = (r.eqItems || []).map(i => `${i.name}(${i.qty}-${i.cond})`).join('; ');
+                rawData.push([
+                    idx + 1,
+                    r.date,
+                    r.programName,
+                    r.authorName,
+                    r.authorPhone || '-',
+                    r.location,
+                    r.timeOn,
+                    r.timeOff,
+                    r.workHours || '-',
+                    r.status,
+                    r.crewTags ? r.crewTags.join(', ') : '-',
+                    eqStr,
+                    r.notes || '-'
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(rawData);
+
+            const headerStyle = {
+                font: { bold: true, color: { rgb: "FFFFFF" } },
+                fill: { fgColor: { rgb: "0D1322" } },
+                alignment: { horizontal: "center", vertical: "center", wrapText: true },
+                border: {
+                    top: { style: "thin", color: { rgb: "1E293B" } },
+                    bottom: { style: "thin", color: { rgb: "1E293B" } },
+                    left: { style: "thin", color: { rgb: "1E293B" } },
+                    right: { style: "thin", color: { rgb: "1E293B" } }
+                }
+            };
+
+            const cellStyle = {
+                alignment: { vertical: "top", wrapText: true },
+                border: {
+                    top: { style: "thin", color: { rgb: "1E293B" } },
+                    bottom: { style: "thin", color: { rgb: "1E293B" } },
+                    left: { style: "thin", color: { rgb: "1E293B" } },
+                    right: { style: "thin", color: { rgb: "1E293B" } }
+                }
+            };
+
+            const titleStyle = {
+                font: { bold: true, sz: 14, color: { rgb: "FFB800" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+
+            const subtitleStyle = {
+                font: { italic: true, sz: 10, color: { rgb: "888888" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+
+            const colWidths = [];
+
+            if (!ws['!merges']) ws['!merges'] = [];
+            ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 12 } });
+            ws['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 1, c: 12 } });
+
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+                    if (!ws[cellRef]) continue;
+
+                    if (R === 0) {
+                        ws[cellRef].s = titleStyle;
+                    } else if (R === 1) {
+                        ws[cellRef].s = subtitleStyle;
+                    } else if (R === 3) {
+                        ws[cellRef].s = headerStyle;
+                    } else if (R > 3) {
+                        ws[cellRef].s = cellStyle;
+                    }
+
+                    const valStr = ws[cellRef].v ? String(ws[cellRef].v) : "";
+                    if (!colWidths[C] || valStr.length > colWidths[C]) {
+                        colWidths[C] = Math.min(Math.max(valStr.length + 3, 10), 35);
+                    }
+                }
+            }
+
+            ws['!cols'] = colWidths.map(w => ({ wch: w }));
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekapitulasi_Laporan_Kerja");
+            XLSX.writeFile(wb, `Rekapitulasi_Laporan_Kerja_3TV_${getFormattedTodayDate()}.xlsx`);
+        }
+
+        function exportPRHistoryPDF() {
+            if (!window.jspdf || !window.jspdf.jsPDF) return alert("Pustaka PDF belum siap.");
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(255, 184, 0);
+            doc.text("3TV BROADCAST - REKAPITULASI LAPORAN KERJA CREW IT BROADCAST", 10, 10);
+
+            const tableHeaders = ["Nomor", "Tanggal", "Program", "Pelapor", "Lokasi", "Waktu", "Total Jam", "Status", "Crew Duty"];
+            const tableData = window.personalReportsList.map((r, idx) => [
+                String(idx + 1),
+                r.date,
+                r.programName,
+                r.authorName,
+                r.location,
+                `${r.timeOn}-${r.timeOff}`,
+                r.workHours || '-',
+                r.status,
+                r.crewTags ? r.crewTags.join(', ') : '-'
+            ]);
+
+            doc.autoTable({
+                head: [tableHeaders],
+                body: tableData,
+                startY: 15,
+                theme: 'grid',
+                styles: { fontSize: 7, cellPadding: 1.5 },
+                headStyles: { fillColor: [13, 19, 34], textColor: [255, 184, 0] }
+            });
+
+            doc.save(`Rekapitulasi_Laporan_Kerja_3TV_${getFormattedTodayDate()}.pdf`);
+        }
+
+        function openSheetConfigModal() { document.getElementById('sheet-config-modal').classList.remove('hidden'); }
+        function closeSheetConfigModal() { document.getElementById('sheet-config-modal').classList.add('hidden'); }
+        function saveSheetConfig() {
+            const val = document.getElementById('sheet-webhook-input').value.trim();
+            if (val) {
+                localStorage.setItem('google_sheet_webhook_url', val);
+                document.getElementById('sheet-config-modal').classList.add('hidden');
+                loadDataFromGoogleSheet();
+                alert("URL Google Sheets Webhook terhubung!");
+            }
+        }
+
+        // --- DOM INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', async () => {
+            loadFromLocalStorage();
+            
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000);
+            initWeatherAndGPS();
+
+            const dashDateEl = document.getElementById('dashboard-date');
+            if (dashDateEl) dashDateEl.value = getFormattedTodayDate();
+
+            applyRolePermissions();
             renderDashboard();
             renderMonthlyGrid();
-        }
+
+            await loadDataFromGoogleSheet();
+        });
+
+        // Global Handlers
+        window.getFormattedTodayDate = getFormattedTodayDate;
+        window.updateLiveClock = updateLiveClock;
+        window.initWeatherAndGPS = initWeatherAndGPS;
+        window.applyRolePermissions = applyRolePermissions;
+        window.handleRoleChange = handleRoleChange;
+        window.verifyRolePin = verifyRolePin;
+        window.closePinModal = closePinModal;
+        window.switchTab = switchTab;
+        window.toggleSidebar = toggleSidebar;
+        window.renderDashboard = renderDashboard;
+        window.renderMonthlyGrid = renderMonthlyGrid;
+        window.renderJobReport = renderJobReport;
+        window.changeMonth = changeMonth;
+        window.goToCurrentMonth = goToCurrentMonth;
+        window.handleGlobalSearch = handleGlobalSearch;
+        window.openActiveProgramsModal = openActiveProgramsModal;
+        window.closeActiveProgramsModal = closeActiveProgramsModal;
+        window.openOffDutyModal = openOffDutyModal;
+        window.closeOffDutyModal = closeOffDutyModal;
+        window.openMntModal = openMntModal;
+        window.closeMntModal = closeMntModal;
+        window.toggleChangePasswordModal = toggleChangePasswordModal;
+        window.handleChangePasswordSubmit = handleChangePasswordSubmit;
+        window.toggleManageAccountsModal = toggleManageAccountsModal;
+        window.togglePRFormVisibility = togglePRFormVisibility;
+        window.rootResetUserPassword = rootResetUserPassword;
+        window.rootDeleteUser = rootDeleteUser;
+        window.togglePRAuthMode = togglePRAuthMode;
+        window.handlePRLogin = handlePRLogin;
+        window.handlePRRegister = handlePRRegister;
+        window.logoutPRUser = logoutPRUser;
+        window.addEquipmentItemRow = addEquipmentItemRow;
+        window.handleEquipmentEnter = handleEquipmentEnter;
+        window.addCrewTagRow = addCrewTagRow;
+        window.calculateWorkHours = calculateWorkHours;
+        window.populatePRProgramDropdown = populatePRProgramDropdown;
+        window.applyPRProgramSelection = applyPRProgramSelection;
+        window.handlePersonalReportSubmit = handlePersonalReportSubmit;
+        window.downloadSingleReportPDF = downloadSingleReportPDF;
+        window.previewPRReport = previewPRReport;
+        window.closePRPreviewModal = closePRPreviewModal;
+        window.editPRReport = editPRReport;
+        window.cancelReportEdit = cancelReportEdit;
+        window.deletePRReport = deletePRReport;
+        window.exportPRHistoryXLSX = exportPRHistoryXLSX;
+        window.exportPRHistoryPDF = exportPRHistoryPDF;
+        window.openSheetConfigModal = openSheetConfigModal;
+        window.closeSheetConfigModal = closeSheetConfigModal;
+        window.saveSheetConfig = saveSheetConfig;
+        window.forceSyncFromSheet = forceSyncFromSheet;
+        window.openProgramModal = openProgramModal;
+        window.applyProgramPreset = applyProgramPreset;
+        window.closeProgramModal = closeProgramModal;
+        window.saveProgramAssignment = saveProgramAssignment;
+        window.openAddCrewModal = openAddCrewModal;
+        window.closeCrewModal = closeCrewModal;
+        window.handleCrewSubmit = handleCrewSubmit;
+        window.openClearDataModal = openClearDataModal;
+        window.closeClearDataModal = closeClearDataModal;
+        window.executeClearData = executeClearData;
+        window.importXLSX = importXLSX;
+        window.downloadXlsxTemplate = downloadXlsxTemplate;
+        window.exportToXLSX = exportToXLSX;
+        window.exportToPDF = exportToPDF;
+        window.exportJobReportPDF = exportJobReportPDF;
     </script>
 </body>
 </html>
