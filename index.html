@@ -34,7 +34,7 @@
                         }
                     },
                     animation: {
-                        marquee: 'marquee 12s linear infinite'
+                        marquee: 'marquee 25s linear infinite'
                     }
                 }
             }
@@ -62,6 +62,7 @@
                 linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
             background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+            -webkit-tap-highlight-color: transparent;
         }
         .font-cyber { font-family: 'Orbitron', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -90,9 +91,7 @@
 
         .smooth-scroll { -webkit-overflow-scrolling: touch; }
         
-        .live-indicator {
-            animation: pulse-red 1.5s infinite;
-        }
+        .live-indicator { animation: pulse-red 1.5s infinite; }
         @keyframes pulse-red {
             0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.7); }
             70% { box-shadow: 0 0 0 8px rgba(229, 9, 20, 0); }
@@ -102,11 +101,11 @@
         .perspective-1000 { perspective: 1000px; }
         .modal-flip-container {
             transform-style: preserve-3d;
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
         }
         .modal-flip-hidden {
             opacity: 0;
-            transform: rotateY(-60deg) scale(0.85);
+            transform: rotateY(-90deg) scale(0.85);
             pointer-events: none;
         }
         .modal-flip-visible {
@@ -134,14 +133,13 @@
     <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden transition-opacity duration-300"></div>
 
     <!-- SIDEBAR NAVIGATION -->
-    <aside id="sidebar" class="sidebar-collapsed md:sidebar-expanded fixed md:sticky top-0 h-screen h-[100dvh] w-72 bg-cybercard/95 backdrop-blur-xl border-r border-cyan-500/30 z-50 flex flex-col shadow-2xl shrink-0 transition-transform duration-300">
+    <aside id="sidebar" class="sidebar-collapsed md:sidebar-expanded fixed md:sticky top-0 h-screen h-[100dvh] w-72 bg-cybercard/95 backdrop-blur-xl border-r border-cyan-500/30 z-50 flex flex-col justify-between shadow-2xl shrink-0 transition-transform duration-300">
         
-        <!-- CENTER-EDGE TOGGLE BUTTON -->
         <button id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar" class="absolute -right-4 top-1/2 -translate-y-1/2 w-9 h-12 bg-slate-900 border border-cyan-500/50 rounded-r-xl text-cyan-400 hover:text-white flex items-center justify-center shadow-glow-cyan z-50 cursor-pointer transition-all hover:w-10">
             <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-right md:fa-chevron-left text-xs transition-transform duration-300"></i>
         </button>
 
-        <div class="flex-1 overflow-y-auto smooth-scroll p-3 space-y-3 pb-20 md:pb-3">
+        <div class="flex-1 overflow-y-auto smooth-scroll p-3 space-y-3">
             <div class="p-3 border-b border-cyan-500/20 flex items-center justify-between bg-slate-950/40 rounded-xl">
                 <div class="flex items-center gap-3 overflow-hidden">
                     <div class="w-10 h-10 shrink-0 rounded-lg bg-gradient-to-tr from-cyan-500 via-fuchsia-600 to-red-600 flex items-center justify-center text-slate-950 font-black shadow-glow-cyan">
@@ -155,12 +153,12 @@
                 </div>
             </div>
 
-            <!-- RUNNING TEXT STASIUN TV -->
-            <div class="p-2.5 bg-gradient-to-r from-red-950/60 via-slate-950 to-red-950/60 rounded-xl border border-red-500/40 flex items-center gap-2 overflow-hidden shadow-glow-red relative">
+            <!-- RUNNING TEXT STASIUN TV & QUOTE ISLAMI / MOTIVASI REAL-TIME -->
+            <div class="p-2.5 bg-gradient-to-r from-red-950/60 via-slate-950 to-indigo-950/60 rounded-xl border border-red-500/40 flex items-center gap-2 overflow-hidden shadow-glow-red relative">
                 <span class="w-2.5 h-2.5 rounded-full bg-red-600 live-indicator shrink-0"></span>
                 <div class="overflow-hidden whitespace-nowrap w-full">
-                    <div class="inline-block animate-marquee font-cyber font-bold text-[11px] text-red-400 uppercase tracking-wider">
-                        RCTI &bull; MNCTV &bull; GTV &bull; 3TV BROADCAST
+                    <div id="running-text-content" class="inline-block animate-marquee font-cyber font-bold text-[11px] text-red-400 uppercase tracking-wider">
+                        RCTI &bull; MNCTV &bull; GTV &bull; 3TV BROADCAST &bull; ✨ "Sabar adalah pilar keimanan." (Ali bin Abi Thalib) &bull; 🚀 "Mulailah dengan Bismillah dan teruslah melangkah."
                     </div>
                 </div>
             </div>
@@ -198,15 +196,14 @@
                     <i class="fa-solid fa-user-pen text-base shrink-0 text-amber-400"></i>
                     <span class="whitespace-nowrap font-cyber">Personal Report</span>
                 </button>
-
-                <!-- Tombol Google Sheets Sync (Dipindah ke dalam area navigasi) -->
-                <div class="pt-3 mt-3 border-t border-cyan-500/20">
-                    <button onclick="openSheetConfigModal()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:shadow-glow-green">
-                        <i class="fa-solid fa-file-excel text-base shrink-0"></i>
-                        <span class="whitespace-nowrap font-cyber">Google Sheets Sync</span>
-                    </button>
-                </div>
             </nav>
+        </div>
+
+        <div class="p-3 border-t border-cyan-500/20 bg-slate-950/80 shrink-0 space-y-2">
+            <button onclick="openSheetConfigModal()" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold transition border border-emerald-500/30 hover:shadow-glow-green">
+                <i class="fa-solid fa-file-excel shrink-0 text-sm"></i>
+                <span class="whitespace-nowrap font-cyber">Google Sheets Sync</span>
+            </button>
         </div>
     </aside>
 
@@ -245,15 +242,15 @@
                     </h2>
                     <div class="flex items-center gap-2">
                         <p id="page-subtitle" class="text-[9px] sm:text-[11px] text-cyan-400 font-semibold tracking-wider hidden sm:block truncate">Broadcast Control Matrix</p>
-                        <span id="firestore-status-pill" class="text-[8px] sm:text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 shrink-0">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sheet Webhook Ready
+                        <span id="firestore-status-pill" class="text-[8px] sm:text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green flex items-center gap-1 shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> DB Local & Sheets
                         </span>
                     </div>
                 </div>
             </div>
 
             <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
-                <button onclick="forceSyncFromSheet()" title="Sync Ulang Data" class="p-2 rounded-xl bg-slate-950 border border-cyan-500/30 text-cyan-400 hover:text-white transition">
+                <button onclick="forceSyncFromSheet()" title="Sync Ulang Data" class="p-2 rounded-xl bg-slate-950 border border-cyan-500/30 text-cyan-400 hover:text-white transition active:scale-95">
                     <i id="sync-icon" class="fa-solid fa-rotate text-xs"></i>
                 </button>
                 <div class="relative hidden lg:block">
@@ -295,7 +292,8 @@
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
-                    <div class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-cyan-500/30 shadow-lg flex items-center justify-between">
+                    <!-- Total On Duty -->
+                    <div class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-cyan-500/30 shadow-lg flex items-center justify-between transition-transform duration-200 hover:-translate-y-1">
                         <div>
                             <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 uppercase">Total On Duty</p>
                             <h4 id="metric-onduty" class="text-lg sm:text-2xl font-cyber font-black text-cyan-400 mt-0.5">0</h4>
@@ -305,7 +303,8 @@
                         </div>
                     </div>
 
-                    <div onclick="openOffDutyModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-amber-500/30 shadow-lg hover:border-amber-400 transition cursor-pointer flex items-center justify-between group">
+                    <!-- OFF DUTY CARD -->
+                    <div onclick="openOffDutyModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-amber-500/30 shadow-lg hover:border-amber-400 cursor-pointer flex items-center justify-between group transition-all duration-200 hover:-translate-y-1 active:scale-95">
                         <div>
                             <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-amber-300 transition uppercase">
                                 Off Duty <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-amber-500"></i>
@@ -317,7 +316,8 @@
                         </div>
                     </div>
 
-                    <div onclick="openMntModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-blue-500/30 shadow-lg hover:border-blue-400 transition cursor-pointer flex items-center justify-between group">
+                    <!-- MNT CARD -->
+                    <div onclick="openMntModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-blue-500/30 shadow-lg hover:border-blue-400 cursor-pointer flex items-center justify-between group transition-all duration-200 hover:-translate-y-1 active:scale-95">
                         <div>
                             <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-blue-300 transition uppercase">
                                 MNT / Maintenance <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-blue-500"></i>
@@ -329,7 +329,8 @@
                         </div>
                     </div>
 
-                    <div onclick="openActiveProgramsModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-emerald-500/30 shadow-lg hover:border-emerald-400 transition cursor-pointer flex items-center justify-between group">
+                    <!-- PROGRAM CARD -->
+                    <div onclick="openActiveProgramsModal()" class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-emerald-500/30 shadow-lg hover:border-emerald-400 cursor-pointer flex items-center justify-between group transition-all duration-200 hover:-translate-y-1 active:scale-95">
                         <div>
                             <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 group-hover:text-emerald-300 transition uppercase">
                                 Program On Air <i class="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5 text-emerald-500"></i>
@@ -341,7 +342,8 @@
                         </div>
                     </div>
 
-                    <div class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-emerald-500/30 shadow-lg flex items-center justify-between">
+                    <!-- Total Master Crew -->
+                    <div class="bg-cybercard p-2.5 sm:p-3.5 rounded-2xl border border-emerald-500/30 shadow-lg flex items-center justify-between transition-transform duration-200 hover:-translate-y-1">
                         <div>
                             <p class="text-[9px] sm:text-[10px] font-cyber font-semibold text-slate-400 uppercase">Master Crew</p>
                             <h4 id="metric-totalcrew" class="text-lg sm:text-2xl font-cyber font-black text-emerald-400 mt-0.5">0</h4>
@@ -447,17 +449,30 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                     <div class="bg-slate-900/80 border border-amber-500/30 p-4 rounded-2xl shadow-xl flex items-center justify-between relative overflow-hidden">
                         <div class="space-y-1">
                             <p class="text-[10px] font-cyber font-bold text-amber-400/80 uppercase tracking-widest">Total Tugas Terlaksana</p>
                             <h4 id="jr-total-tasks" class="text-2xl font-cyber font-black text-white">0</h4>
                             <p class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
-                                <i class="fa-solid fa-circle-check text-[9px]"></i> Verifikasi Sistem OK
+                                <i class="fa-solid fa-circle-check text-[9px]"></i> On-Air Program OK
                             </p>
                         </div>
                         <div class="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg shadow-glow-amber">
                             <i class="fa-solid fa-list-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 border border-blue-500/30 p-4 rounded-2xl shadow-xl flex items-center justify-between relative overflow-hidden">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-cyber font-bold text-blue-400/80 uppercase tracking-widest">Total Tugas Maint.</p>
+                            <h4 id="jr-total-mnt" class="text-2xl font-cyber font-black text-blue-400">0</h4>
+                            <p class="text-[10px] text-blue-300 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-wrench text-[9px]"></i> Status MNT / Maint.
+                            </p>
+                        </div>
+                        <div class="w-11 h-11 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-lg shadow-glow-cyan">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
                         </div>
                     </div>
 
@@ -530,29 +545,29 @@
                 </div>
             </section>
 
-            <!-- TAB 4: PERSONAL REPORT & LOCAL STORAGE AUTHENTICATION -->
+            <!-- TAB 4: PERSONAL REPORT -->
             <section id="tab-personalreport" class="space-y-5 hidden">
-                
                 <div id="pr-auth-card" class="max-w-md mx-auto bg-slate-900/90 border border-amber-500/40 p-6 rounded-2xl shadow-glow-amber space-y-5">
                     <div class="text-center space-y-2">
                         <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto text-xl shadow-glow-amber">
-                            <i class="fa-solid fa-user-lock"></i>
+                            <i class="fa-solid fa-cloud-lock"></i>
                         </div>
                         <h3 id="pr-auth-title" class="font-cyber font-black text-amber-300 text-lg uppercase tracking-wider">IT BROADCAST 3TV</h3>
                         <p id="pr-auth-subtitle" class="text-xs text-slate-400 font-mono">Masukan Username Anda</p>
                     </div>
 
-                    <form id="pr-login-form" onsubmit="handlePRLogin(event)" class="space-y-3">
+                    <!-- FORM LOGIN AUTOCOMPLETE OFF -->
+                    <form id="pr-login-form" onsubmit="handlePRLogin(event)" class="space-y-3" autocomplete="off">
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Username / ID Admin</label>
-                            <input type="text" id="pr-login-user" required placeholder="Masukkan username" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-amber-400 font-medium">
+                            <input type="text" id="pr-login-user" autocomplete="off" required placeholder="Masukkan username" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-amber-400 font-medium transition-all duration-300 focus:shadow-glow-amber">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
-                            <input type="password" id="pr-login-pass" required placeholder="Masukkan password" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-amber-400 font-mono">
+                            <input type="password" id="pr-login-pass" autocomplete="new-password" required placeholder="Masukkan password" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-amber-400 font-mono transition-all duration-300 focus:shadow-glow-amber">
                         </div>
                         <div class="pt-2">
-                            <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber transition">
+                            <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber transition active:scale-95">
                                 Login ITB 3TV <i class="fa-solid fa-right-to-bracket ml-1"></i>
                             </button>
                         </div>
@@ -561,39 +576,32 @@
                         </p>
                     </form>
 
-                    <form id="pr-register-form" onsubmit="handlePRRegister(event)" class="space-y-3 hidden">
+                    <!-- FORM REGISTER AUTOCOMPLETE OFF -->
+                    <form id="pr-register-form" onsubmit="handlePRRegister(event)" class="space-y-3 hidden" autocomplete="off">
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Lengkap</label>
-                            <input type="text" id="pr-reg-name" required oninput="this.value = this.value.toUpperCase()" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400 uppercase">
+                            <input type="text" id="pr-reg-name" autocomplete="off" required oninput="this.value = this.value.toUpperCase()" class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none uppercase transition-all duration-300 focus:ring-1 focus:ring-cyan-400 focus:shadow-glow-cyan">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Nomor Handphone / WA</label>
-                            <input type="text" id="pr-reg-phone" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                            <input type="text" id="pr-reg-phone" autocomplete="off" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none transition-all duration-300 focus:ring-1 focus:ring-cyan-400 focus:shadow-glow-cyan">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Username</label>
-                            <input type="text" id="pr-reg-user" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                            <input type="text" id="pr-reg-user" autocomplete="off" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none transition-all duration-300 focus:ring-1 focus:ring-cyan-400 focus:shadow-glow-cyan">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
-                            <input type="password" id="pr-reg-pass" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400 font-mono">
+                            <input type="password" id="pr-reg-pass" autocomplete="new-password" required class="w-full bg-slate-950 border border-amber-500/30 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none font-mono transition-all duration-300 focus:ring-1 focus:ring-cyan-400 focus:shadow-glow-cyan">
                         </div>
                         <div class="pt-2 flex gap-2">
-                            <button type="button" onclick="togglePRAuthMode('login')" class="flex-1 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-300 font-cyber font-bold text-xs transition">
-                                <i class="fa-solid fa-arrow-left mr-1"></i> Batal
-                            </button>
-                            <button type="submit" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan transition">
-                                Daftar Akun ITB 3TV <i class="fa-solid fa-user-plus ml-1"></i>
-                            </button>
+                            <button type="button" onclick="togglePRAuthMode('login')" class="flex-1 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 font-cyber font-bold text-xs active:scale-95 transition">Batal</button>
+                            <button type="submit" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan active:scale-95 transition">Daftar</button>
                         </div>
-                        <p class="text-[11px] text-center text-slate-400 pt-2">
-                            Sudah memiliki akun? <a href="javascript:void(0)" onclick="togglePRAuthMode('login')" class="text-amber-400 font-semibold hover:underline">Login disini</a>
-                        </p>
                     </form>
                 </div>
 
                 <div id="pr-main-container" class="space-y-5 hidden">
-                    
                     <div class="bg-slate-900/90 border border-amber-500/30 p-4 rounded-2xl shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold font-cyber shrink-0">
@@ -601,23 +609,20 @@
                             </div>
                             <div>
                                 <span id="pr-logged-role-badge" class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase">Root Admin</span>
-                                <h4 id="pr-logged-user-name" class="text-sm font-bold text-white mt-1">Nama Crew Logged</h4>
+                                <h4 id="pr-logged-user-name" class="text-sm font-bold text-white mt-1">Nama Crew</h4>
                                 <p id="pr-logged-user-phone" class="text-[10px] text-slate-400 font-mono">HP: -</p>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-2 self-end md:self-auto flex-wrap">
-                            <button onclick="toggleManageAccountsModal()" id="manage-accounts-btn" class="hidden px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
-                                <i class="fa-solid fa-users-gear"></i>
-                                <span>Kelola Akun Lokal</span>
+                            <button onclick="toggleManageAccountsModal()" id="manage-accounts-btn" class="hidden px-3 py-1.5 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95">
+                                <i class="fa-solid fa-users-gear"></i> Kelola Akun
                             </button>
-                            <button onclick="toggleChangePasswordModal()" class="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
-                                <i class="fa-solid fa-key"></i>
-                                <span>Ganti Password</span>
+                            <button onclick="toggleChangePasswordModal()" class="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95">
+                                <i class="fa-solid fa-key"></i> Ganti Password
                             </button>
-                            <button onclick="logoutPRUser()" class="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                                <span>Logout</span>
+                            <button onclick="logoutPRUser()" class="px-3 py-1.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/30 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
                             </button>
                         </div>
                     </div>
@@ -628,13 +633,11 @@
                                 <i class="fa-solid fa-file-signature text-amber-400"></i> FORM INPUT PERSONAL REPORT SIARAN
                             </h3>
                             <div class="flex items-center gap-2">
-                                <button id="pr-form-toggle-btn" type="button" onclick="togglePRFormVisibility()" class="hidden px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-cyber font-semibold flex items-center gap-1.5 transition shadow-glow-amber">
+                                <button id="pr-form-toggle-btn" type="button" onclick="togglePRFormVisibility()" class="hidden px-3 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-cyber font-semibold flex items-center gap-1.5">
                                     <i id="pr-form-toggle-icon" class="fa-solid fa-eye text-[10px]"></i>
                                     <span id="pr-form-toggle-text">Tampilkan Form</span>
                                 </button>
-                                <button id="pr-cancel-edit-btn" onclick="cancelReportEdit()" class="hidden px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white text-[10px] font-semibold">
-                                    Batal Edit
-                                </button>
+                                <button id="pr-cancel-edit-btn" onclick="cancelReportEdit()" class="hidden px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-semibold">Batal Edit</button>
                             </div>
                         </div>
 
@@ -645,30 +648,30 @@
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Program Siaran <span class="text-red-400">*</span></label>
                                     <div class="space-y-1.5">
-                                        <select id="pr-program-select" onchange="applyPRProgramSelection(this.value)" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400 font-semibold cursor-pointer">
+                                        <select id="pr-program-select" onchange="applyPRProgramSelection(this.value)" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none font-semibold cursor-pointer">
                                             <option value="">-- Pilih dari Jadwal Siaran Hari Ini --</option>
                                         </select>
-                                        <input type="text" id="pr-program-name" required placeholder="Atau ketik manual nama program siaran..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400 font-semibold">
+                                        <input type="text" id="pr-program-name" required placeholder="Atau ketik manual nama program siaran..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none font-semibold">
                                     </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-300 mb-1">Lokasi Siaran / Studio <span class="text-red-400">*</span></label>
-                                    <input type="text" id="pr-location" required placeholder="Contoh: Studio 1 Kebon Jeruk / OB Van 3" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400">
+                                    <input type="text" id="pr-location" required placeholder="Contoh: Studio 1 Kebon Jeruk / OB Van 3" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-300 mb-1">Jam On System <span class="text-red-400">*</span></label>
-                                    <input type="time" id="pr-time-on" onchange="calculateWorkHours()" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400 font-mono">
+                                    <input type="time" id="pr-time-on" onchange="calculateWorkHours()" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none font-mono">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-300 mb-1">Jam Off System <span class="text-red-400">*</span></label>
-                                    <input type="time" id="pr-time-off" onchange="calculateWorkHours()" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400 font-mono">
+                                    <input type="time" id="pr-time-off" onchange="calculateWorkHours()" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none font-mono">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-300 mb-1">Status Program <span class="text-red-400">*</span></label>
-                                    <select id="pr-program-status" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:ring-1 focus:ring-cyan-400 font-semibold cursor-pointer">
+                                    <select id="pr-program-status" required class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2.5 outline-none font-semibold cursor-pointer">
                                         <option value="Live">🔴 Live (Siaran Langsung)</option>
                                         <option value="Taping">📼 Taping (Rekaman)</option>
                                         <option value="GR">🎭 GR (General Rehearsal)</option>
@@ -679,7 +682,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-300 mb-1">Total Jam Kerja (Work Hours)</label>
-                                    <input type="text" id="pr-work-hours" readonly placeholder="Otomatis terhitung..." class="w-full bg-slate-950/80 border border-amber-500/20 text-amber-300 text-xs rounded-xl px-3 py-2.5 outline-none font-mono font-bold cursor-not-allowed select-none">
+                                    <input type="text" id="pr-work-hours" readonly placeholder="Otomatis terhitung..." class="w-full bg-slate-950/85 border border-amber-500/20 text-amber-300 text-xs rounded-xl px-3 py-2.5 outline-none font-mono font-bold cursor-not-allowed select-none">
                                 </div>
                             </div>
 
@@ -688,7 +691,7 @@
                                     <label class="text-xs font-cyber font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                                         <i class="fa-solid fa-boxes-packing"></i> PERALATAN & KONDISI ALAT
                                     </label>
-                                    <button type="button" onclick="addEquipmentItemRow()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-semibold flex items-center gap-1 transition">
+                                    <button type="button" onclick="addEquipmentItemRow()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-semibold flex items-center gap-1">
                                         <i class="fa-solid fa-plus text-[9px]"></i> Tambah Alat
                                     </button>
                                 </div>
@@ -698,9 +701,9 @@
                             <div class="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-3">
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-cyber font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                                        <i class="fa-solid fa-users-gear"></i> CREW IT ON DUTY / BERTUGAS
+                                        <i class="fa-solid fa-users-gear"></i> CREW IT ON DUTY
                                     </label>
-                                    <button type="button" onclick="addCrewTagRow()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-[10px] font-semibold flex items-center gap-1 transition">
+                                    <button type="button" onclick="addCrewTagRow()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-semibold flex items-center gap-1">
                                         <i class="fa-solid fa-user-plus text-[9px]"></i> Tambah Crew
                                     </button>
                                 </div>
@@ -709,11 +712,11 @@
 
                             <div>
                                 <label class="block text-xs font-semibold text-slate-300 mb-1">Catatan Tambahan / Operational Log</label>
-                                <textarea id="pr-notes" rows="3" placeholder="Tuliskan kendala teknis, instruksi khusus, atau catatan siaran..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl p-3 outline-none focus:ring-1 focus:ring-cyan-400"></textarea>
+                                <textarea id="pr-notes" rows="3" placeholder="Tuliskan kendala teknis, instruksi khusus, atau catatan siaran..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl p-3 outline-none"></textarea>
                             </div>
 
                             <div class="pt-2 flex justify-end gap-2">
-                                <button type="submit" id="pr-submit-btn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber transition flex items-center gap-2">
+                                <button type="submit" id="pr-submit-btn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber transition flex items-center gap-2 active:scale-95">
                                     <i class="fa-solid fa-cloud-arrow-up"></i>
                                     <span>Simpan Laporan</span>
                                 </button>
@@ -725,16 +728,16 @@
                         <div class="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div class="flex items-center gap-2">
                                 <h4 class="font-cyber font-bold text-cyan-300 text-sm sm:text-base flex items-center gap-2">
-                                    <i class="fa-solid fa-history text-cyan-400"></i> RIWAYAT PERSONAL REPORT (LOCAL)
+                                    <i class="fa-solid fa-history text-cyan-400"></i> RIWAYAT PERSONAL REPORT
                                 </h4>
                                 <span id="pr-history-count" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">0 Laporan</span>
                             </div>
 
                             <div id="pr-admin-export-tools" class="hidden items-center gap-1.5 flex-wrap">
-                                <button onclick="exportPRHistoryXLSX()" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] font-semibold flex items-center gap-1 transition">
+                                <button onclick="exportPRHistoryXLSX()" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-semibold flex items-center gap-1 transition active:scale-95">
                                     <i class="fa-solid fa-file-excel"></i> Export XLSX
                                 </button>
-                                <button onclick="exportPRHistoryPDF()" class="px-2.5 py-1 rounded-lg bg-fuchsia-500/20 hover:bg-fuchsia-500/30 text-fuchsia-300 border border-fuchsia-500/40 text-[10px] font-semibold flex items-center gap-1 transition">
+                                <button onclick="exportPRHistoryPDF()" class="px-2.5 py-1 rounded-lg bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/40 text-[10px] font-semibold flex items-center gap-1 transition active:scale-95">
                                     <i class="fa-solid fa-file-pdf"></i> Export PDF
                                 </button>
                             </div>
@@ -746,12 +749,29 @@
         </div>
     </main>
 
-    <!-- MODAL CHANGE PASSWORD -->
+    <!-- KELOLA AKUN MODAL -->
+    <div id="manage-accounts-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-2xl p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-users-gear text-cyan-400 text-base"></i>
+                    <h3 class="font-cyber font-bold text-cyan-300 text-sm">KELOLA AKUN CREW</h3>
+                </div>
+                <button onclick="toggleManageAccountsModal(false)" class="text-slate-400 hover:text-white p-1 transition active:scale-90"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="manage-accounts-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button onclick="toggleManageAccountsModal(false)" class="px-4 py-2 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-semibold transition active:scale-95">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GANTI PASSWORD MODAL -->
     <div id="change-pass-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-amber-500/40 rounded-2xl w-full max-w-sm p-5 shadow-glow-amber space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="font-cyber font-bold text-amber-300 text-sm">GANTI PASSWORD AKUN LOKAL</h3>
-                <button onclick="toggleChangePasswordModal(false)" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-cyber font-bold text-amber-300 text-sm">GANTI PASSWORD AKUN</h3>
+                <button onclick="toggleChangePasswordModal(false)" class="text-slate-400 hover:text-white p-1 transition active:scale-90"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form onsubmit="handleChangePasswordSubmit(event)" class="space-y-3">
                 <div>
@@ -767,48 +787,31 @@
                     <input type="password" id="pr-confirm-pass" required placeholder="******" class="w-full bg-slate-950 border border-slate-700 text-amber-200 text-xs rounded-xl px-3 py-2 outline-none font-mono">
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
-                    <button type="button" onclick="toggleChangePasswordModal(false)" class="px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 text-xs font-semibold">Batal</button>
-                    <button type="submit" class="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber">Simpan</button>
+                    <button type="button" onclick="toggleChangePasswordModal(false)" class="px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 text-xs font-semibold transition active:scale-95">Batal</button>
+                    <button type="submit" class="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-amber transition active:scale-95">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL MANAGE ACCOUNTS (ROOT ADMIN) -->
-    <div id="manage-accounts-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-2xl p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-users-gear text-cyan-400 text-base"></i>
-                    <h3 class="font-cyber font-bold text-cyan-300 text-sm">KELOLA AKUN CREW LOKAL & RESET PASSWORD</h3>
-                </div>
-                <button onclick="toggleManageAccountsModal(false)" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div id="manage-accounts-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
-            <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button onclick="toggleManageAccountsModal(false)" class="px-4 py-2 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-semibold">Tutup</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL PREVIEW PERSONAL REPORT -->
+    <!-- PREVIEW REPORT MODAL -->
     <div id="pr-preview-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-lg p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-file-invoice text-cyan-400 text-base"></i>
-                    <h3 class="font-cyber font-bold text-cyan-300 text-sm">PREVIEW PERSONAL REPORT SIARAN</h3>
+                    <h3 class="font-cyber font-bold text-cyan-300 text-sm">PREVIEW PERSONAL REPORT</h3>
                 </div>
-                <button onclick="closePRPreviewModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closePRPreviewModal()" class="text-slate-400 hover:text-white p-1 transition active:scale-90"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div id="pr-preview-modal-body" class="space-y-3"></div>
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button onclick="closePRPreviewModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-semibold hover:bg-slate-800">Tutup</button>
+                <button onclick="closePRPreviewModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-semibold transition active:scale-95">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- OTHER MODALS -->
+    <!-- OFF DUTY MODAL (FLIP 3D) -->
     <div id="offduty-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden perspective-1000">
         <div id="offduty-modal-card" class="modal-flip-container modal-flip-hidden bg-cybercard border border-amber-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-amber space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -821,15 +824,16 @@
                         <p id="offduty-modal-date" class="text-[10px] font-mono text-slate-400 mt-0.5">Tanggal: -</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeOffDutyModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition"><i class="fa-solid fa-xmark text-base"></i></button>
+                <button type="button" onclick="closeOffDutyModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition active:scale-90"><i class="fa-solid fa-xmark text-base"></i></button>
             </div>
             <div id="offduty-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button type="button" onclick="closeOffDutyModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:bg-slate-800 transition">Tutup</button>
+                <button type="button" onclick="closeOffDutyModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-semibold transition active:scale-95">Tutup</button>
             </div>
         </div>
     </div>
 
+    <!-- PROGRAMS ON AIR MODAL (FLIP 3D) -->
     <div id="programs-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden perspective-1000">
         <div id="programs-modal-card" class="modal-flip-container modal-flip-hidden bg-cybercard border border-emerald-500/40 rounded-2xl w-full max-w-lg p-5 shadow-glow-green space-y-4 max-h-[90vh] overflow-y-auto relative">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -842,15 +846,16 @@
                         <p id="programs-modal-date" class="text-[10px] font-mono text-slate-400 mt-0.5">Tanggal: -</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeActiveProgramsModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition"><i class="fa-solid fa-xmark text-base"></i></button>
+                <button type="button" onclick="closeActiveProgramsModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition active:scale-90"><i class="fa-solid fa-xmark text-base"></i></button>
             </div>
             <div id="programs-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button type="button" onclick="closeActiveProgramsModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-semibold hover:bg-slate-800 transition">Tutup</button>
+                <button type="button" onclick="closeActiveProgramsModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition active:scale-95">Tutup</button>
             </div>
         </div>
     </div>
 
+    <!-- MNT MODAL (FLIP 3D) -->
     <div id="mnt-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden perspective-1000">
         <div id="mnt-modal-card" class="modal-flip-container modal-flip-hidden bg-cybercard border border-blue-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -863,30 +868,29 @@
                         <p id="mnt-modal-date" class="text-[10px] font-mono text-slate-400 mt-0.5">Tanggal: -</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeMntModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition"><i class="fa-solid fa-xmark text-base"></i></button>
+                <button type="button" onclick="closeMntModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-950 border border-slate-800 transition active:scale-90"><i class="fa-solid fa-xmark text-base"></i></button>
             </div>
             <div id="mnt-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button type="button" onclick="closeMntModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-blue-500/30 text-blue-300 text-xs font-semibold hover:bg-slate-800 transition">Tutup</button>
+                <button type="button" onclick="closeMntModal()" class="px-4 py-2 rounded-xl bg-slate-900 border border-blue-500/30 text-blue-300 text-xs font-semibold transition active:scale-95">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL EDIT PROGRAM ASSIGNMENT -->
+    <!-- EDIT PROGRAM MODAL -->
     <div id="edit-program-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div>
                     <h3 class="font-cyber font-bold text-cyan-300 text-sm">EDIT PROGRAM SIARAN</h3>
                     <p id="modal-sub-info" class="text-[10px] text-fuchsia-400 mt-0.5 font-mono">Crew: - | Tanggal: -</p>
                 </div>
-                <button onclick="closeProgramModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeProgramModal()" class="text-slate-400 hover:text-white p-1 transition active:scale-90"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            
             <div class="space-y-3">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Pilih Preset Program</label>
-                    <select id="preset-program-select" onchange="applyProgramPreset(this.value)" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                    <select id="preset-program-select" onchange="applyProgramPreset(this.value)" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none">
                         <option value="">-- Pilih Preset --</option>
                         <option value="BWF Super 100">🏸 BWF Super 100</option>
                         <option value="Kuis Halo RCTI">📺 Kuis Halo RCTI</option>
@@ -896,60 +900,56 @@
                         <option value="MNT">🔧 MNT (Maintenance)</option>
                         <option value="Standby">⏳ Standby</option>
                         <option value="OFF">😴 OFF (Libur)</option>
-                        <option value="CUSTOM">✏️ Custom Text (Ketik Manual)</option>
+                        <option value="CUSTOM">✏️ Custom Text</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Program (Custom)</label>
-                    <input type="text" id="input-program-name" placeholder="Ketik program..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                    <input type="text" id="input-program-name" placeholder="Ketik program..." class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none">
                 </div>
-
                 <div class="pt-2 border-t border-slate-800/80">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="send-wa-checkbox" checked class="w-4 h-4 rounded bg-slate-950 border-cyan-500/40 text-cyan-500 focus:ring-cyan-400">
+                        <input type="checkbox" id="send-wa-checkbox" checked class="w-4 h-4 rounded bg-slate-950 border-cyan-500/40 text-cyan-500">
                         <span class="text-xs font-medium text-emerald-400 flex items-center gap-1.5">
                             <i class="fa-brands fa-whatsapp text-sm"></i> Kirim WA Notifikasi
                         </span>
                     </label>
                 </div>
             </div>
-
             <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
-                <button onclick="saveProgramAssignment(true)" class="px-2.5 py-1.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 text-xs font-semibold mr-auto">
-                    Kosongkan
-                </button>
-                <button onclick="closeProgramModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
-                <button onclick="saveProgramAssignment(false)" class="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Simpan</button>
+                <button onclick="saveProgramAssignment(true)" class="px-2.5 py-1.5 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/30 text-xs font-semibold mr-auto transition active:scale-95">Kosongkan</button>
+                <button onclick="closeProgramModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold transition active:scale-95">Batal</button>
+                <button onclick="saveProgramAssignment(false)" class="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan transition active:scale-95">Simpan</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL ADD CREW -->
+    <!-- TAMBAH CREW MODAL -->
     <div id="crew-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-cyan-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-cyan space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <h3 id="crew-modal-title" class="font-cyber font-bold text-cyan-300 text-sm">TAMBAH CREW IT BROADCAST</h3>
-                <button onclick="closeCrewModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeCrewModal()" class="text-slate-400 hover:text-white p-1 transition active:scale-90"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="crew-form" onsubmit="handleCrewSubmit(event)" class="space-y-3">
                 <input type="hidden" id="crew-id">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Lengkap</label>
-                    <input type="text" id="crew-fullname" required placeholder="Contoh: Budi Santoso" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                    <input type="text" id="crew-fullname" required placeholder="Contoh: Budi Santoso" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Nomor HP / WhatsApp</label>
-                    <input type="text" id="crew-phone" placeholder="Contoh: 08123456789" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-cyan-400">
+                    <input type="text" id="crew-phone" placeholder="Contoh: 08123456789" class="w-full bg-slate-950 border border-cyan-500/30 text-cyan-200 text-xs rounded-xl px-3 py-2 outline-none">
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeCrewModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
-                    <button type="submit" class="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan">Simpan</button>
+                    <button type="button" onclick="closeCrewModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 text-xs font-semibold transition active:scale-95">Batal</button>
+                    <button type="submit" class="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-cyan transition active:scale-95">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL GOOGLE SHEETS CONFIG -->
+    <!-- GOOGLE SHEETS CONFIG MODAL -->
     <div id="sheet-config-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-emerald-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-green space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -957,22 +957,22 @@
                     <i class="fa-solid fa-file-excel text-emerald-400 text-lg"></i>
                     <h3 class="font-cyber font-bold text-emerald-400 text-sm">GOOGLE SHEETS WEBHOOK</h3>
                 </div>
-                <button onclick="closeSheetConfigModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeSheetConfigModal()" class="text-slate-400 hover:text-white p-1 transition active:scale-90"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3">
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-400 mb-1">URL Google Apps Script</label>
-                    <input type="text" id="sheet-webhook-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-950 border border-emerald-500/30 text-emerald-200 text-xs font-mono rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-emerald-400">
+                    <input type="text" id="sheet-webhook-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-950 border border-emerald-500/30 text-emerald-200 text-xs font-mono rounded-xl px-3 py-2 outline-none">
                 </div>
             </div>
             <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
-                <button onclick="closeSheetConfigModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
-                <button onclick="saveSheetConfig()" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-green">Simpan & Sync</button>
+                <button onclick="closeSheetConfigModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 text-xs font-semibold transition active:scale-95">Batal</button>
+                <button onclick="saveSheetConfig()" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-cyber font-bold text-xs shadow-glow-green transition active:scale-95">Simpan & Sync</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CLEAR DATA -->
+    <!-- CLEAR DATA MODAL -->
     <div id="clear-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cybercard border border-pink-500/40 rounded-2xl w-full max-w-md p-5 shadow-glow-pink space-y-4">
             <div class="text-center space-y-2">
@@ -980,13 +980,13 @@
                 <p class="text-xs text-slate-400">Pilih opsi pembersihan data:</p>
             </div>
             <div class="space-y-2 pt-1">
-                <button onclick="executeClearData('active_month')" class="w-full p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-left transition flex items-center justify-between">
+                <button onclick="executeClearData('active_month')" class="w-full p-2.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-amber-500/30 text-left transition flex items-center justify-between active:scale-95">
                     <div>
                         <p class="text-xs font-bold text-amber-400">Clear Grid Bulan Ini</p>
                     </div>
                     <i class="fa-solid fa-calendar-minus text-amber-400 text-xs"></i>
                 </button>
-                <button onclick="executeClearData('all')" class="w-full p-2.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 text-left transition flex items-center justify-between">
+                <button onclick="executeClearData('all')" class="w-full p-2.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 text-left transition flex items-center justify-between active:scale-95">
                     <div>
                         <p class="text-xs font-bold text-pink-400">Reset Total Sistem</p>
                     </div>
@@ -994,10 +994,55 @@
                 </button>
             </div>
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button onclick="closeClearDataModal()" class="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold">Batal</button>
+                <button onclick="closeClearDataModal()" class="px-4 py-1.5 rounded-xl bg-slate-900 text-slate-300 text-xs font-semibold transition active:scale-95">Batal</button>
             </div>
         </div>
     </div>
+
+    <!-- LOCAL DATABASE SCRIPT (REPLACING FIREBASE) -->
+    <script>
+        // INISIALISASI LOCAL STORAGE
+        window.registeredUsers = JSON.parse(localStorage.getItem('3tv_pr_users') || '[]');
+        if (window.registeredUsers.length === 0) {
+            window.registeredUsers = [
+                { name: 'Root Administrator 3TV', phone: '089680808008', user: 'root', pass: '130723', isRoot: true },
+                { name: 'Administrator 3TV', phone: '081391073330', user: 'admin', pass: '8080', isRoot: false }
+            ];
+            localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
+        }
+        window.personalReportsList = JSON.parse(localStorage.getItem('3tv_pr_reports') || '[]');
+        window.loggedPRUser = JSON.parse(localStorage.getItem('3tv_pr_logged_user') || 'null');
+
+        // CRUD AKUN
+        window.dbSaveUser = function(userData) {
+            let idx = window.registeredUsers.findIndex(u => u.user.toLowerCase() === userData.user.toLowerCase());
+            if (idx >= 0) window.registeredUsers[idx] = userData;
+            else window.registeredUsers.push(userData);
+            localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
+            if (window.updatePRViewState) window.updatePRViewState();
+        };
+
+        window.dbDeleteUser = function(username) {
+            window.registeredUsers = window.registeredUsers.filter(u => u.user.toLowerCase() !== username.toLowerCase());
+            localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
+            if (window.renderManageAccountsList) window.renderManageAccountsList();
+        };
+
+        // CRUD PERSONAL REPORT
+        window.dbSaveReport = function(reportData) {
+            let idx = window.personalReportsList.findIndex(r => r.id === reportData.id);
+            if (idx >= 0) window.personalReportsList[idx] = reportData;
+            else window.personalReportsList.unshift(reportData);
+            localStorage.setItem('3tv_pr_reports', JSON.stringify(window.personalReportsList));
+            if (window.renderPRHistoryList) window.renderPRHistoryList();
+        };
+
+        window.dbDeleteReport = function(reportId) {
+            window.personalReportsList = window.personalReportsList.filter(r => r.id !== reportId);
+            localStorage.setItem('3tv_pr_reports', JSON.stringify(window.personalReportsList));
+            if (window.renderPRHistoryList) window.renderPRHistoryList();
+        };
+    </script>
 
     <!-- CORE SYSTEM JS LOGIC -->
     <script>
@@ -1016,26 +1061,10 @@
 
         let crewsData = [];
         let scheduleData = {};
-        
-        // LocalStorage Data Initialization
-        window.registeredUsers = JSON.parse(localStorage.getItem('3tv_pr_users') || '[]');
-        if (window.registeredUsers.length === 0) {
-            window.registeredUsers = [
-                { name: 'Root Administrator 3TV', phone: '089680808008', user: 'root', pass: '130723', isRoot: true },
-                { name: 'Administrator 3TV', phone: '081391073330', user: 'admin', pass: '8080', isRoot: false }
-            ];
-            localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
-        }
-
-        window.loggedPRUser = JSON.parse(localStorage.getItem('3tv_pr_logged_user') || 'null');
-        window.personalReportsList = JSON.parse(localStorage.getItem('3tv_pr_reports') || '[]');
 
         function getFormattedTodayDate() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         }
 
         function updateLiveClock() {
@@ -1046,40 +1075,64 @@
             }
         }
 
+        // --- REAL-TIME ISLAMIC & MOTIVATION RSS FEED ---
+        const fallbackQuotes = [
+            "✨ \"Sabar adalah pilar keimanan.\" (Ali bin Abi Thalib)",
+            "🚀 \"Mulailah dengan Bismillah dan teruslah melangkah untuk hasil terbaik.\"",
+            "🌙 \"Sesungguhnya bersama kesusahan ada kemudahan.\" (QS. Al-Insyirah: 6)",
+            "💡 \"Success is not final, failure is not fatal: it is the courage to continue that counts.\" (Winston Churchill)",
+            "🌿 \"Barangsiapa bersungguh-sungguh, sesungguhnya dia bersungguh-sungguh untuk dirinya sendiri.\"",
+            "⭐ \"The best of people are those that bring most benefit to others.\""
+        ];
+
+        async function initRealTimeQuotesFeed() {
+            let quotesList = [...fallbackQuotes];
+            try {
+                const res = await fetch('https://zenquotes.io/api/quotes');
+                const data = await res.json();
+                if (data && Array.isArray(data)) {
+                    data.forEach(item => {
+                        if (item.q && item.a) {
+                            quotesList.push(`💬 "${item.q}" — ${item.a}`);
+                        }
+                    });
+                }
+            } catch (e) { }
+            updateRunningText(quotesList);
+        }
+
+        function updateRunningText(quotes) {
+            const runningTextEl = document.getElementById('running-text-content');
+            if (!runningTextEl) return;
+            const baseTvChannels = "RCTI &bull; MNCTV &bull; GTV &bull; 3TV BROADCAST";
+            let index = 0;
+            function renderNextFeed() {
+                const quoteText = quotes[index % quotes.length];
+                runningTextEl.innerHTML = `${baseTvChannels} &bull;&bull;&bull; ${quoteText} &bull;&bull;&bull;`;
+                index++;
+            }
+            renderNextFeed();
+            setInterval(renderNextFeed, 12000); 
+        }
+
         function initWeatherAndGPS() {
             const infoEl = document.getElementById('weather-info');
             if (!infoEl) return;
-            
-            if (!navigator.geolocation) {
-                infoEl.textContent = "Jakarta Studio 28°C";
-                return;
-            }
-
+            if (!navigator.geolocation) { infoEl.textContent = "Jakarta Studio 28°C"; return; }
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
                 try {
-                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`);
                     const data = await res.json();
                     if (data && data.current_weather) {
-                        const temp = Math.round(data.current_weather.temperature);
-                        infoEl.textContent = `${temp}°C | Studio 3TV`;
-                    } else {
-                        infoEl.textContent = "Jakarta Studio 28°C";
-                    }
-                } catch (e) {
-                    infoEl.textContent = "Jakarta Studio 28°C";
-                }
-            }, () => {
-                infoEl.textContent = "Jakarta Studio 28°C";
-            });
+                        infoEl.textContent = `${Math.round(data.current_weather.temperature)}°C | Studio 3TV`;
+                    } else { infoEl.textContent = "Jakarta Studio 28°C"; }
+                } catch (e) { infoEl.textContent = "Jakarta Studio 28°C"; }
+            }, () => { infoEl.textContent = "Jakarta Studio 28°C"; });
         }
 
         function loadFromLocalStorage() {
-            const savedCrews = localStorage.getItem('itb_crews');
+            crewsData = JSON.parse(localStorage.getItem('itb_crews') || '[]');
             const savedSchedules = localStorage.getItem('itb_schedules');
-            crewsData = savedCrews ? JSON.parse(savedCrews) : [];
-            
             if (savedSchedules) {
                 scheduleData = JSON.parse(savedSchedules);
             } else {
@@ -1095,7 +1148,6 @@
         function applyRolePermissions() {
             const badge = document.getElementById('role-badge');
             const selectEl = document.getElementById('role-select');
-            
             if (selectEl) selectEl.value = currentUserRole;
 
             if (badge) {
@@ -1114,21 +1166,13 @@
             const isViewer = (currentUserRole === 'viewer');
             const isAdmin = (currentUserRole === 'admin');
 
-            const btnImport = document.getElementById('btn-import-xlsx');
-            const btnTemplate = document.getElementById('btn-dl-template');
-            const btnExportXlsx = document.getElementById('btn-export-xlsx');
-            const btnExportPdf = document.getElementById('btn-export-pdf');
-            const btnAddCrew = document.getElementById('btn-add-crew');
-            const btnClear = document.getElementById('tab-clear-btn');
-            const navJobReport = document.getElementById('nav-jobreport');
-
-            if (btnImport) btnImport.style.display = isViewer ? "none" : "flex";
-            if (btnTemplate) btnTemplate.style.display = isViewer ? "none" : "flex";
-            if (btnExportXlsx) btnExportXlsx.style.display = isViewer ? "none" : "flex";
-            if (btnExportPdf) btnExportPdf.style.display = isViewer ? "none" : "flex";
-            if (btnAddCrew) btnAddCrew.style.display = isViewer ? "none" : "flex";
-            if (btnClear) btnClear.style.display = isAdmin ? "flex" : "none";
-            if (navJobReport) navJobReport.style.display = isAdmin ? "flex" : "none";
+            document.getElementById('btn-import-xlsx').style.display = isViewer ? "none" : "flex";
+            document.getElementById('btn-dl-template').style.display = isViewer ? "none" : "flex";
+            document.getElementById('btn-export-xlsx').style.display = isViewer ? "none" : "flex";
+            document.getElementById('btn-export-pdf').style.display = isViewer ? "none" : "flex";
+            document.getElementById('btn-add-crew').style.display = isViewer ? "none" : "flex";
+            document.getElementById('tab-clear-btn').style.display = isAdmin ? "flex" : "none";
+            document.getElementById('nav-jobreport').style.display = isAdmin ? "flex" : "none";
 
             renderDashboard();
             renderMonthlyGrid();
@@ -1140,11 +1184,9 @@
             if (!sidebar) return;
 
             const isMobile = window.innerWidth < 768;
-
             if (isMobile) {
                 let expanded = sidebar.classList.contains('sidebar-expanded');
                 if (typeof forceState === 'boolean') expanded = !forceState;
-
                 if (expanded) {
                     sidebar.classList.remove('sidebar-expanded');
                     sidebar.classList.add('sidebar-collapsed');
@@ -1168,58 +1210,38 @@
 
         function handleRoleChange(newRole) {
             if (newRole === currentUserRole) return;
-
             if (newRole === 'viewer') {
                 currentUserRole = 'viewer';
                 applyRolePermissions();
             } else {
                 targetPendingRole = newRole;
-                const pinInput = document.getElementById('pin-input');
-                const pinErr = document.getElementById('pin-error-msg');
-                const modalTitle = document.getElementById('pin-modal-title');
-                const modalSub = document.getElementById('pin-modal-subtitle');
-                const pinModal = document.getElementById('pin-modal');
-
-                if (pinInput) pinInput.value = "";
-                if (pinErr) pinErr.classList.add('hidden');
-
-                if (newRole === 'editor' && modalTitle && modalSub) {
-                    modalTitle.textContent = "VERIFIKASI PIN EDITOR";
-                    modalSub.textContent = "Masukkan 4 digit PIN Editor (8080)";
-                } else if (newRole === 'admin' && modalTitle && modalSub) {
-                    modalTitle.textContent = "VERIFIKASI PIN ADMIN";
-                    modalSub.textContent = "Masukkan 6 digit PIN Admin";
-                }
-
-                if (pinModal) pinModal.classList.remove('hidden');
+                document.getElementById('pin-error-msg').classList.add('hidden');
+                document.getElementById('pin-input').value = "";
+                document.getElementById('pin-modal-title').textContent = newRole === 'editor' ? "VERIFIKASI PIN EDITOR" : "VERIFIKASI PIN ADMIN";
+                document.getElementById('pin-modal-subtitle').textContent = newRole === 'editor' ? "Masukkan 4 digit PIN Editor (8080)" : "Masukkan 6 digit PIN Admin";
+                document.getElementById('pin-modal').classList.remove('hidden');
             }
         }
 
         function verifyRolePin() {
             const inputVal = document.getElementById('pin-input')?.value.trim() || "";
-            const pinModal = document.getElementById('pin-modal');
-            const pinErr = document.getElementById('pin-error-msg');
-
             if (targetPendingRole === 'editor' && inputVal === EDITOR_PIN) {
                 currentUserRole = 'editor';
-                if (pinModal) pinModal.classList.add('hidden');
+                document.getElementById('pin-modal').classList.add('hidden');
                 applyRolePermissions();
             } else if (targetPendingRole === 'admin' && inputVal === ADMIN_PIN) {
                 currentUserRole = 'admin';
-                if (pinModal) pinModal.classList.add('hidden');
+                document.getElementById('pin-modal').classList.add('hidden');
                 applyRolePermissions();
             } else {
-                if (pinErr) pinErr.classList.remove('hidden');
-                const selectEl = document.getElementById('role-select');
-                if (selectEl) selectEl.value = currentUserRole;
+                document.getElementById('pin-error-msg').classList.remove('hidden');
+                document.getElementById('role-select').value = currentUserRole;
             }
         }
 
         function closePinModal() {
-            const pinModal = document.getElementById('pin-modal');
-            if (pinModal) pinModal.classList.add('hidden');
-            const selectEl = document.getElementById('role-select');
-            if (selectEl) selectEl.value = currentUserRole;
+            document.getElementById('pin-modal').classList.add('hidden');
+            document.getElementById('role-select').value = currentUserRole;
         }
 
         function switchTab(tabName) {
@@ -1262,67 +1284,56 @@
                 updatePRViewState();
             }
 
-            if (window.innerWidth < 768) {
-                toggleSidebar(false);
-            }
+            if (window.innerWidth < 768) toggleSidebar(false);
         }
 
         async function loadDataFromGoogleSheet() {
             const webhookUrl = localStorage.getItem('google_sheet_webhook_url') || DEFAULT_WEBHOOK_URL;
-            if (!webhookUrl) return;
+            if (!webhookUrl || !webhookUrl.startsWith('http')) return;
 
             const syncIcon = document.getElementById('sync-icon');
             if (syncIcon) syncIcon.classList.add('animate-spin');
 
             try {
-                const response = await fetch(webhookUrl);
+                const fetchUrl = `${webhookUrl}?t=${new Date().getTime()}`;
+                const response = await fetch(fetchUrl, { method: 'GET', headers: { 'Accept': 'application/json' }});
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
 
                 if (data && data.length > 1) {
                     const currentKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
                     if (!scheduleData[currentKey]) scheduleData[currentKey] = {};
-
                     const headerRow = data[0]; 
-
                     for (let i = 1; i < data.length; i++) {
                         const row = data[i];
                         const crewName = String(row[0] || '').trim();
                         if (!crewName) continue;
-
                         const crewPhone = row[1] ? String(row[1]).trim() : '';
-
                         let crew = crewsData.find(c => c.fullname.toLowerCase() === crewName.toLowerCase());
+                        
                         if (!crew) {
                             crew = { id: 'c_' + Date.now() + '_' + i, fullname: crewName, phone: crewPhone };
                             crewsData.push(crew);
-                        } else if (crewPhone) {
-                            crew.phone = crewPhone;
+                        } else if (crewPhone && crewPhone !== '-') { 
+                            crew.phone = crewPhone; 
                         }
-
                         if (!scheduleData[currentKey][crew.id]) scheduleData[currentKey][crew.id] = {};
 
                         for (let j = 2; j < row.length; j++) {
                             const dayNum = parseInt(headerRow[j], 10);
                             const progVal = String(row[j] || '').trim();
-                            
                             if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= 31) {
-                                if (progVal) {
-                                    scheduleData[currentKey][crew.id][dayNum] = progVal;
-                                } else {
-                                    delete scheduleData[currentKey][crew.id][dayNum];
-                                }
+                                if (progVal && progVal !== '-') scheduleData[currentKey][crew.id][dayNum] = progVal;
+                                else delete scheduleData[currentKey][crew.id][dayNum];
                             }
                         }
                     }
-
                     saveCrewsToLocalStorage();
                     saveSchedulesToLocalStorage();
                     renderDashboard();
                     renderMonthlyGrid();
                 }
-            } catch (err) {
-                console.error("Gagal sinkronisasi Google Sheets:", err);
-            } finally {
+            } catch (err) { } finally {
                 if (syncIcon) syncIcon.classList.remove('animate-spin');
             }
         }
@@ -1337,17 +1348,15 @@
             return `https://wa.me/${clean}`;
         }
 
-        function openActiveProgramsModal() {
+        window.openActiveProgramsModal = function() {
             const dateInput = document.getElementById('dashboard-date').value;
             if (!dateInput) return;
-
             const selectedDate = new Date(dateInput);
             const day = selectedDate.getDate();
             const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
             const monthSchedule = scheduleData[monthKey] || {};
 
             document.getElementById('programs-modal-date').textContent = `Tanggal: ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-
             const container = document.getElementById('programs-list-container');
             container.innerHTML = "";
 
@@ -1356,130 +1365,87 @@
                 const programName = monthSchedule[crew.id]?.[day] || "";
                 const isOff = !programName || programName.trim().toUpperCase() === "OFF";
                 const isMnt = programName.trim().toUpperCase() === "MNT" || programName.trim().toUpperCase() === "MAINTENANCE";
-
                 if (!isOff && !isMnt) {
                     count++;
                     const waUrl = getFormattedWaLink(crew.phone);
-                    const phoneHtml = waUrl 
-                        ? `<a href="${waUrl}" target="_blank" class="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 ml-2 inline-flex items-center gap-1 transition"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>`
-                        : '';
-
+                    const phoneHtml = waUrl ? `<a href="${waUrl}" target="_blank" class="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 ml-2"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>` : '';
                     const item = document.createElement('div');
                     item.className = "p-2.5 rounded-xl bg-slate-950/80 border border-emerald-500/30 flex items-center justify-between gap-2";
-                    item.innerHTML = `
-                        <div>
-                            <p class="text-xs font-cyber font-bold text-emerald-300 tracking-wide">${programName}</p>
-                            <p class="text-[11px] text-slate-300 mt-0.5"><i class="fa-solid fa-user-astronaut text-[10px] mr-1 text-cyan-400"></i> ${crew.fullname} ${phoneHtml}</p>
-                        </div>
-                        <span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green whitespace-nowrap">ON AIR</span>
-                    `;
+                    item.innerHTML = `<div><p class="text-xs font-cyber font-bold text-emerald-300 tracking-wide">${programName}</p><p class="text-[11px] text-slate-300 mt-0.5"><i class="fa-solid fa-user-astronaut text-[10px] mr-1 text-cyan-400"></i> ${crew.fullname} ${phoneHtml}</p></div><span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green">ON AIR</span>`;
                     container.appendChild(item);
                 }
             });
 
-            if (count === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">TIDAK ADA PROGRAM SIARAN BERJALAN</p>`;
-            }
-
+            if (count === 0) container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">TIDAK ADA PROGRAM SIARAN BERJALAN</p>`;
+            
             const modal = document.getElementById('programs-modal');
             const card = document.getElementById('programs-modal-card');
             modal.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                if (card) {
-                    card.classList.remove('modal-flip-hidden');
-                    card.classList.add('modal-flip-visible');
-                }
-            });
-        }
+            setTimeout(() => {
+                card.classList.remove('modal-flip-hidden');
+                card.classList.add('modal-flip-visible');
+            }, 10);
+        };
 
-        function closeActiveProgramsModal() {
+        window.closeActiveProgramsModal = function() {
             const modal = document.getElementById('programs-modal');
             const card = document.getElementById('programs-modal-card');
-            if (card) {
-                card.classList.remove('modal-flip-visible');
-                card.classList.add('modal-flip-hidden');
-            }
-            setTimeout(() => { if (modal) modal.classList.add('hidden'); }, 300);
-        }
+            card.classList.remove('modal-flip-visible');
+            card.classList.add('modal-flip-hidden');
+            setTimeout(() => { modal.classList.add('hidden'); }, 350);
+        };
 
-        function openOffDutyModal() {
+        window.openOffDutyModal = function() {
             const dateInput = document.getElementById('dashboard-date').value;
             if (!dateInput) return;
-
             const selectedDate = new Date(dateInput);
             const day = selectedDate.getDate();
             const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
             const monthSchedule = scheduleData[monthKey] || {};
-
             document.getElementById('offduty-modal-date').textContent = `Tanggal: ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-
             const container = document.getElementById('offduty-list-container');
             container.innerHTML = "";
 
             let count = 0;
             crewsData.forEach(crew => {
                 const programName = monthSchedule[crew.id]?.[day] || "";
-                const isOff = !programName || programName.trim().toUpperCase() === "OFF";
-
-                if (isOff) {
+                if (!programName || programName.trim().toUpperCase() === "OFF") {
                     count++;
                     const waUrl = getFormattedWaLink(crew.phone);
-                    const phoneHtml = waUrl 
-                        ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>`
-                        : '';
-
+                    const phoneHtml = waUrl ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>` : '';
                     const item = document.createElement('div');
                     item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800";
-                    item.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-amber-500 shadow-glow-amber"></div>
-                            <div>
-                                <p class="text-xs font-semibold text-slate-200">${crew.fullname}</p>
-                                ${phoneHtml}
-                            </div>
-                        </div>
-                        <span class="px-2 py-0.5 text-[9px] font-mono font-bold rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">OFF</span>
-                    `;
+                    item.innerHTML = `<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-amber-500 shadow-glow-amber"></div><div><p class="text-xs font-semibold text-slate-200">${crew.fullname}</p>${phoneHtml}</div></div><span class="px-2 py-0.5 text-[9px] font-mono font-bold rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">OFF</span>`;
                     container.appendChild(item);
                 }
             });
-
-            if (count === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">ALL CREW ON DUTY (0 OFF)</p>`;
-            }
-
+            if (count === 0) container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">ALL CREW ON DUTY (0 OFF)</p>`;
+            
             const modal = document.getElementById('offduty-modal');
             const card = document.getElementById('offduty-modal-card');
             modal.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                if (card) {
-                    card.classList.remove('modal-flip-hidden');
-                    card.classList.add('modal-flip-visible');
-                }
-            });
-        }
+            setTimeout(() => {
+                card.classList.remove('modal-flip-hidden');
+                card.classList.add('modal-flip-visible');
+            }, 10);
+        };
 
-        function closeOffDutyModal() {
+        window.closeOffDutyModal = function() {
             const modal = document.getElementById('offduty-modal');
             const card = document.getElementById('offduty-modal-card');
-            if (card) {
-                card.classList.remove('modal-flip-visible');
-                card.classList.add('modal-flip-hidden');
-            }
-            setTimeout(() => { if (modal) modal.classList.add('hidden'); }, 300);
-        }
+            card.classList.remove('modal-flip-visible');
+            card.classList.add('modal-flip-hidden');
+            setTimeout(() => { modal.classList.add('hidden'); }, 350);
+        };
 
-        function openMntModal() {
+        window.openMntModal = function() {
             const dateInput = document.getElementById('dashboard-date').value;
             if (!dateInput) return;
-
             const selectedDate = new Date(dateInput);
             const day = selectedDate.getDate();
             const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
             const monthSchedule = scheduleData[monthKey] || {};
-
             document.getElementById('mnt-modal-date').textContent = `Tanggal: ${selectedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-
             const container = document.getElementById('mnt-list-container');
             container.innerHTML = "";
 
@@ -1487,54 +1453,34 @@
             crewsData.forEach(crew => {
                 const programName = monthSchedule[crew.id]?.[day] || "";
                 const isMnt = programName.trim().toUpperCase() === "MNT" || programName.trim().toUpperCase() === "MAINTENANCE";
-
                 if (isMnt) {
                     count++;
                     const waUrl = getFormattedWaLink(crew.phone);
-                    const phoneHtml = waUrl 
-                        ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>`
-                        : '';
-
+                    const phoneHtml = waUrl ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>` : '';
                     const item = document.createElement('div');
                     item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-blue-500/30";
-                    item.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-blue-400 shadow-glow-cyan"></div>
-                            <div>
-                                <p class="text-xs font-semibold text-slate-200">${crew.fullname}</p>
-                                ${phoneHtml}
-                            </div>
-                        </div>
-                        <span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">MNT</span>
-                    `;
+                    item.innerHTML = `<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-blue-400 shadow-glow-cyan"></div><div><p class="text-xs font-semibold text-slate-200">${crew.fullname}</p>${phoneHtml}</div></div><span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">MNT</span>`;
                     container.appendChild(item);
                 }
             });
-
-            if (count === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">TIDAK ADA CREW MAINTENANCE (0 MNT)</p>`;
-            }
-
+            if (count === 0) container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6 font-mono">TIDAK ADA CREW MAINTENANCE (0 MNT)</p>`;
+            
             const modal = document.getElementById('mnt-modal');
             const card = document.getElementById('mnt-modal-card');
             modal.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                if (card) {
-                    card.classList.remove('modal-flip-hidden');
-                    card.classList.add('modal-flip-visible');
-                }
-            });
-        }
+            setTimeout(() => {
+                card.classList.remove('modal-flip-hidden');
+                card.classList.add('modal-flip-visible');
+            }, 10);
+        };
 
-        function closeMntModal() {
+        window.closeMntModal = function() {
             const modal = document.getElementById('mnt-modal');
             const card = document.getElementById('mnt-modal-card');
-            if (card) {
-                card.classList.remove('modal-flip-visible');
-                card.classList.add('modal-flip-hidden');
-            }
-            setTimeout(() => { if (modal) modal.classList.add('hidden'); }, 300);
-        }
+            card.classList.remove('modal-flip-visible');
+            card.classList.add('modal-flip-hidden');
+            setTimeout(() => { modal.classList.add('hidden'); }, 350);
+        };
 
         function renderDashboard() {
             const dateInput = document.getElementById('dashboard-date').value;
@@ -1543,13 +1489,9 @@
             const day = selectedDate.getDate();
             const monthKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
             const monthSchedule = scheduleData[monthKey] || {};
-
             const cardsContainer = document.getElementById('crew-cards-grid');
             cardsContainer.innerHTML = "";
-            let onDutyCount = 0;
-            let offDutyCount = 0;
-            let mntCount = 0;
-            let programCount = 0;
+            let onDutyCount = 0, offDutyCount = 0, mntCount = 0, programCount = 0;
 
             crewsData.forEach(crew => {
                 if (searchQuery && !crew.fullname.toLowerCase().includes(searchQuery.toLowerCase())) return;
@@ -1557,61 +1499,19 @@
                 const isOff = !programName || programName.trim().toUpperCase() === "OFF";
                 const isMnt = programName.trim().toUpperCase() === "MNT" || programName.trim().toUpperCase() === "MAINTENANCE";
 
-                if (isOff) {
-                    offDutyCount++;
-                } else if (isMnt) {
+                if (isOff) offDutyCount++;
+                else {
                     onDutyCount++;
-                    mntCount++;
+                    if (isMnt) mntCount++; else programCount++;
                     const waUrl = getFormattedWaLink(crew.phone);
-                    const phoneHtml = waUrl 
-                        ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-xs"></i> ${crew.phone}</a>`
-                        : `<span class="text-[10px] text-slate-500 font-mono">3TV IT Broadcast</span>`;
+                    const phoneHtml = waUrl ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5"><i class="fa-brands fa-whatsapp"></i> ${crew.phone}</a>` : `<span class="text-[10px] text-slate-500 font-mono">3TV Broadcast</span>`;
+                    const badgeClass = isMnt ? "bg-blue-500/10 text-blue-400 border-blue-500/30" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-glow-green";
+                    const badgeText = isMnt ? "MNT DUTY" : "ON DUTY";
+                    const boxBorder = isMnt ? "border-blue-500/40" : "border-cyan-500/30";
 
                     const card = document.createElement('div');
-                    card.className = "bg-cybercard border border-blue-500/40 rounded-2xl p-3.5 shadow-xl hover:border-blue-400 transition flex flex-col justify-between space-y-2.5 relative overflow-hidden group";
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex items-start justify-between gap-2">
-                                <h4 class="font-bold text-white text-xs sm:text-sm tracking-wide">${crew.fullname}</h4>
-                                <span class="px-2 py-0.5 text-[8px] sm:text-[9px] font-cyber font-bold rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">MNT DUTY</span>
-                            </div>
-                            <div class="mt-2 p-2 rounded-xl bg-slate-950/80 border border-blue-500/20">
-                                <p class="text-[8px] text-blue-400 font-cyber font-semibold tracking-wider uppercase">MAINTENANCE / MNT</p>
-                                <p class="text-xs font-semibold text-white mt-0.5">${programName}</p>
-                            </div>
-                        </div>
-                        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-                            ${phoneHtml}
-                            ${currentUserRole !== 'viewer' ? `<button onclick="openProgramModal('${crew.id}', ${day})" class="text-cyan-400 hover:text-cyan-300 font-medium p-1 ml-auto"><i class="fa-solid fa-pen-to-square"></i></button>` : ''}
-                        </div>
-                    `;
-                    cardsContainer.appendChild(card);
-                } else {
-                    onDutyCount++;
-                    programCount++;
-                    const waUrl = getFormattedWaLink(crew.phone);
-                    const phoneHtml = waUrl 
-                        ? `<a href="${waUrl}" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-xs"></i> ${crew.phone}</a>`
-                        : `<span class="text-[10px] text-slate-500 font-mono">3TV Broadcast</span>`;
-
-                    const card = document.createElement('div');
-                    card.className = "bg-cybercard border border-cyan-500/30 rounded-2xl p-3.5 shadow-xl hover:border-cyan-400 transition flex flex-col justify-between space-y-2.5 relative overflow-hidden group";
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex items-start justify-between gap-2">
-                                <h4 class="font-bold text-white text-xs sm:text-sm tracking-wide">${crew.fullname}</h4>
-                                <span class="px-2 py-0.5 text-[8px] sm:text-[9px] font-cyber font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-glow-green">ON DUTY</span>
-                            </div>
-                            <div class="mt-2 p-2 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                                <p class="text-[8px] text-cyan-400 font-cyber font-semibold tracking-wider uppercase">PROGRAM SIARAN</p>
-                                <p class="text-xs font-semibold text-white mt-0.5">${programName}</p>
-                            </div>
-                        </div>
-                        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-                            ${phoneHtml}
-                            ${currentUserRole !== 'viewer' ? `<button onclick="openProgramModal('${crew.id}', ${day})" class="text-cyan-400 hover:text-cyan-300 font-medium p-1 ml-auto"><i class="fa-solid fa-pen-to-square"></i></button>` : ''}
-                        </div>
-                    `;
+                    card.className = `bg-cybercard border ${boxBorder} rounded-2xl p-3.5 shadow-xl transition flex flex-col justify-between space-y-2.5`;
+                    card.innerHTML = `<div><div class="flex items-start justify-between gap-2"><h4 class="font-bold text-white text-xs sm:text-sm tracking-wide">${crew.fullname}</h4><span class="px-2 py-0.5 text-[8px] sm:text-[9px] font-cyber font-bold rounded border ${badgeClass}">${badgeText}</span></div><div class="mt-2 p-2 rounded-xl bg-slate-950/80 border ${isMnt ? 'border-blue-500/20' : 'border-cyan-500/20'}"><p class="text-[8px] ${isMnt ? 'text-blue-400' : 'text-cyan-400'} font-cyber font-semibold uppercase">${isMnt ? 'MAINTENANCE' : 'PROGRAM SIARAN'}</p><p class="text-xs font-semibold text-white mt-0.5">${programName}</p></div></div><div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">${phoneHtml}${currentUserRole !== 'viewer' ? `<button onclick="openProgramModal('${crew.id}', ${day})" class="text-cyan-400 hover:text-cyan-300 p-1 ml-auto"><i class="fa-solid fa-pen-to-square"></i></button>` : ''}</div>`;
                     cardsContainer.appendChild(card);
                 }
             });
@@ -1628,9 +1528,7 @@
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const dayNamesShort = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
-            
             document.getElementById('current-month-display').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
             const now = new Date();
             const isCurrentRealMonth = (now.getMonth() === currentMonth && now.getFullYear() === currentYear);
             const realTodayDay = now.getDate();
@@ -1639,14 +1537,9 @@
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(currentYear, currentMonth, d);
                 const dayOfWeek = dateObj.getDay();
-                const dayNameStr = dayNamesShort[dayOfWeek];
                 const isWeekend = [0, 6].includes(dayOfWeek);
                 const isTodayCell = isCurrentRealMonth && (d === realTodayDay);
-                
-                headerHTML += `<th class="p-2 min-w-[90px] sm:min-w-[105px] text-center border-b border-r border-cyan-500/20 ${isTodayCell ? 'bg-cyan-500/30 text-cyan-300 shadow-glow-cyan font-black ring-1 ring-cyan-400' : (isWeekend ? 'bg-amber-500/10 text-amber-400' : '')}">
-                    <span class="block text-[10px] text-fuchsia-400 font-mono font-semibold uppercase">${dayNameStr}</span>
-                    <span class="block text-xs font-bold font-mono">${d} ${isTodayCell ? '📌' : ''}</span>
-                </th>`;
+                headerHTML += `<th class="p-2 min-w-[90px] text-center border-b border-r border-cyan-500/20 ${isTodayCell ? 'bg-cyan-500/30 text-cyan-300 font-black ring-1 ring-cyan-400' : (isWeekend ? 'bg-amber-500/10 text-amber-400' : '')}"><span class="block text-[10px] text-fuchsia-400 font-mono font-semibold uppercase">${dayNamesShort[dayOfWeek]}</span><span class="block text-xs font-bold font-mono">${d} ${isTodayCell ? '📌' : ''}</span></th>`;
             }
             document.getElementById('matrix-header-row').innerHTML = headerHTML;
 
@@ -1656,7 +1549,7 @@
 
             crewsData.forEach((crew, idx) => {
                 if (searchQuery && !crew.fullname.toLowerCase().includes(searchQuery.toLowerCase())) return;
-                bodyHTML += `<tr class="hover:bg-cyan-950/20 transition"><td class="p-2.5 text-center border-b border-r border-slate-800 text-slate-400 sticky-col-1 bg-cybercard font-mono text-[11px]">${idx + 1}</td><td class="p-2.5 border-b border-r border-slate-800 sticky-col-2 bg-cybercard font-bold text-white text-[11px]">${crew.fullname}</td>`;
+                bodyHTML += `<tr class="hover:bg-cyan-950/20 transition"><td class="p-2.5 text-center border-b border-r border-slate-800 sticky-col-1 bg-cybercard font-mono text-[11px]">${idx + 1}</td><td class="p-2.5 border-b border-r border-slate-800 sticky-col-2 bg-cybercard font-bold text-white text-[11px]">${crew.fullname}</td>`;
                 for (let d = 1; d <= daysInMonth; d++) {
                     const progName = monthSchedule[crew.id]?.[d] || "";
                     const isOff = progName.toUpperCase() === "OFF";
@@ -1665,15 +1558,10 @@
 
                     let cellContent = `<span class="text-slate-600 text-[10px]">-</span>`;
                     if (progName) {
-                        if (isOff) {
-                            cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 shadow-glow-red block w-full text-center">OFF</span>`;
-                        } else if (isMnt) {
-                            cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-glow-cyan block w-full text-center">${progName}</span>`;
-                        } else {
-                            cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-glow-green block w-full text-center">${progName}</span>`;
-                        }
+                        if (isOff) cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 block w-full text-center">OFF</span>`;
+                        else if (isMnt) cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 block w-full text-center">${progName}</span>`;
+                        else cellContent = `<span class="px-2 py-1 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 block w-full text-center">${progName}</span>`;
                     }
-
                     bodyHTML += `<td ${currentUserRole !== 'viewer' ? `onclick="openProgramModal('${crew.id}', ${d})"` : ''} class="p-1.5 border-b border-r border-slate-800 text-center schedule-cell ${isTodayCell ? 'bg-cyan-500/5' : ''} ${currentUserRole !== 'viewer' ? 'cursor-pointer hover:bg-cyan-900/30' : ''}">${cellContent}</td>`;
                 }
                 bodyHTML += `</tr>`;
@@ -1684,13 +1572,12 @@
         function renderJobReport() {
             const periodFilter = document.getElementById('report-period-filter')?.value || 'month';
             const currentKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-            
             let logEntries = [];
             let totalTasks = 0;
+            let totalMntTasks = 0;
             let crewTaskMap = {};
             let programTaskMap = {};
             let onAirDutyCount = 0;
-
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
             if (periodFilter === 'month') {
@@ -1699,18 +1586,11 @@
                     for (let d = 1; d <= daysInMonth; d++) {
                         const prog = monthSchedule[crew.id]?.[d];
                         if (prog && prog.trim().toUpperCase() !== 'OFF') {
-                            totalTasks++;
+                            const isMnt = prog.toUpperCase() === 'MNT' || prog.toUpperCase() === 'MAINTENANCE';
+                            if (isMnt) { totalMntTasks++; } else { totalTasks++; onAirDutyCount++; }
                             crewTaskMap[crew.fullname] = (crewTaskMap[crew.fullname] || 0) + 1;
                             programTaskMap[prog] = (programTaskMap[prog] || 0) + 1;
-                            if (prog.toUpperCase() !== 'MNT' && prog.toUpperCase() !== 'MAINTENANCE') {
-                                onAirDutyCount++;
-                            }
-                            logEntries.push({
-                                date: `${d}/${currentMonth + 1}/${currentYear}`,
-                                crewName: crew.fullname,
-                                program: prog,
-                                category: (prog.toUpperCase() === 'MNT' || prog.toUpperCase() === 'MAINTENANCE') ? 'Maintenance' : 'Program Siaran'
-                            });
+                            logEntries.push({ date: `${d}/${currentMonth + 1}/${currentYear}`, crewName: crew.fullname, program: prog, category: isMnt ? 'Maintenance' : 'Program Siaran' });
                         }
                     }
                 });
@@ -1722,18 +1602,11 @@
                         Object.keys(crewAssignments).forEach(dayNum => {
                             const prog = crewAssignments[dayNum];
                             if (prog && prog.trim().toUpperCase() !== 'OFF') {
-                                totalTasks++;
+                                const isMnt = prog.toUpperCase() === 'MNT' || prog.toUpperCase() === 'MAINTENANCE';
+                                if (isMnt) { totalMntTasks++; } else { totalTasks++; onAirDutyCount++; }
                                 crewTaskMap[crew.fullname] = (crewTaskMap[crew.fullname] || 0) + 1;
                                 programTaskMap[prog] = (programTaskMap[prog] || 0) + 1;
-                                if (prog.toUpperCase() !== 'MNT' && prog.toUpperCase() !== 'MAINTENANCE') {
-                                    onAirDutyCount++;
-                                }
-                                logEntries.push({
-                                    date: `${dayNum} (${mKey})`,
-                                    crewName: crew.fullname,
-                                    program: prog,
-                                    category: (prog.toUpperCase() === 'MNT' || prog.toUpperCase() === 'MAINTENANCE') ? 'Maintenance' : 'Program Siaran'
-                                });
+                                logEntries.push({ date: `${dayNum} (${mKey})`, crewName: crew.fullname, program: prog, category: isMnt ? 'Maintenance' : 'Program Siaran' });
                             }
                         });
                     });
@@ -1741,25 +1614,24 @@
             }
 
             document.getElementById('jr-total-tasks').textContent = totalTasks;
+            document.getElementById('jr-total-mnt').textContent = totalMntTasks;
 
             let topCrew = "-";
             let maxCrewTasks = 0;
             Object.keys(crewTaskMap).forEach(cName => {
-                if (crewTaskMap[cName] > maxCrewTasks) {
-                    maxCrewTasks = crewTaskMap[cName];
-                    topCrew = cName;
-                }
+                if (crewTaskMap[cName] > maxCrewTasks) { maxCrewTasks = crewTaskMap[cName]; topCrew = cName; }
             });
             document.getElementById('jr-top-crew').textContent = topCrew;
             document.getElementById('jr-top-crew-count').textContent = `${maxCrewTasks} Sesi Tugas`;
 
-            const dutyRatio = totalTasks > 0 ? Math.round((onAirDutyCount / totalTasks) * 100) : 0;
+            const totalCombinedTasks = totalTasks + totalMntTasks;
+            const dutyRatio = totalCombinedTasks > 0 ? Math.round((onAirDutyCount / totalCombinedTasks) * 100) : 0;
             document.getElementById('jr-duty-ratio').textContent = `${dutyRatio}%`;
 
             let topProg = "-";
             let maxProgCount = 0;
             Object.keys(programTaskMap).forEach(pName => {
-                if (programTaskMap[pName] > maxProgCount) {
+                if (programTaskMap[pName] > maxProgCount && pName.toUpperCase() !== 'MNT' && pName.toUpperCase() !== 'MAINTENANCE') {
                     maxProgCount = programTaskMap[pName];
                     topProg = pName;
                 }
@@ -1769,7 +1641,6 @@
 
             const rankingContainer = document.getElementById('jr-crew-ranking-list');
             rankingContainer.innerHTML = "";
-
             const sortedCrews = Object.keys(crewTaskMap).sort((a, b) => crewTaskMap[b] - crewTaskMap[a]);
 
             if (sortedCrews.length === 0) {
@@ -1777,22 +1648,10 @@
             } else {
                 sortedCrews.forEach((cName, rank) => {
                     const taskCnt = crewTaskMap[cName];
-                    const percentage = Math.min(100, Math.round((taskCnt / (totalTasks || 1)) * 100));
-
+                    const percentage = Math.min(100, Math.round((taskCnt / (totalCombinedTasks || 1)) * 100));
                     const rankCard = document.createElement('div');
                     rankCard.className = "bg-slate-950/80 border border-slate-800 p-2.5 rounded-xl space-y-1.5";
-                    rankCard.innerHTML = `
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="font-bold text-slate-200 flex items-center gap-1.5 leading-tight break-words max-w-[180px]">
-                                <span class="w-4 h-4 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-mono flex items-center justify-center shrink-0">${rank + 1}</span>
-                                ${cName}
-                            </span>
-                            <span class="font-mono text-amber-400 font-bold shrink-0 ml-1">${taskCnt} Tugas</span>
-                        </div>
-                        <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
-                            <div class="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full" style="width: ${percentage}%"></div>
-                        </div>
-                    `;
+                    rankCard.innerHTML = `<div class="flex items-center justify-between text-xs"><span class="font-bold text-slate-200 flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-mono flex items-center justify-center">${rank + 1}</span> ${cName}</span><span class="font-mono text-amber-400 font-bold">${taskCnt} Tugas</span></div><div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full" style="width: ${percentage}%"></div></div>`;
                     rankingContainer.appendChild(rankCard);
                 });
             }
@@ -1805,18 +1664,10 @@
                 auditTbody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-slate-500 font-mono">Tidak ada riwayat log penugasan.</td></tr>`;
             } else {
                 logEntries.slice(0, 50).forEach(log => {
-                    const catBadge = log.category === 'Maintenance' 
-                        ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
-                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-
+                    const catBadge = log.category === 'Maintenance' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
                     const row = document.createElement('tr');
                     row.className = "hover:bg-slate-800/40 transition";
-                    row.innerHTML = `
-                        <td class="p-2.5 font-mono text-slate-400">${log.date}</td>
-                        <td class="p-2.5 font-bold text-white">${log.crewName}</td>
-                        <td class="p-2.5 text-cyan-300 font-medium">${log.program}</td>
-                        <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded text-[9px] font-cyber font-bold border ${catBadge}">${log.category}</span></td>
-                    `;
+                    row.innerHTML = `<td class="p-2.5 font-mono text-slate-400">${log.date}</td><td class="p-2.5 font-bold text-white">${log.crewName}</td><td class="p-2.5 text-cyan-300 font-medium">${log.program}</td><td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded text-[9px] font-cyber font-bold border ${catBadge}">${log.category}</span></td>`;
                     auditTbody.appendChild(row);
                 });
             }
@@ -1824,83 +1675,53 @@
 
         function exportJobReportPDF() {
             if (!window.jspdf || !window.jspdf.jsPDF) return alert("Pustaka PDF belum siap.");
-
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.setTextColor(255, 184, 0);
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(255, 184, 0);
             doc.text("3TV BROADCAST - EXECUTIVE JOB REPORT & AUDIT", 14, 15);
-
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(140, 140, 140);
+            doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(140, 140, 140);
             doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 21);
-
-            const totalTasks = document.getElementById('jr-total-tasks').textContent;
-            const topCrew = document.getElementById('jr-top-crew').textContent;
-            const dutyRatio = document.getElementById('jr-duty-ratio').textContent;
-            const topProg = document.getElementById('jr-top-program').textContent;
-
             doc.autoTable({
                 head: [["Ringkasan Eksekutif", "Nilai Meter"]],
                 body: [
-                    ["Total Sesi Tugas Terlaksana", totalTasks],
-                    ["Crew Teraktif (Duty Rank #1)", topCrew],
-                    ["Rasio Penayangan On-Air", dutyRatio],
-                    ["Program Paling Sering Tayang", topProg]
+                    ["Total Sesi Tugas On-Air", document.getElementById('jr-total-tasks').textContent],
+                    ["Total Tugas Maintenance (MNT)", document.getElementById('jr-total-mnt').textContent],
+                    ["Crew Teraktif (Duty Rank #1)", document.getElementById('jr-top-crew').textContent],
+                    ["Rasio Penayangan On-Air", document.getElementById('jr-duty-ratio').textContent],
+                    ["Program Paling Sering Tayang", document.getElementById('jr-top-program').textContent]
                 ],
-                startY: 26,
-                theme: 'grid',
-                styles: { fontSize: 9, cellPadding: 2.5 },
-                headStyles: { fillColor: [13, 19, 34], textColor: [255, 184, 0] }
+                startY: 26, theme: 'grid', styles: { fontSize: 9, cellPadding: 2.5 }, headStyles: { fillColor: [13, 19, 34], textColor: [255, 184, 0] }
             });
-
             doc.save(`Job_Report_3TV_${getFormattedTodayDate()}.pdf`);
         }
 
         function populatePRProgramDropdown() {
             const selectEl = document.getElementById('pr-program-select');
             if (!selectEl) return;
-
             selectEl.innerHTML = `<option value="">-- Pilih dari Jadwal Siaran Hari Ini --</option>`;
-
             const now = new Date();
             const todayDay = now.getDate();
             const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             const todaySchedule = scheduleData[monthKey] || {};
-
             const programSet = new Set();
-
             Object.values(todaySchedule).forEach(crewDayMap => {
                 const prog = crewDayMap[todayDay];
-                if (prog && prog.trim().toUpperCase() !== 'OFF') {
-                    programSet.add(prog.trim());
-                }
+                if (prog && prog.trim().toUpperCase() !== 'OFF') programSet.add(prog.trim());
             });
-
             if (programSet.size > 0) {
                 programSet.forEach(pName => {
                     const opt = document.createElement('option');
-                    opt.value = pName;
-                    opt.textContent = `📺 ${pName}`;
+                    opt.value = pName; opt.textContent = `📺 ${pName}`;
                     selectEl.appendChild(opt);
                 });
             } else {
                 const opt = document.createElement('option');
-                opt.value = "";
-                opt.disabled = true;
-                opt.textContent = "(Tidak ada program siaran terjadwal hari ini)";
+                opt.value = ""; opt.disabled = true; opt.textContent = "(Tidak ada program siaran terjadwal hari ini)";
                 selectEl.appendChild(opt);
             }
         }
 
-        function applyPRProgramSelection(val) {
-            if (val) {
-                document.getElementById('pr-program-name').value = val;
-            }
-        }
+        function applyPRProgramSelection(val) { if (val) document.getElementById('pr-program-name').value = val; }
 
         function updatePRViewState() {
             const authCard = document.getElementById('pr-auth-card');
@@ -1909,15 +1730,12 @@
             if (!window.loggedPRUser) {
                 authCard.classList.remove('hidden');
                 mainContainer.classList.add('hidden');
-                document.getElementById('pr-login-user').value = "";
-                document.getElementById('pr-login-pass').value = "";
             } else {
                 authCard.classList.add('hidden');
                 mainContainer.classList.remove('hidden');
 
                 const isRootAdmin = (window.loggedPRUser.isRoot || window.loggedPRUser.user.toLowerCase() === 'root');
                 const isAdminRole = (currentUserRole === 'admin') || (window.loggedPRUser.user.toLowerCase() === 'admin');
-
                 const roleBadge = document.getElementById('pr-logged-role-badge');
                 if (isRootAdmin) {
                     roleBadge.textContent = "Root Admin";
@@ -1932,30 +1750,18 @@
 
                 document.getElementById('pr-logged-user-name').textContent = window.loggedPRUser.name;
                 document.getElementById('pr-logged-user-phone').textContent = `HP: ${window.loggedPRUser.phone}`;
-
-                const manageBtn = document.getElementById('manage-accounts-btn');
+                document.getElementById('manage-accounts-btn').classList.toggle('hidden', !isRootAdmin);
+                
                 const formToggleBtn = document.getElementById('pr-form-toggle-btn');
                 const formEl = document.getElementById('personal-report-form');
-
-                if (manageBtn) {
-                    if (isRootAdmin) manageBtn.classList.remove('hidden');
-                    else manageBtn.classList.add('hidden');
-                }
-
-                if (formToggleBtn && formEl) {
-                    if (isRootAdmin || isAdminRole) {
-                        formToggleBtn.classList.remove('hidden');
-                        isPRFormVisible = false;
-                        formEl.classList.add('hidden');
-                        const toggleIcon = document.getElementById('pr-form-toggle-icon');
-                        const toggleText = document.getElementById('pr-form-toggle-text');
-                        if (toggleIcon) toggleIcon.className = "fa-solid fa-eye text-[10px]";
-                        if (toggleText) toggleText.textContent = "Tampilkan Form";
-                    } else {
-                        formToggleBtn.classList.add('hidden');
-                        isPRFormVisible = true;
-                        formEl.classList.remove('hidden');
-                    }
+                if (isRootAdmin || isAdminRole) {
+                    formToggleBtn.classList.remove('hidden');
+                    formEl.classList.add('hidden');
+                    isPRFormVisible = false;
+                } else {
+                    formToggleBtn.classList.add('hidden');
+                    formEl.classList.remove('hidden');
+                    isPRFormVisible = true;
                 }
 
                 populatePRProgramDropdown();
@@ -1966,159 +1772,81 @@
 
         let isPRFormVisible = true;
         function togglePRFormVisibility() {
-            const formEl = document.getElementById('personal-report-form');
-            const toggleIcon = document.getElementById('pr-form-toggle-icon');
-            const toggleText = document.getElementById('pr-form-toggle-text');
-            if (!formEl) return;
-
             isPRFormVisible = !isPRFormVisible;
-            if (isPRFormVisible) {
-                formEl.classList.remove('hidden');
-                if (toggleIcon) toggleIcon.className = "fa-solid fa-eye-slash text-[10px]";
-                if (toggleText) toggleText.textContent = "Sembunyikan Form";
-            } else {
-                formEl.classList.add('hidden');
-                if (toggleIcon) toggleIcon.className = "fa-solid fa-eye text-[10px]";
-                if (toggleText) toggleText.textContent = "Tampilkan Form";
-            }
+            document.getElementById('personal-report-form').classList.toggle('hidden', !isPRFormVisible);
+            document.getElementById('pr-form-toggle-icon').className = isPRFormVisible ? "fa-solid fa-eye-slash text-[10px]" : "fa-solid fa-eye text-[10px]";
+            document.getElementById('pr-form-toggle-text').textContent = isPRFormVisible ? "Sembunyikan Form" : "Tampilkan Form";
         }
 
         function handlePRLogin(e) {
             e.preventDefault();
             const userVal = document.getElementById('pr-login-user').value.trim();
             const passVal = document.getElementById('pr-login-pass').value.trim();
-
             const foundUser = window.registeredUsers.find(u => u.user.toLowerCase() === userVal.toLowerCase() && String(u.pass) === passVal);
 
             if (foundUser) {
                 window.loggedPRUser = foundUser;
                 localStorage.setItem('3tv_pr_logged_user', JSON.stringify(window.loggedPRUser));
-                document.getElementById('pr-login-user').value = "";
-                document.getElementById('pr-login-pass').value = "";
                 updatePRViewState();
-            } else {
-                alert("Kredensial Login Salah! Silakan periksa Username dan Password.");
-            }
+            } else { alert("Kredensial Login Salah!"); }
         }
 
-        function logoutPRUser() {
-            window.loggedPRUser = null;
-            localStorage.removeItem('3tv_pr_logged_user');
-            updatePRViewState();
-        }
-
-        function toggleManageAccountsModal(show = true) {
+        window.toggleManageAccountsModal = function(show = true) {
             const modal = document.getElementById('manage-accounts-modal');
-            if (!modal) return;
+            if (show) { renderManageAccountsList(); modal.classList.remove('hidden'); }
+            else { modal.classList.add('hidden'); }
+        };
 
-            if (show) {
-                if (!window.loggedPRUser || (!window.loggedPRUser.isRoot && window.loggedPRUser.user.toLowerCase() !== 'root')) {
-                    alert("Akses Ditolak! Hanya Root Admin yang dapat mengelola akun.");
-                    return;
-                }
-                renderManageAccountsList();
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        function renderManageAccountsList() {
+        window.renderManageAccountsList = function() {
             const listContainer = document.getElementById('manage-accounts-list');
             if (!listContainer) return;
             listContainer.innerHTML = "";
-
             window.registeredUsers.forEach(acc => {
                 const isRoot = acc.isRoot || acc.user.toLowerCase() === 'root';
                 const card = document.createElement('div');
                 card.className = "p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-2";
-                card.innerHTML = `
-                    <div>
-                        <p class="text-xs font-bold text-slate-200">${acc.name} ${isRoot ? '<span class="text-[9px] text-amber-400 font-mono">(Root)</span>' : ''}</p>
-                        <p class="text-[10px] text-slate-400 font-mono">User: ${acc.user} | HP: ${acc.phone} | Pass: <span class="text-cyan-400">${acc.pass}</span></p>
-                    </div>
-                    ${!isRoot ? `
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="rootResetUserPassword('${acc.user}')" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-semibold">
-                                Reset Pass
-                            </button>
-                            <button onclick="rootDeleteUser('${acc.user}')" class="px-2 py-1 rounded bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-[10px] font-semibold">
-                                Hapus
-                            </button>
-                        </div>
-                    ` : ''}
-                `;
+                card.innerHTML = `<div><p class="text-xs font-bold text-slate-200">${acc.name} ${isRoot ? '<span class="text-[9px] text-amber-400 font-mono ml-1 px-1 border border-amber-500/40 rounded bg-amber-500/20">(Root)</span>' : ''}</p><p class="text-[10px] text-slate-400 font-mono mt-1">User: ${acc.user} | HP: ${acc.phone} <br/> Pass: <span class="text-cyan-400 font-bold">${acc.pass}</span></p></div>${!isRoot ? `<div class="flex flex-col sm:flex-row items-center gap-1.5"><button onclick="window.rootResetUserPassword('${acc.user}')" class="w-full sm:w-auto px-2.5 py-1.5 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-[10px] font-semibold border border-amber-500/40 transition active:scale-95 shadow-glow-amber">Reset Pass</button><button onclick="window.rootDeleteUser('${acc.user}')" class="w-full sm:w-auto px-2.5 py-1.5 rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 text-[10px] font-semibold border border-red-500/40 transition active:scale-95 shadow-glow-red">Hapus</button></div>` : ''}`;
                 listContainer.appendChild(card);
             });
-        }
+        };
 
-        function rootResetUserPassword(username) {
-            const newPass = prompt(`Masukkan password baru untuk user ${username}:`);
+        window.rootResetUserPassword = function(username) {
+            const newPass = prompt(`RESET PASSWORD\nMasukkan password baru untuk user: ${username}`);
             if (newPass && newPass.trim().length >= 4) {
                 const idx = window.registeredUsers.findIndex(u => u.user.toLowerCase() === username.toLowerCase());
                 if (idx >= 0) {
                     window.registeredUsers[idx].pass = newPass.trim();
                     localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
-                    renderManageAccountsList();
-                    alert(`Password user ${username} berhasil diperbarui!`);
+                    window.renderManageAccountsList(); 
+                    alert(`SUKSES: Password untuk akun [${username}] berhasil diubah menjadi [${newPass.trim()}]!`);
                 }
-            }
-        }
+            } else if (newPass !== null) { alert("GAGAL: Password minimal harus 4 karakter."); }
+        };
 
-        function rootDeleteUser(username) {
-            if (confirm(`Apakah Anda yakin ingin menghapus akun ${username}?`)) {
+        window.rootDeleteUser = function(username) {
+            if (confirm(`PERINGATAN!\nApakah Anda yakin ingin menghapus akun crew [${username}] secara permanen?`)) {
                 window.registeredUsers = window.registeredUsers.filter(u => u.user.toLowerCase() !== username.toLowerCase());
                 localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
-                renderManageAccountsList();
+                window.renderManageAccountsList();
+                alert(`Akun [${username}] berhasil dihapus dari sistem!`);
             }
-        }
+        };
 
         function addEquipmentItemRow(name = '', qty = '1', cond = 'OK') {
             const container = document.getElementById('equipment-items-container');
             const row = document.createElement('div');
             row.className = "flex items-center gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-800";
-            row.innerHTML = `
-                <input type="text" placeholder="Nama Alat (e.g. CAM 1)" value="${name}" oninput="this.value = this.value.toUpperCase()" onkeydown="handleEquipmentEnter(event)" class="eq-name-input uppercase flex-1 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-amber-400">
-                <input type="number" min="1" value="${qty}" onkeydown="handleEquipmentEnter(event)" class="eq-qty-input w-16 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2 py-1.5 text-center outline-none">
-                <select class="eq-cond-select bg-slate-950 border border-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none">
-                    <option value="OK" ${cond === 'OK' ? 'selected' : ''}>OK (Normal)</option>
-                    <option value="Trouble" ${cond === 'Trouble' ? 'selected' : ''}>Trouble</option>
-                    <option value="Ganti" ${cond === 'Ganti' ? 'selected' : ''}>Perlu Ganti</option>
-                </select>
-                <button type="button" onclick="this.parentElement.remove()" class="text-pink-400 hover:text-pink-300 p-1.5"><i class="fa-solid fa-trash-can text-xs"></i></button>
-            `;
+            row.innerHTML = `<input type="text" placeholder="Nama Alat (e.g. CAM 1)" value="${name}" oninput="this.value = this.value.toUpperCase()" onkeydown="if(event.key==='Enter'){event.preventDefault();addEquipmentItemRow();}" class="eq-name-input uppercase flex-1 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 outline-none"><input type="number" min="1" value="${qty}" class="eq-qty-input w-16 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2 py-1.5 text-center outline-none"><select class="eq-cond-select bg-slate-950 border border-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none"><option value="OK" ${cond === 'OK' ? 'selected' : ''}>OK</option><option value="Trouble" ${cond === 'Trouble' ? 'selected' : ''}>Trouble</option><option value="Ganti" ${cond === 'Ganti' ? 'selected' : ''}>Ganti</option></select><button type="button" onclick="this.parentElement.remove()" class="text-pink-400 p-1.5"><i class="fa-solid fa-trash-can text-xs"></i></button>`;
             container.appendChild(row);
-
-            const newNameInput = row.querySelector('.eq-name-input');
-            if (newNameInput && name === '') {
-                setTimeout(() => newNameInput.focus(), 50);
-            }
-        }
-
-        function handleEquipmentEnter(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                addEquipmentItemRow();
-            }
         }
 
         function addCrewTagRow(name = '', isSelf = false) {
             const container = document.getElementById('crew-tags-container');
             const row = document.createElement('div');
             row.className = "flex items-center gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-800";
-
-            let optionsHtml = `<option value="">-- Pilih dari Master Crew --</option>`;
-            crewsData.forEach(c => {
-                optionsHtml += `<option value="${c.fullname}" ${c.fullname === name ? 'selected' : ''}>${c.fullname}</option>`;
-            });
-
-            row.innerHTML = `
-                <select onchange="this.nextElementSibling.value=this.value" class="bg-slate-950 border border-slate-700 text-cyan-300 text-xs rounded-lg px-2 py-1.5 outline-none flex-1">
-                    ${optionsHtml}
-                </select>
-                <input type="text" placeholder="Nama Crew Bertugas" value="${name}" class="crew-manual-input flex-1 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-cyan-400">
-                ${!isSelf ? `<button type="button" onclick="this.parentElement.remove()" class="text-pink-400 hover:text-pink-300 p-1.5"><i class="fa-solid fa-trash-can text-xs"></i></button>` : '<span class="text-[9px] text-amber-400 font-mono px-1">(You)</span>'}
-            `;
+            let optionsHtml = `<option value="">-- Pilih Master Crew --</option>`;
+            crewsData.forEach(c => { optionsHtml += `<option value="${c.fullname}" ${c.fullname === name ? 'selected' : ''}>${c.fullname}</option>`; });
+            row.innerHTML = `<select onchange="this.nextElementSibling.value=this.value" class="bg-slate-950 border border-slate-700 text-cyan-300 text-xs rounded-lg px-2 py-1.5 outline-none flex-1">${optionsHtml}</select><input type="text" placeholder="Nama Crew Bertugas" value="${name}" class="crew-manual-input flex-1 bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 outline-none">${!isSelf ? `<button type="button" onclick="this.parentElement.remove()" class="text-pink-400 p-1.5"><i class="fa-solid fa-trash-can text-xs"></i></button>` : '<span class="text-[9px] text-amber-400 font-mono px-1">(You)</span>'}`;
             container.appendChild(row);
         }
 
@@ -2148,26 +1876,17 @@
             const crew = crewsData.find(c => c.id === crewId);
             document.getElementById('modal-sub-info').textContent = `Crew: ${crew?.fullname || '-'} | Tanggal: ${dayIndex}`;
             const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-            const progName = scheduleData[monthKey]?.[crewId]?.[dayIndex] || "";
-            document.getElementById('input-program-name').value = progName;
-            document.getElementById('send-wa-checkbox').checked = true;
+            document.getElementById('input-program-name').value = scheduleData[monthKey]?.[crewId]?.[dayIndex] || "";
             document.getElementById('edit-program-modal').classList.remove('hidden');
         }
 
-        function applyProgramPreset(val) {
-            document.getElementById('input-program-name').value = val === "CUSTOM" ? "" : val;
-        }
+        function applyProgramPreset(val) { document.getElementById('input-program-name').value = val === "CUSTOM" ? "" : val; }
+        function closeProgramModal() { document.getElementById('edit-program-modal').classList.add('hidden'); selectedCell = null; }
 
-        function closeProgramModal() {
-            document.getElementById('edit-program-modal').classList.add('hidden');
-            selectedCell = null;
-        }
-
-        function saveProgramAssignment(clearCell = false) {
+        async function saveProgramAssignment(clearCell = false) {
             if (!selectedCell) return;
             const { crewId, dayIndex, month, year } = selectedCell;
             const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
-            
             const crew = crewsData.find(c => c.id === crewId);
             if (!crew) return;
 
@@ -2175,50 +1894,19 @@
             if (!scheduleData[monthKey][crewId]) scheduleData[monthKey][crewId] = {};
 
             let newProgVal = "";
-
             if (clearCell) {
                 delete scheduleData[monthKey][crewId][dayIndex];
-                newProgVal = "";
             } else {
                 const progName = document.getElementById('input-program-name').value.trim();
-                if (progName) {
-                    scheduleData[monthKey][crewId][dayIndex] = progName;
-                    newProgVal = progName;
-                } else {
-                    delete scheduleData[monthKey][crewId][dayIndex];
-                    newProgVal = "";
-                }
+                if (progName) { scheduleData[monthKey][crewId][dayIndex] = progName; newProgVal = progName; }
+                else delete scheduleData[monthKey][crewId][dayIndex];
             }
-
             saveSchedulesToLocalStorage();
 
             const webhookUrl = localStorage.getItem('google_sheet_webhook_url') || DEFAULT_WEBHOOK_URL;
-            if (webhookUrl) {
-                const payload = JSON.stringify({
-                    crewName: crew.fullname,
-                    day: dayIndex,
-                    program: newProgVal
-                });
-
-                fetch(webhookUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: payload
-                }).catch(err => {
-                    console.error("Gagal update cloud sheet:", err);
-                });
-            }
-
-            const shouldSendWa = document.getElementById('send-wa-checkbox').checked;
-            if (shouldSendWa && crew.phone) {
-                const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-                const dateFormatted = `${dayIndex} ${monthNames[month]} ${year}`;
-                const programText = newProgVal ? newProgVal : "TIDAK ADA TUGAS / OFF";
-                const message = `Halo *${crew.fullname}*,\n\nPembaruan jadwal tugas 3TV Broadcast:\n🗓 *Tanggal:* ${dateFormatted}\n📺 *Program:* ${programText}\n\nTerima kasih!\n- *3TV Media Operations*`;
-                let cleanPhone = String(crew.phone).replace(/[^0-9]/g, '');
-                if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
+            if (webhookUrl && webhookUrl.startsWith('http')) {
+                const payload = JSON.stringify({ crewName: crew.fullname, day: dayIndex, program: newProgVal });
+                fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).catch(err => {});
             }
 
             closeProgramModal();
@@ -2250,15 +1938,9 @@
 
         function openClearDataModal() { document.getElementById('clear-modal').classList.remove('hidden'); }
         function closeClearDataModal() { document.getElementById('clear-modal').classList.add('hidden'); }
-
         function executeClearData(type) {
-            if (type === 'active_month') {
-                delete scheduleData[`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`];
-            } else {
-                crewsData = [];
-                scheduleData = {};
-                localStorage.clear();
-            }
+            if (type === 'active_month') delete scheduleData[`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`];
+            else { crewsData = []; scheduleData = {}; localStorage.clear(); }
             saveSchedulesToLocalStorage();
             closeClearDataModal();
             renderMonthlyGrid();
@@ -2282,22 +1964,15 @@
                     for (let i = 1; i < jsonData.length; i++) {
                         const row = jsonData[i];
                         if (!row || !row[0]) continue;
-
                         const crewName = String(row[0]).trim();
-                        if (!crewName) continue;
-
                         const crewPhone = row[1] ? String(row[1]).trim() : "";
-
                         let crew = crewsData.find(c => c.fullname.toLowerCase() === crewName.toLowerCase());
                         if (!crew) {
                             crew = { id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4), fullname: crewName, phone: crewPhone };
                             crewsData.push(crew);
-                        } else if (crewPhone) {
-                            crew.phone = crewPhone;
-                        }
+                        } else if (crewPhone) crew.phone = crewPhone;
 
                         if (!scheduleData[monthKey][crew.id]) scheduleData[monthKey][crew.id] = {};
-
                         header.forEach((col, idx) => {
                             const dayNum = parseInt(col, 10);
                             if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= 31 && row[idx] !== undefined) {
@@ -2305,16 +1980,12 @@
                             }
                         });
                     }
-
                     saveCrewsToLocalStorage();
                     saveSchedulesToLocalStorage();
                     renderMonthlyGrid();
                     renderDashboard();
                     alert("Import Excel Berhasil!");
-                } catch (err) {
-                    console.error("Import error:", err);
-                    alert("Gagal membaca file Excel.");
-                }
+                } catch (err) { alert("Gagal membaca file."); }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -2325,56 +1996,40 @@
             for (let d = 1; d <= daysInMonth; d++) headerRow.push(d);
             const ws = XLSX.utils.aoa_to_sheet([headerRow, ["Budi Santoso", "081234567890", "Kuis Halo RCTI", "OFF"]]);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Template_Jadwal");
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
             XLSX.writeFile(wb, `Template_Jadwal_3TV_${currentMonth + 1}_${currentYear}.xlsx`);
         }
 
         function exportToXLSX() {
-            if (typeof XLSX === 'undefined' || !XLSX.utils) return alert("Pustaka XLSX-Style belum siap.");
-
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const monthTitle = document.getElementById('current-month-display').textContent;
             const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-
-            const allRows = [
-                [`JADWAL MATRIKS BULANAN 3TV BROADCAST`],
-                [`Periode: ${monthTitle}`]
-            ];
-
-            const colHeaders = ["No", "NAMA CREW", "NO HP / WHATSAPP"];
+            const allRows = [["JADWAL MATRIKS BULANAN 3TV BROADCAST"], [`Periode: ${currentMonth + 1}/${currentYear}`]];
+            const colHeaders = ["No", "NAMA CREW", "NO HP"];
             for (let d = 1; d <= daysInMonth; d++) colHeaders.push(d);
             allRows.push(colHeaders);
 
             crewsData.forEach((crew, idx) => {
                 const row = [idx + 1, crew.fullname, crew.phone || '-'];
-                for (let d = 1; d <= daysInMonth; d++) {
-                    row.push(scheduleData[monthKey]?.[crew.id]?.[d] || '-');
-                }
+                for (let d = 1; d <= daysInMonth; d++) row.push(scheduleData[monthKey]?.[crew.id]?.[d] || '-');
                 allRows.push(row);
             });
-
             const ws = XLSX.utils.aoa_to_sheet(allRows);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Jadwal_Matriks_3TV");
+            XLSX.utils.book_append_sheet(wb, ws, "Jadwal");
             XLSX.writeFile(wb, `Jadwal_3TV_${currentMonth + 1}_${currentYear}.xlsx`);
         }
 
         function exportToPDF() {
             if (!window.jspdf || !window.jspdf.jsPDF) return alert("Pustaka PDF belum siap.");
-
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-
-            const monthTitle = document.getElementById('current-month-display').textContent;
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-
             const DAYS_PER_PAGE = 15;
             const totalChunks = Math.ceil(daysInMonth / DAYS_PER_PAGE);
 
             for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
                 if (chunkIdx > 0) doc.addPage();
-
                 const startDay = (chunkIdx * DAYS_PER_PAGE) + 1;
                 const endDay = Math.min((chunkIdx + 1) * DAYS_PER_PAGE, daysInMonth);
 
@@ -2383,102 +2038,60 @@
                 doc.setTextColor(0, 150, 200);
                 doc.text("3TV BROADCAST - JADWAL MATRIKS BULANAN", 10, 10);
 
-                doc.setFontSize(9);
-                doc.setTextColor(100, 100, 100);
-                doc.text(`Periode: ${monthTitle} (Tanggal ${startDay} - ${endDay}) - Hal ${chunkIdx + 1}/${totalChunks}`, 10, 15);
-
                 const tableHeaders = ["No", "Nama Crew"];
                 for (let d = startDay; d <= endDay; d++) tableHeaders.push(String(d));
-
                 const tableData = crewsData.map((crew, idx) => {
                     const row = [String(idx + 1), crew.fullname];
-                    for (let d = startDay; d <= endDay; d++) {
-                        row.push(scheduleData[monthKey]?.[crew.id]?.[d] || "-");
-                    }
+                    for (let d = startDay; d <= endDay; d++) row.push(scheduleData[monthKey]?.[crew.id]?.[d] || "-");
                     return row;
                 });
 
-                doc.autoTable({
-                    head: [tableHeaders],
-                    body: tableData,
-                    startY: 18,
-                    theme: 'grid',
-                    styles: { fontSize: 7, cellPadding: 1.5, valign: 'middle' },
-                    headStyles: { fillColor: [13, 19, 34], textColor: [0, 240, 255] }
-                });
+                doc.autoTable({ head: [tableHeaders], body: tableData, startY: 15, theme: 'grid', styles: { fontSize: 7, cellPadding: 1.5 }, headStyles: { fillColor: [13, 19, 34], textColor: [0, 240, 255] } });
             }
-
             doc.save(`Jadwal_3TV_${currentMonth + 1}_${currentYear}.pdf`);
         }
 
         function toggleChangePasswordModal(show = true) {
-            const modal = document.getElementById('change-pass-modal');
-            if (!modal) return;
-            if (show) {
-                document.getElementById('pr-old-pass').value = "";
-                document.getElementById('pr-new-pass').value = "";
-                document.getElementById('pr-confirm-pass').value = "";
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
+            document.getElementById('change-pass-modal').classList.toggle('hidden', !show);
         }
 
         function handleChangePasswordSubmit(e) {
             e.preventDefault();
-            if (!window.loggedPRUser) return alert("Silakan login terlebih dahulu.");
-
+            if (!window.loggedPRUser) return;
             const oldPass = document.getElementById('pr-old-pass').value.trim();
             const newPass = document.getElementById('pr-new-pass').value.trim();
             const confirmPass = document.getElementById('pr-confirm-pass').value.trim();
 
-            if (String(window.loggedPRUser.pass) !== oldPass) {
-                return alert("Password lama salah!");
-            }
-            if (newPass.length < 4) {
-                return alert("Password baru minimal 4 karakter.");
-            }
-            if (newPass !== confirmPass) {
-                return alert("Konfirmasi password baru tidak cocok!");
-            }
+            if (String(window.loggedPRUser.pass) !== oldPass) return alert("Password lama salah!");
+            if (newPass.length < 4) return alert("Minimal 4 karakter.");
+            if (newPass !== confirmPass) return alert("Password baru tidak cocok.");
 
             window.loggedPRUser.pass = newPass;
             localStorage.setItem('3tv_pr_logged_user', JSON.stringify(window.loggedPRUser));
-
-            let idx = window.registeredUsers.findIndex(u => u.user.toLowerCase() === window.loggedPRUser.user.toLowerCase());
-            if (idx >= 0) {
-                window.registeredUsers[idx].pass = newPass;
-                localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
-            }
-
+            if (window.dbSaveUser) window.dbSaveUser(window.loggedPRUser);
             toggleChangePasswordModal(false);
-            alert("Password akun berhasil diperbarui!");
+            alert("Password berhasil diubah!");
         }
 
-        function togglePRAuthMode(mode) {
-            const loginForm = document.getElementById('pr-login-form');
-            const regForm = document.getElementById('pr-register-form');
-            const title = document.getElementById('pr-auth-title');
-            const sub = document.getElementById('pr-auth-subtitle');
+        window.togglePRAuthMode = function(mode) {
+            document.getElementById('pr-login-user').value = '';
+            document.getElementById('pr-login-pass').value = '';
+            document.getElementById('pr-reg-name').value = '';
+            document.getElementById('pr-reg-phone').value = '';
+            document.getElementById('pr-reg-user').value = '';
+            document.getElementById('pr-reg-pass').value = '';
 
-            if (mode === 'register') {
-                loginForm.classList.add('hidden');
-                regForm.classList.remove('hidden');
-                document.getElementById('pr-reg-name').value = "";
-                document.getElementById('pr-reg-phone').value = "";
-                document.getElementById('pr-reg-user').value = "";
-                document.getElementById('pr-reg-pass').value = "";
-                if (title) title.textContent = "REGISTRASI AKUN ITB 3TV";
-                if (sub) sub.textContent = "Lengkapi formulir untuk pendaftaran akun laporan siaran.";
-            } else {
-                regForm.classList.add('hidden');
-                loginForm.classList.remove('hidden');
-                document.getElementById('pr-login-user').value = "";
-                document.getElementById('pr-login-pass').value = "";
-                if (title) title.textContent = "IT BROADCAST 3TV";
-                if (sub) sub.textContent = "Masukan Username Anda";
-            }
-        }
+            document.getElementById('pr-login-form').classList.toggle('hidden', mode === 'register');
+            document.getElementById('pr-register-form').classList.toggle('hidden', mode !== 'register');
+        };
+
+        window.logoutPRUser = function() {
+            window.loggedPRUser = null;
+            localStorage.removeItem('3tv_pr_logged_user');
+            document.getElementById('pr-login-user').value = '';
+            document.getElementById('pr-login-pass').value = '';
+            window.updatePRViewState();
+        };
 
         function handlePRRegister(e) {
             e.preventDefault();
@@ -2487,15 +2100,10 @@
             const user = document.getElementById('pr-reg-user').value.trim();
             const pass = document.getElementById('pr-reg-pass').value.trim();
 
-            if (window.registeredUsers.some(u => u.user.toLowerCase() === user.toLowerCase())) {
-                return alert("Username sudah terdaftar! Gunakan username lain.");
-            }
-
+            if (window.registeredUsers.some(u => u.user.toLowerCase() === user.toLowerCase())) return alert("Username sudah terdaftar.");
             const newUser = { name, phone, user, pass, isRoot: false };
-            window.registeredUsers.push(newUser);
-            localStorage.setItem('3tv_pr_users', JSON.stringify(window.registeredUsers));
-
-            alert("Registrasi berhasil! Silakan login dengan akun baru Anda.");
+            if (window.dbSaveUser) window.dbSaveUser(newUser);
+            alert("Registrasi Berhasil! Silakan login.");
             togglePRAuthMode('login');
         }
 
@@ -2509,58 +2117,31 @@
             document.getElementById('pr-work-hours').value = "";
             document.getElementById('pr-program-status').value = "Live";
             document.getElementById('pr-notes').value = "";
-
             document.getElementById('equipment-items-container').innerHTML = "";
             document.getElementById('crew-tags-container').innerHTML = "";
-
             addEquipmentItemRow('', '1', 'OK');
-            if (window.loggedPRUser) {
-                addCrewTagRow(window.loggedPRUser.name, true);
-            }
-
-            const cancelBtn = document.getElementById('pr-cancel-edit-btn');
-            if (cancelBtn) cancelBtn.classList.add('hidden');
-
-            const titleEl = document.getElementById('pr-form-header-title');
-            if (titleEl) {
-                titleEl.innerHTML = `<i class="fa-solid fa-file-signature text-amber-400"></i> FORM INPUT PERSONAL REPORT SIARAN`;
-            }
+            if (window.loggedPRUser) addCrewTagRow(window.loggedPRUser.name, true);
+            document.getElementById('pr-cancel-edit-btn')?.classList.add('hidden');
         }
 
         function calculateWorkHours() {
             const timeOn = document.getElementById('pr-time-on').value;
             const timeOff = document.getElementById('pr-time-off').value;
-            
             if (!timeOn || !timeOff) return;
-
             const [onH, onM] = timeOn.split(':').map(Number);
             const [offH, offM] = timeOff.split(':').map(Number);
-
-            let startMinutes = onH * 60 + onM;
-            let endMinutes = offH * 60 + offM;
-
-            if (endMinutes < startMinutes) {
-                endMinutes += 24 * 60;
-            }
-
-            const diffMinutes = endMinutes - startMinutes;
-            const hours = Math.floor(diffMinutes / 60);
-            const minutes = diffMinutes % 60;
-
-            let resultText = "";
-            if (minutes === 0) {
-                resultText = `${hours} Jam`;
-            } else {
-                resultText = `${hours} Jam ${minutes} Mnt`;
-            }
-
-            document.getElementById('pr-work-hours').value = resultText;
+            let start = onH * 60 + onM;
+            let end = offH * 60 + offM;
+            if (end < start) end += 24 * 60;
+            const diff = end - start;
+            const h = Math.floor(diff / 60);
+            const m = diff % 60;
+            document.getElementById('pr-work-hours').value = m === 0 ? `${h} Jam` : `${h} Jam ${m} Mnt`;
         }
 
         function handlePersonalReportSubmit(e) {
             e.preventDefault();
-            if (!window.loggedPRUser) return alert("Silakan login terlebih dahulu.");
-
+            if (!window.loggedPRUser) return;
             const editingId = document.getElementById('pr-editing-report-id').value;
             const programName = document.getElementById('pr-program-name').value.trim();
             const location = document.getElementById('pr-location').value.trim();
@@ -2569,7 +2150,6 @@
             const workHours = document.getElementById('pr-work-hours').value.trim();
             const status = document.getElementById('pr-program-status').value;
             const notes = document.getElementById('pr-notes').value.trim();
-
             const eqItems = [];
             document.querySelectorAll('#equipment-items-container > div').forEach(row => {
                 const name = row.querySelector('.eq-name-input')?.value.trim();
@@ -2577,136 +2157,44 @@
                 const cond = row.querySelector('.eq-cond-select')?.value || 'OK';
                 if (name) eqItems.push({ name, qty, cond });
             });
-
             const crewTags = [];
             document.querySelectorAll('#crew-tags-container > div').forEach(row => {
                 const name = row.querySelector('.crew-manual-input')?.value.trim();
                 if (name && !crewTags.includes(name)) crewTags.push(name);
             });
-
-            if (editingId) {
-                let idx = window.personalReportsList.findIndex(r => r.id === editingId);
-                if (idx >= 0) {
-                    window.personalReportsList[idx] = {
-                        ...window.personalReportsList[idx],
-                        programName,
-                        location,
-                        timeOn,
-                        timeOff,
-                        workHours,
-                        status,
-                        notes,
-                        eqItems,
-                        crewTags,
-                        updatedAt: new Date().toISOString()
-                    };
-                }
-            } else {
-                const reportObject = {
-                    id: 'pr_' + Date.now(),
-                    authorUser: window.loggedPRUser.user,
-                    authorName: window.loggedPRUser.name,
-                    authorPhone: window.loggedPRUser.phone,
-                    date: getFormattedTodayDate(),
-                    timestamp: new Date().toLocaleString('id-ID'),
-                    programName,
-                    location,
-                    timeOn,
-                    timeOff,
-                    workHours,
-                    status,
-                    notes,
-                    eqItems,
-                    crewTags
-                };
-                window.personalReportsList.unshift(reportObject);
-            }
-
-            localStorage.setItem('3tv_pr_reports', JSON.stringify(window.personalReportsList));
+            const reportObject = editingId ? {
+                ...(window.personalReportsList.find(r => r.id === editingId) || {}),
+                id: editingId, programName, location, timeOn, timeOff, workHours, status, notes, eqItems, crewTags, updatedAt: new Date().toISOString()
+            } : {
+                id: 'pr_' + Date.now(), authorUser: window.loggedPRUser.user, authorName: window.loggedPRUser.name, authorPhone: window.loggedPRUser.phone, date: getFormattedTodayDate(), timestamp: new Date().toLocaleString('id-ID'), programName, location, timeOn, timeOff, workHours, status, notes, eqItems, crewTags
+            };
+            if (window.dbSaveReport) window.dbSaveReport(reportObject);
             resetPersonalReportForm();
-            renderPRHistoryList();
-            alert("Laporan Personal Siaran berhasil tersimpan!");
+            alert("Personal Report berhasil disimpan!");
         }
 
         function renderPRHistoryList() {
             const container = document.getElementById('pr-history-list');
-            const countBadge = document.getElementById('pr-history-count');
-            const adminExportTools = document.getElementById('pr-admin-export-tools');
-
-            if (!container) return;
+            if (!container || !window.loggedPRUser) return;
             container.innerHTML = "";
-
-            if (!window.loggedPRUser) return;
-
             const isRootAdmin = (window.loggedPRUser.isRoot || window.loggedPRUser.user.toLowerCase() === 'root');
             const isAdminRole = (currentUserRole === 'admin') || (window.loggedPRUser.user.toLowerCase() === 'admin');
+            document.getElementById('pr-admin-export-tools').classList.toggle('hidden', !isRootAdmin && !isAdminRole);
 
-            if (adminExportTools) {
-                if (isRootAdmin || isAdminRole) adminExportTools.classList.remove('hidden');
-                else adminExportTools.classList.add('hidden');
-            }
-
-            let filteredList = window.personalReportsList;
+            let filtered = window.personalReportsList;
             if (!isRootAdmin && !isAdminRole) {
-                filteredList = window.personalReportsList.filter(r => {
-                    const isAuthor = (r.authorUser === window.loggedPRUser.user || r.authorName.toLowerCase() === window.loggedPRUser.name.toLowerCase());
-                    const isTagged = r.crewTags && r.crewTags.some(tag => tag.toLowerCase() === window.loggedPRUser.name.toLowerCase());
-                    return isAuthor || isTagged;
-                });
+                filtered = window.personalReportsList.filter(r => r.authorUser === window.loggedPRUser.user || r.authorName.toLowerCase() === window.loggedPRUser.name.toLowerCase() || (r.crewTags && r.crewTags.some(t => t.toLowerCase() === window.loggedPRUser.name.toLowerCase())));
             }
-
-            if (countBadge) countBadge.textContent = `${filteredList.length} Laporan`;
-
-            if (filteredList.length === 0) {
+            document.getElementById('pr-history-count').textContent = `${filtered.length} Laporan`;
+            if (filtered.length === 0) {
                 container.innerHTML = `<p class="text-xs text-slate-500 text-center py-8 font-mono">Belum ada riwayat Personal Report.</p>`;
                 return;
             }
 
-            filteredList.forEach(report => {
-                const statusBadge = report.status === 'Live' 
-                    ? 'bg-red-500/20 text-red-400 border-red-500/40 shadow-glow-red' 
-                    : (report.status === 'Taping' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40');
-
-                const canDelete = isRootAdmin || isAdminRole;
-
+            filtered.forEach(report => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-950/80 border border-slate-800 p-3.5 rounded-xl space-y-2.5 hover:border-amber-500/30 transition";
-                card.innerHTML = `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
-                        <div>
-                            <span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded border ${statusBadge}">${report.status}</span>
-                            <h5 class="text-sm font-bold text-white mt-1.5">${report.programName}</h5>
-                            <p class="text-[10px] text-slate-400 font-mono">Pelapor: <span class="text-amber-300">${report.authorName}</span> &bull; ${report.timestamp || report.date}</p>
-                        </div>
-                        <div class="flex items-center gap-1.5 self-end sm:self-auto">
-                            <button onclick="previewPRReport('${report.id}')" class="px-2 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-semibold flex items-center gap-1">
-                                <i class="fa-solid fa-eye"></i> Preview
-                            </button>
-                            <button onclick="downloadSingleReportPDF('${report.id}')" class="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold flex items-center gap-1">
-                                <i class="fa-solid fa-file-pdf"></i> PDF
-                            </button>
-                            <button onclick="editPRReport('${report.id}')" class="px-2 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-semibold flex items-center gap-1">
-                                <i class="fa-solid fa-pen-to-square"></i> Edit
-                            </button>
-                            ${canDelete ? `
-                                <button onclick="deletePRReport('${report.id}')" class="px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-semibold flex items-center gap-1">
-                                    <i class="fa-solid fa-trash-can"></i> Hapus
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-slate-300">
-                        <div><span class="text-slate-500 block text-[9px]">Lokasi / Studio:</span> ${report.location}</div>
-                        <div><span class="text-slate-500 block text-[9px]">Jam On System:</span> ${report.timeOn}</div>
-                        <div><span class="text-slate-500 block text-[9px]">Jam Off System:</span> ${report.timeOff}</div>
-                        <div><span class="text-slate-500 block text-[9px]">Total Jam Kerja:</span> <span class="text-amber-300 font-bold">${report.workHours || '-'}</span></div>
-                    </div>
-                    ${report.crewTags && report.crewTags.length > 0 ? `
-                        <div class="text-[10px] text-slate-400">
-                            <span class="text-slate-500 font-mono">Crew Bertugas:</span> ${report.crewTags.join(', ')}
-                        </div>
-                    ` : ''}
-                `;
+                card.className = "bg-slate-950/80 border border-slate-800 p-3.5 rounded-xl space-y-2.5";
+                card.innerHTML = `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2"><div><span class="px-2 py-0.5 text-[9px] font-cyber font-bold rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">${report.status}</span><h5 class="text-sm font-bold text-white mt-1.5">${report.programName}</h5><p class="text-[10px] text-slate-400 font-mono">Pelapor: <span class="text-amber-300">${report.authorName}</span> &bull; ${report.timestamp || report.date}</p></div><div class="flex items-center gap-1.5"><button onclick="previewPRReport('${report.id}')" class="px-2 py-1 rounded bg-cyan-500/10 text-cyan-300 text-[10px] font-semibold"><i class="fa-solid fa-eye"></i></button><button onclick="downloadSingleReportPDF('${report.id}')" class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-300 text-[10px] font-semibold"><i class="fa-solid fa-file-pdf"></i></button><button onclick="editPRReport('${report.id}')" class="px-2 py-1 rounded bg-amber-500/10 text-amber-300 text-[10px] font-semibold"><i class="fa-solid fa-pen-to-square"></i></button>${(isRootAdmin || isAdminRole) ? `<button onclick="deletePRReport('${report.id}')" class="px-2 py-1 rounded bg-red-500/10 text-red-400 text-[10px] font-semibold"><i class="fa-solid fa-trash-can"></i></button>` : ''}</div></div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-slate-300"><div><span class="text-slate-500 text-[9px]">Lokasi:</span> ${report.location}</div><div><span class="text-slate-500 text-[9px]">On:</span> ${report.timeOn}</div><div><span class="text-slate-500 text-[9px]">Off:</span> ${report.timeOff}</div><div><span class="text-slate-500 text-[9px]">Total:</span> <span class="text-amber-300 font-bold">${report.workHours || '-'}</span></div></div>`;
                 container.appendChild(card);
             });
         }
@@ -2714,7 +2202,6 @@
         function editPRReport(id) {
             const report = window.personalReportsList.find(r => r.id === id);
             if (!report) return;
-
             document.getElementById('pr-editing-report-id').value = report.id;
             document.getElementById('pr-program-name').value = report.programName || '';
             document.getElementById('pr-location').value = report.location || '';
@@ -2723,295 +2210,51 @@
             document.getElementById('pr-work-hours').value = report.workHours || '';
             document.getElementById('pr-program-status').value = report.status || 'Live';
             document.getElementById('pr-notes').value = report.notes || '';
-
             const eqContainer = document.getElementById('equipment-items-container');
             eqContainer.innerHTML = "";
-            if (report.eqItems && report.eqItems.length > 0) {
-                report.eqItems.forEach(item => addEquipmentItemRow(item.name, item.qty, item.cond));
-            } else {
-                addEquipmentItemRow('', '1', 'OK');
-            }
-
+            (report.eqItems || []).forEach(item => addEquipmentItemRow(item.name, item.qty, item.cond));
             const crewContainer = document.getElementById('crew-tags-container');
             crewContainer.innerHTML = "";
-            if (report.crewTags && report.crewTags.length > 0) {
-                report.crewTags.forEach((cName, i) => addCrewTagRow(cName, i === 0 && cName === report.authorName));
-            } else {
-                if (window.loggedPRUser) addCrewTagRow(window.loggedPRUser.name, true);
-            }
-
+            (report.crewTags || []).forEach(cName => addCrewTagRow(cName));
             document.getElementById('pr-cancel-edit-btn')?.classList.remove('hidden');
-            const titleEl = document.getElementById('pr-form-header-title');
-            if (titleEl) {
-                titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> EDIT PERSONAL REPORT SIARAN`;
-            }
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function downloadSingleReportPDF(id) {
-            if (!window.jspdf || !window.jspdf.jsPDF) return alert("Pustaka PDF belum siap.");
-            const report = window.personalReportsList.find(r => r.id === id);
-            if (!report) return;
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.setTextColor(255, 184, 0);
-            doc.text("3TV BROADCAST - PERSONAL OPERATIONAL REPORT", 14, 15);
-
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(140, 140, 140);
-            doc.text(`Pelapor: ${report.authorName} (${report.authorPhone || '-'}) | Tanggal: ${report.timestamp || report.date}`, 14, 21);
-
-            const eqBody = (report.eqItems || []).map(item => [item.name, String(item.qty), item.cond]);
-
-            doc.autoTable({
-                head: [["Atribut Siaran", "Keterangan Detail"]],
-                body: [
-                    ["Nama Program", report.programName],
-                    ["Lokasi / Studio", report.location],
-                    ["Status Program", report.status],
-                    ["Jam On / Off System", `${report.timeOn} - ${report.timeOff}`],
-                    ["Total Jam Kerja", report.workHours || '-'],
-                    ["Crew IT On Duty", report.crewTags ? report.crewTags.join(', ') : '-'],
-                    ["Catatan Operasional", report.notes || '-']
-                ],
-                startY: 26,
-                theme: 'grid',
-                styles: { fontSize: 9, cellPadding: 2.5 },
-                headStyles: { fillColor: [13, 19, 34], textColor: [255, 184, 0] }
-            });
-
-            if (eqBody.length > 0) {
-                doc.autoTable({
-                    head: [["Nama Peralatan", "Jumlah", "Kondisi"]],
-                    body: eqBody,
-                    startY: doc.lastAutoTable.finalY + 6,
-                    theme: 'grid',
-                    styles: { fontSize: 8, cellPadding: 2 },
-                    headStyles: { fillColor: [13, 19, 34], textColor: [0, 240, 255] }
-                });
-            }
-
-            doc.save(`Personal_Report_${report.programName.replace(/[^a-zA-Z0-9]/g, '_')}_${report.date}.pdf`);
-        }
+        function deletePRReport(id) { if (confirm("Hapus laporan ini?") && window.dbDeleteReport) window.dbDeleteReport(id); }
 
         function previewPRReport(id) {
             const report = window.personalReportsList.find(r => r.id === id);
             if (!report) return;
-
-            const modalBody = document.getElementById('pr-preview-modal-body');
-            if (!modalBody) return;
-
-            const eqListHtml = (report.eqItems || []).map(item => `
-                <tr class="border-b border-slate-800 text-[11px]">
-                    <td class="p-2 font-medium text-slate-200">${item.name}</td>
-                    <td class="p-2 text-center text-slate-300">${item.qty}</td>
-                    <td class="p-2 text-center">
-                        <span class="px-1.5 py-0.5 text-[9px] font-bold rounded ${item.cond === 'OK' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-pink-500/10 text-pink-400 border border-pink-500/30'}">${item.cond}</span>
-                    </td>
-                </tr>
-            `).join('');
-
-            modalBody.innerHTML = `
-                <div class="space-y-3 bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 font-mono">
-                    <div class="flex justify-between border-b border-slate-800 pb-2">
-                        <span class="text-amber-400 font-bold font-cyber">${report.programName}</span>
-                        <span class="text-slate-400">${report.date}</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 text-[11px]">
-                        <div><span class="text-slate-500 block">Pelapor:</span> ${report.authorName} (${report.authorPhone || '-'})</div>
-                        <div><span class="text-slate-500 block">Lokasi:</span> ${report.location}</div>
-                        <div><span class="text-slate-500 block">Waktu On System:</span> ${report.timeOn} - ${report.timeOff}</div>
-                        <div><span class="text-slate-500 block">Total Jam Kerja:</span> ${report.workHours || '-'}</div>
-                        <div><span class="text-slate-500 block">Status:</span> ${report.status}</div>
-                    </div>
-                    ${report.crewTags && report.crewTags.length > 0 ? `
-                        <div class="border-t border-slate-800 pt-2 text-[10px]">
-                            <span class="text-slate-500 block">Crew On Duty:</span> ${report.crewTags.join(', ')}
-                        </div>
-                    ` : ''}
-                    ${report.notes ? `
-                        <div class="border-t border-slate-800 pt-2 text-[10px] text-slate-400">
-                            <span class="text-slate-500 block">Catatan Operasional:</span> ${report.notes}
-                        </div>
-                    ` : ''}
-                </div>
-                ${eqListHtml ? `
-                    <div class="space-y-1.5">
-                        <h6 class="text-[10px] font-cyber font-bold text-cyan-400 uppercase">Daftar Peralatan</h6>
-                        <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/60">
-                            <table class="w-full text-left">
-                                <thead class="bg-slate-900 text-slate-400 text-[10px]">
-                                    <tr>
-                                        <th class="p-2">Alat</th>
-                                        <th class="p-2 text-center">Qty</th>
-                                        <th class="p-2 text-center">Kondisi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${eqListHtml}</tbody>
-                            </table>
-                        </div>
-                    </div>
-                ` : ''}
-            `;
-
-            document.getElementById('pr-preview-modal')?.classList.remove('hidden');
+            document.getElementById('pr-preview-modal-body').innerHTML = `<div class="p-3 bg-slate-950 rounded-xl text-xs font-mono text-slate-300 space-y-1"><b>${report.programName}</b><p>Pelapor: ${report.authorName}</p><p>Lokasi: ${report.location}</p><p>Jam: ${report.timeOn} - ${report.timeOff} (${report.workHours})</p></div>`;
+            document.getElementById('pr-preview-modal').classList.remove('hidden');
         }
+        function closePRPreviewModal() { document.getElementById('pr-preview-modal').classList.add('hidden'); }
+        function cancelReportEdit() { resetPersonalReportForm(); }
 
-        function closePRPreviewModal() {
-            const modal = document.getElementById('pr-preview-modal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function cancelReportEdit() {
-            resetPersonalReportForm();
-        }
-
-        function deletePRReport(id) {
-            if (!confirm("Apakah Anda yakin ingin menghapus Personal Report ini?")) return;
-            window.personalReportsList = window.personalReportsList.filter(r => r.id !== id);
-            localStorage.setItem('3tv_pr_reports', JSON.stringify(window.personalReportsList));
-            renderPRHistoryList();
+        function downloadSingleReportPDF(id) {
+            if (!window.jspdf || !window.jspdf.jsPDF) return;
+            const report = window.personalReportsList.find(r => r.id === id);
+            if (!report) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(`Personal Report - ${report.programName}`, 14, 15);
+            doc.autoTable({ head: [["Atribut", "Nilai"]], body: [["Pelapor", report.authorName], ["Lokasi", report.location], ["Jam", `${report.timeOn} - ${report.timeOff}`]], startY: 20 });
+            doc.save(`Report_${report.programName}.pdf`);
         }
 
         function exportPRHistoryXLSX() {
-            if (typeof XLSX === 'undefined' || !XLSX.utils) return alert("Pustaka XLSX-Style belum siap.");
-
-            const rawData = [
-                ["REKAPITULASI LAPORAN KERJA CREW IT BROADCAST 3TV"],
-                [`Dicetak pada: ${new Date().toLocaleString('id-ID')}`],
-                [],
-                ["Nomor", "Tanggal", "Nama Program", "Pelapor", "No HP Pelapor", "Lokasi", "Jam On", "Jam Off", "Total Jam Kerja", "Status", "Crew On Duty", "Daftar Alat", "Catatan"]
-            ];
-
-            window.personalReportsList.forEach((r, idx) => {
-                const eqStr = (r.eqItems || []).map(i => `${i.name}(${i.qty}-${i.cond})`).join('; ');
-                rawData.push([
-                    idx + 1,
-                    r.date,
-                    r.programName,
-                    r.authorName,
-                    r.authorPhone || '-',
-                    r.location,
-                    r.timeOn,
-                    r.timeOff,
-                    r.workHours || '-',
-                    r.status,
-                    r.crewTags ? r.crewTags.join(', ') : '-',
-                    eqStr,
-                    r.notes || '-'
-                ]);
-            });
-
-            const ws = XLSX.utils.aoa_to_sheet(rawData);
-
-            const headerStyle = {
-                font: { bold: true, color: { rgb: "FFFFFF" } },
-                fill: { fgColor: { rgb: "0D1322" } },
-                alignment: { horizontal: "center", vertical: "center", wrapText: true },
-                border: {
-                    top: { style: "thin", color: { rgb: "1E293B" } },
-                    bottom: { style: "thin", color: { rgb: "1E293B" } },
-                    left: { style: "thin", color: { rgb: "1E293B" } },
-                    right: { style: "thin", color: { rgb: "1E293B" } }
-                }
-            };
-
-            const cellStyle = {
-                alignment: { vertical: "top", wrapText: true },
-                border: {
-                    top: { style: "thin", color: { rgb: "1E293B" } },
-                    bottom: { style: "thin", color: { rgb: "1E293B" } },
-                    left: { style: "thin", color: { rgb: "1E293B" } },
-                    right: { style: "thin", color: { rgb: "1E293B" } }
-                }
-            };
-
-            const titleStyle = {
-                font: { bold: true, sz: 14, color: { rgb: "FFB800" } },
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-
-            const subtitleStyle = {
-                font: { italic: true, sz: 10, color: { rgb: "888888" } },
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-
-            const colWidths = [];
-
-            if (!ws['!merges']) ws['!merges'] = [];
-            ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 12 } });
-            ws['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 1, c: 12 } });
-
-            const range = XLSX.utils.decode_range(ws['!ref']);
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
-                    if (!ws[cellRef]) continue;
-
-                    if (R === 0) {
-                        ws[cellRef].s = titleStyle;
-                    } else if (R === 1) {
-                        ws[cellRef].s = subtitleStyle;
-                    } else if (R === 3) {
-                        ws[cellRef].s = headerStyle;
-                    } else if (R > 3) {
-                        ws[cellRef].s = cellStyle;
-                    }
-
-                    const valStr = ws[cellRef].v ? String(ws[cellRef].v) : "";
-                    if (!colWidths[C] || valStr.length > colWidths[C]) {
-                        colWidths[C] = Math.min(Math.max(valStr.length + 3, 10), 35);
-                    }
-                }
-            }
-
-            ws['!cols'] = colWidths.map(w => ({ wch: w }));
-
+            const ws = XLSX.utils.json_to_sheet(window.personalReportsList);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Rekapitulasi_Laporan_Kerja");
-            XLSX.writeFile(wb, `Rekapitulasi_Laporan_Kerja_3TV_${getFormattedTodayDate()}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Reports");
+            XLSX.writeFile(wb, "Personal_Reports.xlsx");
         }
 
         function exportPRHistoryPDF() {
-            if (!window.jspdf || !window.jspdf.jsPDF) return alert("Pustaka PDF belum siap.");
-
+            if (!window.jspdf || !window.jspdf.jsPDF) return;
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor(255, 184, 0);
-            doc.text("3TV BROADCAST - REKAPITULASI LAPORAN KERJA CREW IT BROADCAST", 10, 10);
-
-            const tableHeaders = ["Nomor", "Tanggal", "Program", "Pelapor", "Lokasi", "Waktu", "Total Jam", "Status", "Crew Duty"];
-            const tableData = window.personalReportsList.map((r, idx) => [
-                String(idx + 1),
-                r.date,
-                r.programName,
-                r.authorName,
-                r.location,
-                `${r.timeOn}-${r.timeOff}`,
-                r.workHours || '-',
-                r.status,
-                r.crewTags ? r.crewTags.join(', ') : '-'
-            ]);
-
-            doc.autoTable({
-                head: [tableHeaders],
-                body: tableData,
-                startY: 15,
-                theme: 'grid',
-                styles: { fontSize: 7, cellPadding: 1.5 },
-                headStyles: { fillColor: [13, 19, 34], textColor: [255, 184, 0] }
-            });
-
-            doc.save(`Rekapitulasi_Laporan_Kerja_3TV_${getFormattedTodayDate()}.pdf`);
+            const doc = new jsPDF({ orientation: 'landscape' });
+            doc.autoTable({ head: [["Tanggal", "Program", "Pelapor", "Lokasi", "Status"]], body: window.personalReportsList.map(r => [r.date, r.programName, r.authorName, r.location, r.status]), startY: 10 });
+            doc.save("Audit_Reports.pdf");
         }
 
         function openSheetConfigModal() { document.getElementById('sheet-config-modal').classList.remove('hidden'); }
@@ -3020,96 +2263,24 @@
             const val = document.getElementById('sheet-webhook-input').value.trim();
             if (val) {
                 localStorage.setItem('google_sheet_webhook_url', val);
-                document.getElementById('sheet-config-modal').classList.add('hidden');
+                closeSheetConfigModal();
                 loadDataFromGoogleSheet();
-                alert("URL Google Sheets Webhook terhubung!");
+                alert("Webhook tersimpan!");
             }
         }
 
-        // --- DOM INITIALIZATION ---
         window.addEventListener('DOMContentLoaded', async () => {
             loadFromLocalStorage();
-            
             updateLiveClock();
             setInterval(updateLiveClock, 1000);
             initWeatherAndGPS();
-
-            const dashDateEl = document.getElementById('dashboard-date');
-            if (dashDateEl) dashDateEl.value = getFormattedTodayDate();
-
+            initRealTimeQuotesFeed();
+            document.getElementById('dashboard-date').value = getFormattedTodayDate();
             applyRolePermissions();
             renderDashboard();
             renderMonthlyGrid();
-
             await loadDataFromGoogleSheet();
         });
-
-        // Global Handlers
-        window.getFormattedTodayDate = getFormattedTodayDate;
-        window.updateLiveClock = updateLiveClock;
-        window.initWeatherAndGPS = initWeatherAndGPS;
-        window.applyRolePermissions = applyRolePermissions;
-        window.handleRoleChange = handleRoleChange;
-        window.verifyRolePin = verifyRolePin;
-        window.closePinModal = closePinModal;
-        window.switchTab = switchTab;
-        window.toggleSidebar = toggleSidebar;
-        window.renderDashboard = renderDashboard;
-        window.renderMonthlyGrid = renderMonthlyGrid;
-        window.renderJobReport = renderJobReport;
-        window.changeMonth = changeMonth;
-        window.goToCurrentMonth = goToCurrentMonth;
-        window.handleGlobalSearch = handleGlobalSearch;
-        window.openActiveProgramsModal = openActiveProgramsModal;
-        window.closeActiveProgramsModal = closeActiveProgramsModal;
-        window.openOffDutyModal = openOffDutyModal;
-        window.closeOffDutyModal = closeOffDutyModal;
-        window.openMntModal = openMntModal;
-        window.closeMntModal = closeMntModal;
-        window.toggleChangePasswordModal = toggleChangePasswordModal;
-        window.handleChangePasswordSubmit = handleChangePasswordSubmit;
-        window.toggleManageAccountsModal = toggleManageAccountsModal;
-        window.togglePRFormVisibility = togglePRFormVisibility;
-        window.rootResetUserPassword = rootResetUserPassword;
-        window.rootDeleteUser = rootDeleteUser;
-        window.togglePRAuthMode = togglePRAuthMode;
-        window.handlePRLogin = handlePRLogin;
-        window.handlePRRegister = handlePRRegister;
-        window.logoutPRUser = logoutPRUser;
-        window.addEquipmentItemRow = addEquipmentItemRow;
-        window.handleEquipmentEnter = handleEquipmentEnter;
-        window.addCrewTagRow = addCrewTagRow;
-        window.calculateWorkHours = calculateWorkHours;
-        window.populatePRProgramDropdown = populatePRProgramDropdown;
-        window.applyPRProgramSelection = applyPRProgramSelection;
-        window.handlePersonalReportSubmit = handlePersonalReportSubmit;
-        window.downloadSingleReportPDF = downloadSingleReportPDF;
-        window.previewPRReport = previewPRReport;
-        window.closePRPreviewModal = closePRPreviewModal;
-        window.editPRReport = editPRReport;
-        window.cancelReportEdit = cancelReportEdit;
-        window.deletePRReport = deletePRReport;
-        window.exportPRHistoryXLSX = exportPRHistoryXLSX;
-        window.exportPRHistoryPDF = exportPRHistoryPDF;
-        window.openSheetConfigModal = openSheetConfigModal;
-        window.closeSheetConfigModal = closeSheetConfigModal;
-        window.saveSheetConfig = saveSheetConfig;
-        window.forceSyncFromSheet = forceSyncFromSheet;
-        window.openProgramModal = openProgramModal;
-        window.applyProgramPreset = applyProgramPreset;
-        window.closeProgramModal = closeProgramModal;
-        window.saveProgramAssignment = saveProgramAssignment;
-        window.openAddCrewModal = openAddCrewModal;
-        window.closeCrewModal = closeCrewModal;
-        window.handleCrewSubmit = handleCrewSubmit;
-        window.openClearDataModal = openClearDataModal;
-        window.closeClearDataModal = closeClearDataModal;
-        window.executeClearData = executeClearData;
-        window.importXLSX = importXLSX;
-        window.downloadXlsxTemplate = downloadXlsxTemplate;
-        window.exportToXLSX = exportToXLSX;
-        window.exportToPDF = exportToPDF;
-        window.exportJobReportPDF = exportJobReportPDF;
     </script>
 </body>
 </html>
