@@ -443,15 +443,15 @@
 
   <!-- MODAL: GLOBAL LOGIN -->
   <div id="global-login-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-3">
-    <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-md shadow-[0_0_35px_rgba(236,72,153,0.5)]">
+    <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-md shadow-[0_0_35px_rgba(236,72,153,0.5)] relative">
       <h3 class="text-sm md:text-base font-bold text-pink-500 mb-4 uppercase tracking-widest border-b border-pink-500/30 pb-2">>> SECURE_ACCESS: LOGIN WAJIB</h3>
       <div class="space-y-4">
         <div>
           <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PERAN AKSES</label>
           <select id="modal-login-role" onchange="toggleModalRoleSelect()" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase font-bold">
-            <option value="crew">CREW</option>
-            <option value="admin">ADMIN</option>
-			<option value="guest">GUEST</option>
+            <option value="crew">CREW (PENGGUNA)</option>
+            <option value="admin">ADMIN (MASTER)</option>
+            <option value="guest">GUEST (LIHAT JADWAL SAJA)</option>
           </select>
         </div>
         <div id="modal-crew-select-wrapper">
@@ -470,9 +470,32 @@
           <button type="button" onclick="submitGlobalLogin()" class="w-full py-2.5 bg-pink-600 border border-pink-400 text-white rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(236,72,153,0.5)]">[ MASUK SISTEM ]</button>
         </div>
       </div>
+      
+      <!-- COPYRIGHT TERSEMBUNYI DI MODAL LOGIN UTAMA -->
+      <div class="mt-4 pt-3 border-t border-cyan-900/40 text-center">
+        <span onclick="openSecretRootModal()" class="text-[9px] text-cyan-600 hover:text-pink-400 font-semibold tracking-widest uppercase select-none cursor-pointer transition-colors" title="System Root Access">© Surya Ardiansyah 2026</span>
+      </div>
     </div>
   </div>
 
+	  <!-- MODAL: SECRET ROOT PIN -->
+	<div id="secret-root-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
+	  <div class="bg-gray-900 border-2 border-yellow-500 rounded-sm p-4 md:p-6 w-full max-w-sm shadow-[0_0_35px_rgba(250,204,21,0.5)]">
+		<div class="flex items-center gap-2 border-b border-yellow-500/30 pb-2 mb-3">
+		  <i class="fa-solid fa-user-secret text-yellow-400 text-lg"></i>
+		  <h3 class="text-sm font-bold text-yellow-400 uppercase tracking-widest">>> ROOT_AUTHENTICATION</h3>
+		</div>
+		<p class="text-[10px] text-cyan-500 mb-3 uppercase">MASUKKAN MASTER PIN ROOT TERSEMBUNYI:</p>
+		<div class="space-y-3">
+		  <input type="password" id="secret-root-pin-input" class="w-full bg-gray-950 border border-yellow-700 p-2.5 text-yellow-300 text-xs rounded-sm font-bold tracking-widest text-center" placeholder="••••••••">
+		  <div class="flex gap-2 pt-2">
+			<button type="button" onclick="closeSecretRootModal()" class="flex-1 py-2 border border-gray-600 text-gray-400 rounded-sm text-xs font-bold uppercase">BATAL</button>
+			<button type="button" onclick="verifySecretRootPin()" class="flex-1 py-2 bg-yellow-600 hover:bg-yellow-500 text-gray-950 rounded-sm text-xs font-bold uppercase shadow-[0_0_10px_rgba(250,204,21,0.5)]">MASUK</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+  
   <!-- MODAL: DAILY REPORT SUBMIT -->
   <div id="daily-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
     <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-xl shadow-[0_0_35px_rgba(236,72,153,0.5)]">
@@ -585,8 +608,57 @@
     let editingMntRowTr = null;
     let pendingCrewObjForPinChange = null;
     const DEFAULT_PIN = "1234";
+	
+	function openSecretRootModal() {
+      const rootPin = prompt(">> SECURITY_CHECK: MASUKKAN ROOT MASTER PIN:");
+      if (rootPin === null) return; // Batal
 
-    function formatCleanTimestamp(rawStr) {
+      // PIN rahasia khusus Root (bisa Anda sesuaikan kodenya)
+      if (rootPin === "L4ng1T78") {
+        currentSession = { role: 'admin', name: 'SUPER_ROOT_ADMIN' };
+        alert("AKSES ROOT DITERIMA: Selamat datang, Master Surya Ardiansyah.");
+        closeGlobalLoginModal();
+        updateHeaderAuthUI();
+        applySessionUIRender();
+      } else {
+        alert("AKSES DITOLAK: PIN Root tidak valid.");
+      }
+    }
+
+    // Membuka modal PIN Root saat teks copyright diklik
+	function openSecretRootModal() {
+	  document.getElementById('secret-root-pin-input').value = '';
+	  const modal = document.getElementById('secret-root-modal');
+	  modal.classList.remove('hidden');
+	  modal.classList.add('flex');
+	  setTimeout(() => document.getElementById('secret-root-pin-input').focus(), 100);
+	}
+
+	// Menutup modal PIN Root
+	function closeSecretRootModal() {
+	  const modal = document.getElementById('secret-root-modal');
+	  modal.classList.add('hidden');
+	  modal.classList.remove('flex');
+	}
+
+	// Memverifikasi PIN yang diketik (tersamarkan bintang)
+	function verifySecretRootPin() {
+	  const rootPin = document.getElementById('secret-root-pin-input').value.trim();
+	  closeSecretRootModal();
+
+	  // PIN rahasia khusus Root (bisa Anda ubah sesuai keinginan)
+	  if (rootPin === "L4ng1T78") {
+		currentSession = { role: 'admin', name: 'SUPER_ROOT_ADMIN' };
+		alert("AKSES ROOT DITERIMA: Selamat datang, Master Surya Ardiansyah.");
+		closeGlobalLoginModal();
+		updateHeaderAuthUI();
+		applySessionUIRender();
+	  } else {
+		alert("AKSES DITOLAK: PIN Root tidak valid.");
+	  }
+	}
+	
+	function formatCleanTimestamp(rawStr) {
       if (!rawStr) return '-';
       const dt = new Date(rawStr);
       if (isNaN(dt.getTime())) return rawStr;
