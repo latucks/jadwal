@@ -794,30 +794,37 @@
 	  const btnDailyNav = document.getElementById('tab-btn-daily');
 	  const btnMntNav = document.getElementById('tab-btn-maintenance');
 	  const btnLogsNav = document.getElementById('tab-btn-logs');
-	  
-	  // Ambil elemen tombol Add Crew di header (kita bisa cari berdasarkan teks onclick-nya)
 	  const addCrewBtn = document.querySelector('button[onclick="openAddModal()"]');
 
 	  if (currentSession.role === 'admin') {
+		// ADMIN: Akses penuh
 		if(btnDailyNav) btnDailyNav.classList.remove('hidden');
 		if(btnMntNav) btnMntNav.classList.remove('hidden');
 		if(btnLogsNav) btnLogsNav.classList.remove('hidden');
-		if(addCrewBtn) addCrewBtn.classList.remove('hidden'); // Admin bisa tambah crew
-	  } else if (currentSession.role === 'guest') {
-		// Sembunyikan semua tab laporan & maintenance untuk guest
-		if(btnDailyNav) btnDailyNav.classList.add('hidden');
-		if(btnMntNav) btnMntNav.classList.add('hidden');
-		if(btnLogsNav) btnLogsNav.classList.add('hidden');
-		if(addCrewBtn) addCrewBtn.classList.add('hidden'); // GUEST TIDAK BISA KLIK ADD CREW
-	  } else {
-		// Crew biasa
+		if(addCrewBtn) addCrewBtn.classList.remove('hidden');
+	  } 
+	  else if (currentSession.role === 'crew') {
+		// CREW: Bisa akses jadwal, daily report, dan maintenance pribadi
 		if(btnDailyNav) btnDailyNav.classList.remove('hidden');
 		if(btnMntNav) btnMntNav.classList.remove('hidden');
 		if(btnLogsNav) btnLogsNav.classList.add('hidden');
-		if(addCrewBtn) addCrewBtn.classList.add('hidden'); // Crew biasa juga tidak bisa tambah crew
+		if(addCrewBtn) addCrewBtn.classList.add('hidden');
+	  } 
+	  else if (currentSession.role === 'guest') {
+		// GUEST: Hanya bisa lihat Jadwal Bulanan
+		if(btnDailyNav) btnDailyNav.classList.add('hidden');
+		if(btnMntNav) btnMntNav.classList.add('hidden');
+		if(btnLogsNav) btnLogsNav.classList.add('hidden');
+		if(addCrewBtn) addCrewBtn.classList.add('hidden');
 	  }
 
+	  // Pastikan panel daily report dirender ulang dengan benar
+	  document.getElementById('daily-main-panel').classList.remove('hidden');
+	  
 	  renderTable();
+	  renderDailyTable();
+	  renderMaintenanceTable();
+	  renderAuditLogsTable();
 	  switchTab('jadwal');
 	}
 
