@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#030712">
   <title>IT Broadcast 3TV</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -591,7 +593,15 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxA6T1ZUHDgWNm0xRCbNORutIcUsUMAqnvg3_YOgcw6p5RQyqSkj5zqLijOR_Y6qN4e/exec";
+    if ('serviceWorker' in navigator) {
+	  window.addEventListener('load', () => {
+		navigator.serviceWorker.register('./sw.js')
+		  .then((reg) => console.log('PWA Service Worker registered!', reg))
+		  .catch((err) => console.log('PWA Registration failed:', err));
+	  });
+	}
+	
+	const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxA6T1ZUHDgWNm0xRCbNORutIcUsUMAqnvg3_YOgcw6p5RQyqSkj5zqLijOR_Y6qN4e/exec";
 
     let globalHeaders = [];
     let globalCrewData = [];
@@ -608,6 +618,7 @@
     let editingMntRowTr = null;
     let pendingCrewObjForPinChange = null;
     const DEFAULT_PIN = "1234";
+	
 	
 	function openSecretRootModal() {
       const rootPin = prompt(">> SECURITY_CHECK: MASUKKAN ROOT MASTER PIN:");
@@ -939,47 +950,54 @@
     }
 
     function switchTab(tab) {
-      if (!currentSession.role) {
-        openGlobalLoginModal();
-        return;
-      }
+	  if (!currentSession.role) {
+		openGlobalLoginModal();
+		return;
+	  }
 	  if (currentSession.role === 'guest' && tab !== 'jadwal') {
 		alert("AKSES DITOLAK: Akun Guest hanya dapat melihat Jadwal Bulanan.");
 		tab = 'jadwal';
 	  }
-      document.getElementById('view-jadwal').classList.toggle('flex', tab === 'jadwal');
-      document.getElementById('view-jadwal').classList.toggle('hidden', tab !== 'jadwal');
-      document.getElementById('view-daily').classList.toggle('flex', tab === 'daily');
-      document.getElementById('view-daily').classList.toggle('hidden', tab !== 'daily');
-      document.getElementById('view-maintenance').classList.toggle('flex', tab === 'maintenance');
-      document.getElementById('view-maintenance').classList.toggle('hidden', tab !== 'maintenance');
-      document.getElementById('view-logs').classList.toggle('flex', tab === 'logs');
-      document.getElementById('view-logs').classList.toggle('hidden', tab !== 'logs');
 
-      const btnJadwal = document.getElementById('tab-btn-jadwal');
-      const btnDaily = document.getElementById('tab-btn-daily');
-      const btnMnt = document.getElementById('tab-btn-maintenance');
-      const btnLogs = document.getElementById('tab-btn-logs');
+	  document.getElementById('view-jadwal').classList.toggle('flex', tab === 'jadwal');
+	  document.getElementById('view-jadwal').classList.toggle('hidden', tab !== 'jadwal');
+	  document.getElementById('view-daily').classList.toggle('flex', tab === 'daily');
+	  document.getElementById('view-daily').classList.toggle('hidden', tab !== 'daily');
+	  document.getElementById('view-maintenance').classList.toggle('flex', tab === 'maintenance');
+	  document.getElementById('view-maintenance').classList.toggle('hidden', tab !== 'maintenance');
+	  document.getElementById('view-logs').classList.toggle('flex', tab === 'logs');
+	  document.getElementById('view-logs').classList.toggle('hidden', tab !== 'logs');
 
-      const inactiveClass = "bg-gray-950 border-cyan-900/80 text-cyan-700 hover:text-cyan-400 shadow-none";
-      btnJadwal.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'jadwal' ? '' : inactiveClass}`;
-      btnDaily.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'daily' ? '' : inactiveClass}`;
-      btnMnt.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'maintenance' ? '' : inactiveClass}`;
-      btnLogs.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'logs' ? '' : inactiveClass}`;
+	  const btnJadwal = document.getElementById('tab-btn-jadwal');
+	  const btnDaily = document.getElementById('tab-btn-daily');
+	  const btnMnt = document.getElementById('tab-btn-maintenance');
+	  const btnLogs = document.getElementById('tab-btn-logs');
 
-      if (tab === 'jadwal') {
-        btnJadwal.className = "px-4 py-2 bg-cyan-500 border-2 border-cyan-300 text-gray-950 text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(6,182,212,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
-      } else if (tab === 'daily') {
-        btnDaily.className = "px-4 py-2 bg-pink-600 border-2 border-pink-400 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(236,72,153,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
-        renderDailyTable();
-      } else if (tab === 'maintenance') {
-        btnMnt.className = "px-4 py-2 bg-blue-600 border-2 border-blue-400 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(59,130,246,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
-        renderMaintenanceTable();
-      } else if (tab === 'logs') {
-        btnLogs.className = "px-4 py-2 bg-yellow-600 border-2 border-yellow-400 text-gray-950 text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(250,204,21,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
-        renderAuditLogsTable();
-      }
-    }
+	  const inactiveClass = "bg-gray-950 border-cyan-900/80 text-cyan-700 hover:text-cyan-400 shadow-none";
+	  
+	  // Reset semua tombol ke kondisi tidak aktif
+	  btnJadwal.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'jadwal' ? '' : inactiveClass}`;
+	  btnDaily.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'daily' ? '' : inactiveClass}`;
+	  btnMnt.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'maintenance' ? '' : inactiveClass}`;
+	  btnLogs.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'logs' ? '' : inactiveClass}`;
+
+	  // Berikan warna tema khusus saat tab aktif
+	  if (tab === 'jadwal') {
+		btnJadwal.className = "px-4 py-2 bg-cyan-500 border-2 border-cyan-300 text-gray-950 text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(6,182,212,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
+	  } else if (tab === 'daily') {
+		// TEMA HIJAU EMERALD UNTUK DAILY REPORT
+		btnDaily.className = "px-4 py-2 bg-emerald-600 border-2 border-emerald-400 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(16,185,129,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
+		renderDailyTable();
+	  } else if (tab === 'maintenance') {
+		// TEMA ORANYE AMBER UNTUK MAINTENANCE
+		btnMnt.className = "px-4 py-2 bg-amber-600 border-2 border-amber-400 text-gray-950 text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(245,158,11,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
+		renderMaintenanceTable();
+	  } else if (tab === 'logs') {
+		// TEMA PINK/MAGENTA UNTUK SYSTEM LOGS
+		btnLogs.className = "px-4 py-2 bg-pink-600 border-2 border-pink-400 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(236,72,153,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
+		renderAuditLogsTable();
+	  }
+	}
 
     function openMntModal() {
       if (!currentSession.role) {
