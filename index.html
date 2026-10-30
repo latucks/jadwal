@@ -449,8 +449,9 @@
         <div>
           <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PERAN AKSES</label>
           <select id="modal-login-role" onchange="toggleModalRoleSelect()" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase font-bold">
-            <option value="crew">CREW (PENGGUNA)</option>
-            <option value="admin">ADMIN (MASTER)</option>
+            <option value="crew">CREW</option>
+            <option value="admin">ADMIN</option>
+			<option value="guest">GUEST</option>
           </select>
         </div>
         <div id="modal-crew-select-wrapper">
@@ -667,10 +668,10 @@
     }
 
     function toggleModalRoleSelect() {
-      const role = document.getElementById('modal-login-role').value;
-      document.getElementById('modal-crew-select-wrapper').classList.toggle('hidden', role === 'admin');
-      document.getElementById('modal-admin-pin-wrapper').classList.toggle('hidden', role !== 'admin');
-    }
+		const role = document.getElementById('modal-login-role').value;
+		document.getElementById('modal-crew-select-wrapper').classList.toggle('hidden', role === 'admin' || role === 'guest');
+		document.getElementById('modal-admin-pin-wrapper').classList.toggle('hidden', role !== 'admin');
+	}
 
     function populateCrewDropdown() {
       const modalSelect = document.getElementById('modal-login-crew-name');
@@ -695,35 +696,37 @@
     }
 
     function submitGlobalLogin() {
-      const role = document.getElementById('modal-login-role').value;
-      if (role === 'crew') {
-        const name = document.getElementById('modal-login-crew-name').value;
-        const pinInput = document.getElementById('modal-crew-pin-input').value.trim();
-        if (!name) return alert("Pilih nama crew terlebih dahulu!");
-        const crewObj = globalCrewData.find(c => c.nama.toUpperCase() === name.toUpperCase());
-        if (!crewObj) return alert("Crew tidak ditemukan!");
-        if (crewObj.pin && crewObj.pin !== pinInput) return alert("PIN PRIBADI SALAH!");
+		const role = document.getElementById('modal-login-role').value;
+		if (role === 'crew') {
+			const name = document.getElementById('modal-login-crew-name').value;
+			const pinInput = document.getElementById('modal-crew-pin-input').value.trim();
+			if (!name) return alert("Pilih nama crew terlebih dahulu!");
+			const crewObj = globalCrewData.find(c => c.nama.toUpperCase() === name.toUpperCase());
+			if (!crewObj) return alert("Crew tidak ditemukan!");
+			if (crewObj.pin && crewObj.pin !== pinInput) return alert("PIN PRIBADI SALAH!");
 
-        if (!crewObj.pin || crewObj.pin === DEFAULT_PIN || pinInput === DEFAULT_PIN) {
-          pendingCrewObjForPinChange = crewObj;
-          closeGlobalLoginModal();
-          document.getElementById('new-forced-pin').value = '';
-          document.getElementById('confirm-forced-pin').value = '';
-          const modal = document.getElementById('forced-pin-modal');
-          modal.classList.remove('hidden'); modal.classList.add('flex');
-          return;
-        }
-        currentSession = { role: 'crew', name: crewObj.nama };
-      } else {
-        const pin = document.getElementById('modal-admin-pin').value;
-        document.getElementById('modal-admin-pin').value = '';
-        if (pin !== "3TV2026") return alert("PIN ADMIN SALAH!");
-        currentSession = { role: 'admin', name: 'MASTER_ADMIN' };
-      }
-      closeGlobalLoginModal();
-      updateHeaderAuthUI();
-      applySessionUIRender();
-    }
+			if (!crewObj.pin || crewObj.pin === DEFAULT_PIN || pinInput === DEFAULT_PIN) {
+				pendingCrewObjForPinChange = crewObj;
+				closeGlobalLoginModal();
+				document.getElementById('new-forced-pin').value = '';
+				document.getElementById('confirm-forced-pin').value = '';
+				const modal = document.getElementById('forced-pin-modal');
+				modal.classList.remove('hidden'); modal.classList.add('flex');
+				return;
+			}
+			currentSession = { role: 'crew', name: crewObj.nama };
+		} else if (role === 'guest') {
+			currentSession = { role: 'guest', name: 'GUEST_VIEWER' };
+		} else {
+			const pin = document.getElementById('modal-admin-pin').value;
+			document.getElementById('modal-admin-pin').value = '';
+			if (pin !== "3TV2026") return alert("PIN ADMIN SALAH!");
+			currentSession = { role: 'admin', name: 'MASTER_ADMIN' };
+		}
+		closeGlobalLoginModal();
+		updateHeaderAuthUI();
+		applySessionUIRender();
+	}
 
     async function submitForcedPinChange() {
       const newPin = document.getElementById('new-forced-pin').value.trim();
@@ -775,15 +778,48 @@
     }
 
     function updateHeaderAuthUI() {
-      const container = document.getElementById('header-auth-status');
-      if (currentSession.role === 'admin') {
-        container.innerHTML = `<div class="px-2.5 py-1 bg-yellow-500/20 border border-yellow-400 text-yellow-300 rounded-sm text-[10px] font-bold uppercase flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> <span>ADMIN ACTIVE</span><button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950 border border-red-500 text-red-400 rounded-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>`;
-      } else if (currentSession.role === 'crew') {
-        container.innerHTML = `<div class="px-2.5 py-1 bg-cyan-500/20 border border-cyan-400 text-cyan-300 rounded-sm text-[10px] font-bold uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-lock"></i> <span class="truncate max-w-[100px]">${currentSession.name}</span><button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950 border border-red-500 text-red-400 rounded-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>`;
-      } else {
-        container.innerHTML = `<button onclick="openGlobalLoginModal()" class="px-3 py-1.5 bg-pink-600 border border-pink-400 text-white rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(236,72,153,0.5)] flex items-center gap-1.5"><i class="fa-solid fa-lock"></i> <span>LOGIN SESI / ADMIN</span></button>`;
-      }
-    }
+		const container = document.getElementById('header-auth-status');
+		if (currentSession.role === 'admin') {
+		container.innerHTML = `<div class="px-2.5 py-1 bg-yellow-500/20 border border-yellow-400 text-yellow-300 rounded-sm text-[10px] font-bold uppercase flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> <span>ADMIN ACTIVE</span><button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950 border border-red-500 text-red-400 rounded-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>`;
+		} else if (currentSession.role === 'crew') {
+			container.innerHTML = `<div class="px-2.5 py-1 bg-cyan-500/20 border border-cyan-400 text-cyan-300 rounded-sm text-[10px] font-bold uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-lock"></i> <span class="truncate max-w-[100px]">${currentSession.name}</span><button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950 border border-red-500 text-red-400 rounded-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>`;
+		} else if (currentSession.role === 'guest') {
+			container.innerHTML = `<div class="px-2.5 py-1 bg-blue-500/20 border border-blue-400 text-blue-300 rounded-sm text-[10px] font-bold uppercase flex items-center gap-1.5"><i class="fa-solid fa-eye"></i> <span>GUEST (VIEW-ONLY)</span><button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950 border border-red-500 text-red-400 rounded-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>`;
+		} else {
+			container.innerHTML = `<button onclick="openGlobalLoginModal()" class="px-3 py-1.5 bg-pink-600 border border-pink-400 text-white rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(236,72,153,0.5)] flex items-center gap-1.5"><i class="fa-solid fa-lock"></i> <span>LOGIN SESI / ADMIN</span></button>`;
+		}
+	}
+
+	function applySessionUIRender() {
+	  const btnDailyNav = document.getElementById('tab-btn-daily');
+	  const btnMntNav = document.getElementById('tab-btn-maintenance');
+	  const btnLogsNav = document.getElementById('tab-btn-logs');
+	  
+	  // Ambil elemen tombol Add Crew di header (kita bisa cari berdasarkan teks onclick-nya)
+	  const addCrewBtn = document.querySelector('button[onclick="openAddModal()"]');
+
+	  if (currentSession.role === 'admin') {
+		if(btnDailyNav) btnDailyNav.classList.remove('hidden');
+		if(btnMntNav) btnMntNav.classList.remove('hidden');
+		if(btnLogsNav) btnLogsNav.classList.remove('hidden');
+		if(addCrewBtn) addCrewBtn.classList.remove('hidden'); // Admin bisa tambah crew
+	  } else if (currentSession.role === 'guest') {
+		// Sembunyikan semua tab laporan & maintenance untuk guest
+		if(btnDailyNav) btnDailyNav.classList.add('hidden');
+		if(btnMntNav) btnMntNav.classList.add('hidden');
+		if(btnLogsNav) btnLogsNav.classList.add('hidden');
+		if(addCrewBtn) addCrewBtn.classList.add('hidden'); // GUEST TIDAK BISA KLIK ADD CREW
+	  } else {
+		// Crew biasa
+		if(btnDailyNav) btnDailyNav.classList.remove('hidden');
+		if(btnMntNav) btnMntNav.classList.remove('hidden');
+		if(btnLogsNav) btnLogsNav.classList.add('hidden');
+		if(addCrewBtn) addCrewBtn.classList.add('hidden'); // Crew biasa juga tidak bisa tambah crew
+	  }
+
+	  renderTable();
+	  switchTab('jadwal');
+	}
 
     function logoutSession() {
       currentSession = { role: null, name: null };
@@ -828,6 +864,10 @@
         openGlobalLoginModal();
         return;
       }
+	  if (currentSession.role === 'guest' && tab !== 'jadwal') {
+		alert("AKSES DITOLAK: Akun Guest hanya dapat melihat Jadwal Bulanan.");
+		tab = 'jadwal';
+	  }
       document.getElementById('view-jadwal').classList.toggle('flex', tab === 'jadwal');
       document.getElementById('view-jadwal').classList.toggle('hidden', tab !== 'jadwal');
       document.getElementById('view-daily').classList.toggle('flex', tab === 'daily');
@@ -1658,8 +1698,15 @@
     }
 
     function closeDetailModal() { document.getElementById('detail-modal').classList.add('hidden'); document.getElementById('detail-modal').classList.remove('flex'); }
-    function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); document.getElementById('add-modal').classList.add('flex'); }
-    function closeAddModal() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-modal').classList.remove('flex'); }
+    function openAddModal() {
+	  if (currentSession.role !== 'admin') {
+		alert("AKSES DITOLAK: Hanya Master Admin yang dapat menambahkan crew baru.");
+		return;
+	  }
+	  document.getElementById('add-modal').classList.remove('hidden'); 
+	  document.getElementById('add-modal').classList.add('flex');
+	}
+	function closeAddModal() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-modal').classList.remove('flex'); }
     function closeDailyModal() { document.getElementById('daily-modal').classList.add('hidden'); document.getElementById('daily-modal').classList.remove('flex'); }
 
     setBulanDanJamAktif();
