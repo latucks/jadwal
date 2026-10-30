@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Jadwal Bulanan - IT Broadcast 3TV</title>
+  <title>IT Broadcast 3TV</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,52 +27,39 @@
     ::-webkit-scrollbar-thumb { background: #db2777; border-radius: 0; box-shadow: 0 0 8px rgba(219,39,119,0.8); }
     ::-webkit-scrollbar-thumb:hover { background: #06b6d4; box-shadow: 0 0 8px rgba(6,182,212,0.8); }
 
-    /* Efek Glow Kartu Statistik Saat Hover */
     @keyframes cyberpunkHoverGlow {
       0% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(236, 72, 153, 0.2); border-color: rgba(6, 182, 212, 0.9); }
       50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.8), inset 0 0 20px rgba(6, 182, 212, 0.5); border-color: rgba(236, 72, 153, 1); }
       100% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(236, 72, 153, 0.2); border-color: rgba(6, 182, 212, 0.9); }
     }
-    .aurora-card {
-      transition: all 0.3s ease;
-    }
+    .aurora-card { transition: all 0.3s ease; }
     .aurora-card:hover {
       animation: cyberpunkHoverGlow 2s infinite ease-in-out;
       transform: translateY(-3px);
       filter: brightness(1.2);
     }
 
-    /* Efek Kedip/Glow Kuat pada Running Text */
     @keyframes neonBlinkGlow {
       0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(34, 197, 94, 0.8), 0 0 15px rgba(34, 197, 94, 0.5); }
       50% { opacity: 0.5; text-shadow: 0 0 2px rgba(34, 197, 94, 0.3); }
     }
-    .running-text-neon {
-      animation: neonBlinkGlow 1.2s infinite ease-in-out;
-    }
+    .running-text-neon { animation: neonBlinkGlow 1.2s infinite ease-in-out; }
   </style>
 </head>
 <body class="bg-gray-950 text-cyan-400 min-h-screen font-mono flex flex-col relative overflow-x-hidden selection:bg-pink-500 selection:text-white">
 
-  <!-- Watermark Copyright Background Transparan -->
-  <div class="fixed inset-0 flex items-center justify-center pointer-events-none z-0 opacity-10 select-none">
-    <span class="text-4xl md:text-7xl font-black tracking-widest text-cyan-400 uppercase transform -rotate-12">
-      © Surya Ardiansyah 2026
-    </span>
-  </div>
-
-  <!-- Header / Navbar -->
+  <!-- Header -->
   <header class="bg-gray-900/95 backdrop-blur-md border-b-2 border-pink-500 shadow-[0_0_25px_rgba(236,72,153,0.4)] px-3 md:px-6 py-3 flex flex-col gap-2 relative z-10">
     <div class="flex flex-col md:flex-row justify-between items-center gap-3">
       <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
         <div class="flex items-center gap-3">
-          <div class="p-2 bg-gray-950 border-2 border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.7)] rounded-sm relative overflow-hidden group">
+          <div class="p-2 bg-gray-950 border-2 border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.7)] rounded-sm">
             <i class="fa-solid fa-tower-broadcast text-lg md:text-xl text-cyan-400 animate-pulse"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-extrabold text-sm md:text-xl tracking-widest text-pink-500 uppercase drop-shadow-[0_0_8px_rgba(236,72,153,0.9)]">IT BROADCAST 3TV</h1>
-              <span class="px-1.5 py-0.5 text-[8px] bg-pink-500/20 border border-pink-500 text-pink-400 rounded-sm">SYS.v5.14</span>
+              <span class="px-1.5 py-0.5 text-[8px] bg-pink-500/20 border border-pink-500 text-pink-400 rounded-sm">SYS.v5.42</span>
             </div>
             <div class="flex items-center gap-2 mt-0.5">
               <p id="current-month-display" class="text-[9px] md:text-xs text-cyan-400 font-bold tracking-wider"></p>
@@ -83,7 +70,6 @@
         </div>
       </div>
 
-      <!-- Action Buttons Top Header & Copyright -->
       <div class="flex flex-col items-end gap-1 w-full md:w-auto">
         <div class="flex items-center gap-2 justify-end flex-wrap">
           <div id="header-auth-status" class="flex items-center gap-2">
@@ -91,7 +77,6 @@
               <i class="fa-solid fa-lock"></i> <span>LOGIN SESI / ADMIN</span>
             </button>
           </div>
-
           <button onclick="fetchData()" class="px-3 py-1.5 bg-gray-950/80 border border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)] flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-rotate" id="refresh-icon"></i> <span>REFRESH</span>
           </button>
@@ -99,112 +84,106 @@
             <i class="fa-solid fa-user-plus"></i> <span>ADD CREW</span>
           </button>
         </div>
-        <span class="text-[9px] text-cyan-600 font-semibold tracking-widest uppercase select-none">
-          © Surya Ardiansyah 2026
-        </span>
+        <span class="text-[9px] text-cyan-600 font-semibold tracking-widest uppercase select-none">© Surya Ardiansyah 2026</span>
       </div>
     </div>
 
-    <!-- RUNNING TEXT HEADER -->
+    <!-- Running Text -->
     <div class="w-full bg-gray-950/90 border border-cyan-500/60 rounded-sm px-3 py-1.5 flex items-center gap-3 overflow-hidden shadow-[inset_0_0_10px_rgba(6,182,212,0.2)]">
       <div class="flex items-center gap-1.5 bg-cyan-500 text-gray-950 px-2 py-0.5 text-[9px] md:text-[10px] font-black tracking-wider rounded-sm shrink-0 uppercase shadow-[0_0_8px_rgba(6,182,212,0.8)]">
-        <i class="fa-solid fa-bullhorn"></i> <span>JADWAL PROGRAM HARI INI:</span>
+        <i class="fa-solid fa-bullhorn"></i> <span>JADWAL HARI INI:</span>
       </div>
       <div class="overflow-hidden whitespace-nowrap flex-1 relative">
         <marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs md:text-sm text-green-400 font-bold uppercase tracking-wide running-text-neon" id="header-running-text">
-          MEMUAT INFORMASI JADWAL SIARAN HARI INI...
+          MEMUAT INFORMASI JADWAL SIARAN...
         </marquee>
       </div>
     </div>
   </header>
 
-  <!-- Sub-Menu Navigation Tabs (Termasuk Tab Dummy Maintenance) -->
-  <nav class="bg-gray-900/60 border-b border-cyan-900/50 px-3 md:px-6 py-2 flex items-center justify-between gap-3 relative z-10 overflow-x-auto">
+  <!-- Navigation Tabs -->
+  <nav class="bg-gray-900/80 border-b border-cyan-900/60 px-3 md:px-6 py-2.5 flex items-center justify-between gap-3 relative z-10 overflow-x-auto shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
     <div class="flex items-center gap-3">
-      <button id="tab-btn-jadwal" onclick="switchTab('jadwal')" class="px-4 py-1.5 bg-cyan-500/20 border border-cyan-400 text-cyan-300 text-xs font-bold uppercase tracking-wider rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.4)] flex items-center gap-2 whitespace-nowrap transition-all">
+      <button id="tab-btn-jadwal" onclick="switchTab('jadwal')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border">
         <i class="fa-solid fa-calendar-days text-pink-500"></i> JADWAL BULANAN
       </button>
-      <button id="tab-btn-daily" onclick="switchTab('daily')" class="px-4 py-1.5 bg-gray-950 border border-cyan-900 text-cyan-600 hover:text-cyan-400 hover:border-cyan-700 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap">
-        <i class="fa-solid fa-clipboard-user text-cyan-700" id="daily-tab-icon"></i> DAILY REPORT (ROLE ACCESS)
+      <button id="tab-btn-daily" onclick="switchTab('daily')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border">
+        <i class="fa-solid fa-clipboard-user text-cyan-400"></i> DAILY REPORT
       </button>
-      <button id="tab-btn-maintenance" onclick="switchTab('maintenance')" class="px-4 py-1.5 bg-gray-950 border border-cyan-900 text-blue-500 hover:text-blue-300 hover:border-blue-700 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap">
-        <i class="fa-solid fa-screwdriver-wrench text-blue-400"></i> MAINTENANCE [DUMMY]
+      <button id="tab-btn-maintenance" onclick="switchTab('maintenance')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border">
+        <i class="fa-solid fa-screwdriver-wrench text-blue-400"></i> MAINTENANCE
+      </button>
+      <button id="tab-btn-logs" onclick="switchTab('logs')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border">
+        <i class="fa-solid fa-terminal text-yellow-400"></i> SYSTEM LOGS
       </button>
     </div>
   </nav>
 
-  <!-- CONTENT VIEW 1: JADWAL BULANAN -->
-  <div id="view-jadwal" class="flex-1 flex flex-col">
+  <!-- VIEW 1: JADWAL BULANAN -->
+  <div id="view-jadwal" class="flex-1 flex flex-col hidden">
     <main class="p-3 md:p-6 flex-1 flex flex-col gap-4 relative z-10 w-full max-w-[100vw]">
-      
-      <!-- Status & Filter Bar -->
-      <div class="flex flex-col lg:flex-row justify-between items-center gap-3 bg-gray-900/80 backdrop-blur-sm p-3 rounded-sm border-l-4 border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.15)]">
-        <div class="flex items-center justify-between w-full lg:w-auto gap-3">
-          <span class="text-[10px] md:text-xs text-cyan-600 uppercase tracking-wider whitespace-nowrap">MAINFRAME_LINK:</span>
-          <span id="sync-status" class="inline-flex items-center gap-2 px-2.5 py-1 text-[10px] font-bold uppercase bg-transparent text-yellow-400 border border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.4)]">
-            <span class="w-2 h-2 bg-yellow-400 animate-ping"></span> ESTABLISHED
-          </span>
-        </div>
-        
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
-          <div class="relative flex-1 sm:w-60">
-            <input type="text" id="search-input" onkeyup="filterTable()" placeholder="CARI NAMA CREW..." class="w-full bg-gray-950 border border-cyan-700/80 text-cyan-300 text-xs rounded-sm px-3 py-2 focus:outline-none focus:border-pink-500 transition-all uppercase">
+      <div class="flex flex-col lg:flex-row justify-between items-center gap-3 bg-gray-900/80 p-3 rounded-sm border-l-4 border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.15)]">
+        <div class="flex items-center gap-3 w-full lg:w-auto">
+          <span class="text-[10px] text-cyan-600 uppercase tracking-wider shrink-0">NAVIGASI BULAN:</span>
+          <div class="flex items-center bg-gray-950 border border-cyan-500 rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+            <button onclick="navigateMonth(-1)" class="px-3 py-2 text-cyan-400 hover:bg-cyan-500 hover:text-gray-950 transition-all border-r border-cyan-900 font-bold" title="Bulan Sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
+            <span id="month-display-label" class="px-4 py-2 text-cyan-300 text-xs font-black uppercase tracking-widest min-w-[130px] text-center">OKTOBER</span>
+            <button onclick="navigateMonth(1)" class="px-3 py-2 text-cyan-400 hover:bg-cyan-500 hover:text-gray-950 transition-all border-l border-cyan-900 font-bold" title="Bulan Berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
+        </div>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
+          <input type="text" id="search-input" onkeyup="filterTable()" placeholder="CARI NAMA CREW..." class="bg-gray-950 border border-cyan-700 text-cyan-300 text-xs rounded-sm px-3 py-2 uppercase">
           <div class="flex items-center gap-2">
-            <button onclick="exportExcel()" class="flex-1 sm:flex-none px-3 py-2 bg-gray-950/80 border border-green-500 text-green-400 hover:bg-green-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 shadow-[0_0_8px_rgba(34,197,94,0.3)]">
-              <i class="fa-solid fa-file-excel"></i> <span>EXCEL</span>
-            </button>
-            <button onclick="exportPDF()" class="flex-1 sm:flex-none px-3 py-2 bg-gray-950/80 border border-red-500 text-red-500 hover:bg-red-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 shadow-[0_0_8px_rgba(239,68,68,0.3)]">
-              <i class="fa-solid fa-file-pdf"></i> <span>PDF</span>
-            </button>
+            <button onclick="exportExcel()" class="px-3 py-2 bg-gray-950 border border-green-500 text-green-400 hover:bg-green-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
+            <button onclick="exportPDF()" class="px-3 py-2 bg-gray-950 border border-red-500 text-red-500 hover:bg-red-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase"><i class="fa-solid fa-file-pdf"></i> PDF</button>
           </div>
         </div>
       </div>
 
-      <!-- Dashboard Cards Grid -->
+      <!-- Dashboard Cards -->
       <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
-        <div onclick="showDetailModal('TOTAL_CREW')" class="bg-gray-900/90 border border-cyan-900/80 border-t-2 border-t-cyan-400 p-3 rounded-sm shadow-[0_0_15px_rgba(6,182,212,0.15)] flex flex-col justify-center cursor-pointer aurora-card">
-          <span class="text-[9px] text-cyan-500 uppercase tracking-widest font-bold">TOTAL CREW</span>
-          <span id="card-total" class="text-xl md:text-2xl font-black text-cyan-300 mt-1">0</span>
+        <div onclick="showDetailModal('TOTAL_CREW')" class="bg-gray-900 border border-cyan-900 border-t-2 border-t-cyan-400 p-3 rounded-sm cursor-pointer aurora-card">
+          <span class="text-[9px] text-cyan-500 uppercase font-bold">TOTAL CREW</span>
+          <span id="card-total" class="text-xl md:text-2xl font-black text-cyan-300 mt-1 block">0</span>
         </div>
-        <div onclick="showDetailModal('ON_DUTY')" class="bg-gray-900/90 border border-green-900/80 border-t-2 border-t-green-400 p-3 rounded-sm shadow-[0_0_15px_rgba(34,197,94,0.15)] flex flex-col justify-center cursor-pointer aurora-card">
-          <span class="text-[9px] text-green-500 uppercase tracking-widest font-bold">ON DUTY (HARI INI)</span>
-          <span id="card-duty" class="text-xl md:text-2xl font-black text-green-400 mt-1">0</span>
+        <div onclick="showDetailModal('ON_DUTY')" class="bg-gray-900 border border-green-900 border-t-2 border-t-green-400 p-3 rounded-sm cursor-pointer aurora-card">
+          <span class="text-[9px] text-green-500 uppercase font-bold">ON DUTY (HARI INI)</span>
+          <span id="card-duty" class="text-xl md:text-2xl font-black text-green-400 mt-1 block">0</span>
         </div>
-        <div onclick="showDetailModal('MAINTENANCE')" class="bg-gray-900/90 border border-blue-900/80 border-t-2 border-t-blue-400 p-3 rounded-sm shadow-[0_0_15px_rgba(59,130,246,0.15)] flex flex-col justify-center cursor-pointer aurora-card">
-          <span class="text-[9px] text-blue-400 uppercase tracking-widest font-bold">MAINTENANCE</span>
-          <span id="card-mnt" class="text-xl md:text-2xl font-black text-blue-400 mt-1">0</span>
+        <div onclick="showDetailModal('MAINTENANCE')" class="bg-gray-900 border border-blue-900 border-t-2 border-t-blue-400 p-3 rounded-sm cursor-pointer aurora-card">
+          <span class="text-[9px] text-blue-400 uppercase font-bold">MAINTENANCE</span>
+          <span id="card-mnt" class="text-xl md:text-2xl font-black text-blue-400 mt-1 block">0</span>
         </div>
-        <div onclick="showDetailModal('OFF')" class="bg-gray-900/90 border border-red-900/80 border-t-2 border-t-red-500 p-3 rounded-sm shadow-[0_0_15px_rgba(239,68,68,0.15)] flex flex-col justify-center cursor-pointer aurora-card">
-          <span class="text-[9px] text-red-400 uppercase tracking-widest font-bold">OFF (HARI INI)</span>
-          <span id="card-off" class="text-xl md:text-2xl font-black text-red-500 mt-1">0</span>
+        <div onclick="showDetailModal('OFF')" class="bg-gray-900 border border-red-900 border-t-2 border-t-red-500 p-3 rounded-sm cursor-pointer aurora-card">
+          <span class="text-[9px] text-red-400 uppercase font-bold">OFF (HARI INI)</span>
+          <span id="card-off" class="text-xl md:text-2xl font-black text-red-500 mt-1 block">0</span>
         </div>
-        <div onclick="showDetailModal('PROGRAM_STATS')" class="bg-gray-900/90 border border-pink-900/80 border-t-2 border-t-pink-500 p-3 rounded-sm shadow-[0_0_15px_rgba(236,72,153,0.15)] flex flex-col justify-center cursor-pointer aurora-card">
-          <span class="text-[9px] text-pink-400 uppercase tracking-widest font-bold">PROGRAM SIARAN</span>
+        <div onclick="showDetailModal('PROGRAM_STATS')" class="bg-gray-900 border border-pink-900 border-t-2 border-t-pink-500 p-3 rounded-sm cursor-pointer aurora-card">
+          <span class="text-[9px] text-pink-400 uppercase font-bold">PROGRAM SIARAN</span>
           <div class="flex items-center gap-2 mt-1">
             <span class="text-[9px] text-cyan-400">H: <strong id="card-prog-today" class="text-white text-sm">0</strong></span>
             <span class="text-[9px] text-cyan-400">B: <strong id="card-prog-month" class="text-pink-400 text-sm">0</strong></span>
           </div>
         </div>
-        <div onclick="showDetailModal('TOP_CREW')" class="bg-gray-900/90 border border-yellow-900/80 border-t-2 border-t-yellow-400 p-3 rounded-sm shadow-[0_0_15px_rgba(250,204,21,0.15)] flex flex-col justify-center cursor-pointer aurora-card">
-          <span class="text-[9px] text-yellow-400 uppercase tracking-widest font-bold"><i class="fa-solid fa-trophy mr-1"></i> TOP CREW</span>
-          <span id="card-top-crew" class="text-xs md:text-sm font-black text-yellow-300 mt-1 truncate">-</span>
+        <div onclick="showDetailModal('TOP_CREW')" class="bg-gray-900 border border-yellow-900 border-t-2 border-t-yellow-400 p-3 rounded-sm cursor-pointer aurora-card">
+          <span class="text-[9px] text-yellow-400 uppercase font-bold"><i class="fa-solid fa-trophy mr-1"></i> TOP CREW</span>
+          <span id="card-top-crew" class="text-xs md:text-sm font-black text-yellow-300 mt-1 block truncate">-</span>
         </div>
       </div>
 
-      <!-- Table Container -->
-      <div class="bg-gray-900/90 border border-cyan-800 shadow-[0_0_25px_rgba(6,182,212,0.15)] flex-1 flex flex-col rounded-sm overflow-hidden">
+      <!-- Main Table Container -->
+      <div class="bg-gray-900 border border-cyan-800 flex-1 flex flex-col rounded-sm overflow-hidden">
         <div id="table-scroll-container" class="overflow-x-auto overflow-y-auto flex-1 max-h-[calc(100vh-320px)] w-full">
           <table class="w-full text-left text-sm border-collapse">
-            <thead class="bg-gray-950 text-pink-500 text-[10px] md:text-xs uppercase tracking-widest sticky top-0 z-40 shadow-md">
+            <thead class="bg-gray-950 text-pink-500 text-[10px] md:text-xs uppercase tracking-widest sticky top-0 z-40">
               <tr id="table-headers">
-                <th class="p-2.5 md:p-4 border-b-2 border-pink-600 min-w-[110px] max-w-[110px] md:min-w-[180px] md:max-w-[180px] sticky left-0 top-0 bg-gray-950 z-50 truncate">NAMA CREW</th>
-                <th class="p-2.5 md:p-4 border-b-2 border-pink-600 min-w-[100px] max-w-[100px] md:min-w-[140px] md:max-w-[140px] sticky left-[110px] md:left-[180px] top-0 bg-gray-950 z-50 truncate shadow-[4px_0_10px_rgba(0,0,0,0.6)]">NOMOR HP</th>
+                <th class="p-2.5 md:p-4 border-b-2 border-pink-600 min-w-[110px] max-w-[110px] md:min-w-[180px] md:max-w-[180px] sticky left-0 top-0 bg-gray-950 z-50">NAMA CREW</th>
+                <th class="p-2.5 md:p-4 border-b-2 border-pink-600 min-w-[100px] max-w-[100px] md:min-w-[140px] md:max-w-[140px] sticky left-[110px] md:left-[180px] top-0 bg-gray-950 z-50">NOMOR HP</th>
               </tr>
             </thead>
             <tbody id="table-body" class="divide-y divide-cyan-900/40">
               <tr>
-                <td colspan="10" class="text-center py-16 text-cyan-600 font-bold uppercase tracking-widest">
+                <td colspan="10" class="text-center py-16 text-cyan-600 font-bold uppercase">
                   <i class="fa-solid fa-spinner fa-spin text-3xl mb-4 text-pink-500"></i>
                   <p class="animate-pulse text-xs">FETCHING_MAINFRAME_DATA...</p>
                 </td>
@@ -216,76 +195,32 @@
     </main>
   </div>
 
-  <!-- CONTENT VIEW 2: DAILY REPORT -->
+  <!-- VIEW 2: DAILY REPORT -->
   <div id="view-daily" class="flex-1 flex-col hidden">
     <main class="p-3 md:p-6 flex-1 flex flex-col gap-4 relative z-10 w-full max-w-[100vw]">
-      
-      <!-- Session Authentication Banner -->
-      <div id="session-login-box" class="bg-gray-900/90 border-2 border-pink-500 p-4 md:p-6 rounded-sm shadow-[0_0_25px_rgba(236,72,153,0.3)] max-w-xl mx-auto w-full my-auto">
-        <h3 class="text-sm md:text-base font-bold text-pink-500 uppercase tracking-widest mb-3 border-b border-pink-500/30 pb-2">>> ACCESS_CONTROL: PILIH SESI LOGIN</h3>
-        <p class="text-xs text-cyan-400 mb-4">Pilih peran Anda untuk mengakses Daily Report sesuai hak akses sistem.</p>
-        
-        <div class="space-y-4">
-          <div>
-            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PERAN AKSES</label>
-            <select id="login-role" onchange="toggleRoleSelect()" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase font-bold">
-              <option value="crew">CREW (PENGGUNA)</option>
-              <option value="admin">ADMIN (MASTER)</option>
-            </select>
-          </div>
-
-          <div id="crew-select-wrapper">
-            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PILIH NAMA ANDA</label>
-            <select id="login-crew-name" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase font-bold">
-              <option value="">-- PILIH CREW --</option>
-            </select>
-          </div>
-
-          <div id="admin-pin-wrapper" class="hidden">
-            <label class="block text-[10px] font-bold text-pink-500 mb-1 uppercase">ADMIN SECURITY PIN</label>
-            <input type="password" id="admin-pin" class="w-full bg-gray-950 border border-pink-700 p-2 text-pink-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm font-bold tracking-widest" placeholder="MASUKKAN PIN ADMIN">
-          </div>
-
-          <button onclick="startSession()" class="w-full py-2.5 bg-pink-600 border border-pink-400 text-white hover:bg-pink-500 rounded-sm text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_12px_rgba(236,72,153,0.6)]">
-            [ MASUK KE SESI ]
-          </button>
-        </div>
-      </div>
-
-      <!-- Main Daily Panel -->
       <div id="daily-main-panel" class="hidden flex-1 flex flex-col gap-4">
-        <div class="flex flex-col lg:flex-row justify-between items-center gap-3 bg-gray-900/80 backdrop-blur-sm p-3 md:p-4 rounded-sm border-l-4 border-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.15)]">
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-3 bg-gray-900/80 p-3 md:p-4 rounded-sm border-l-4 border-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.15)]">
           <div>
             <div class="flex items-center gap-2 flex-wrap">
               <h2 class="font-bold text-sm md:text-base text-pink-400 uppercase tracking-widest" id="session-title-label">>> DAILY REPORT</h2>
-              <span id="session-badge" class="px-2 py-0.5 text-[9px] bg-cyan-500/20 border border-cyan-400 text-cyan-300 rounded-sm font-bold"></span>
+              <span id="session-badge" class="px-2 py-0.5 text-[9px] bg-cyan-500/25 border border-cyan-400 text-cyan-300 rounded-sm font-bold"></span>
             </div>
             <p class="text-[10px] text-cyan-600" id="session-desc-label">Kelola laporan harian siaran.</p>
           </div>
-
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
-            <input type="text" id="daily-search-input" onkeyup="filterDailyTable()" placeholder="CARI LAPORAN..." class="bg-gray-950 border border-cyan-700 text-cyan-300 text-xs px-3 py-2 rounded-sm uppercase focus:outline-none focus:border-pink-500 w-full sm:w-48">
+            <input type="text" id="daily-search-input" onkeyup="filterDailyTable()" placeholder="CARI LAPORAN..." class="bg-gray-950 border border-cyan-700 text-cyan-300 text-xs px-3 py-2 rounded-sm uppercase w-full sm:w-48">
             <div class="flex items-center gap-2 flex-wrap">
-              <button onclick="openDailyModal()" id="btn-input-laporan" class="flex-1 sm:flex-none px-3 py-2 bg-pink-600 border border-pink-400 text-white hover:bg-pink-500 rounded-sm text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 shadow-[0_0_10px_rgba(236,72,153,0.5)]">
-                <i class="fa-solid fa-plus-circle"></i> <span>INPUT</span>
-              </button>
-              <button onclick="exportDailyExcel()" id="btn-admin-excel" class="px-3 py-2 bg-gray-950/80 border border-green-500 text-green-400 hover:bg-green-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase transition-all hidden">
-                <i class="fa-solid fa-file-excel"></i> EXCEL
-              </button>
-              <button onclick="exportDailyPDF()" id="btn-admin-pdf" class="px-3 py-2 bg-gray-950/80 border border-red-500 text-red-500 hover:bg-red-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase transition-all hidden">
-                <i class="fa-solid fa-file-pdf"></i> PDF
-              </button>
-              <button onclick="logoutSession()" class="px-3 py-2 bg-gray-950 border border-gray-600 text-gray-400 hover:text-red-500 hover:border-red-500 rounded-sm text-xs font-bold uppercase transition-all" title="Keluar Sesi">
-                <i class="fa-solid fa-right-from-bracket"></i> KELUAR SESI
-              </button>
+              <button onclick="openDailyModal()" class="px-3 py-2 bg-pink-600 border border-pink-400 text-white hover:bg-pink-500 rounded-sm text-xs font-bold uppercase flex items-center gap-1.5"><i class="fa-solid fa-plus-circle"></i> INPUT</button>
+              <button onclick="exportDailyExcel()" id="btn-admin-excel" class="px-3 py-2 bg-gray-950 border border-green-500 text-green-400 hover:bg-green-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase hidden"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
+              <button onclick="exportDailyPDF()" id="btn-admin-pdf" class="px-3 py-2 bg-gray-950 border border-red-500 text-red-500 hover:bg-red-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase hidden"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+              <button onclick="logoutSession()" class="px-3 py-2 bg-gray-950 border border-gray-600 text-gray-400 hover:text-red-500 rounded-sm text-xs font-bold uppercase" title="Keluar Sesi"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
           </div>
         </div>
-
-        <div class="bg-gray-900/90 border border-cyan-800 shadow-[0_0_25px_rgba(6,182,212,0.15)] flex-1 flex flex-col rounded-sm overflow-hidden">
+        <div class="bg-gray-900 border border-cyan-800 flex-1 flex flex-col rounded-sm overflow-hidden">
           <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[calc(100vh-280px)] w-full">
             <table class="w-full text-left text-sm border-collapse">
-              <thead class="bg-gray-950 text-pink-500 text-[10px] md:text-xs uppercase tracking-widest sticky top-0 z-40 shadow-md">
+              <thead class="bg-gray-950 text-pink-500 text-[10px] md:text-xs uppercase sticky top-0 z-40">
                 <tr>
                   <th class="p-3 border-b-2 border-pink-600">TIMESTAMP</th>
                   <th class="p-3 border-b-2 border-pink-600">NAMA PROGRAM</th>
@@ -298,12 +233,7 @@
                 </tr>
               </thead>
               <tbody id="daily-table-body" class="divide-y divide-cyan-900/40 text-xs">
-                <tr>
-                  <td colspan="8" class="text-center py-16 text-cyan-600 font-bold uppercase tracking-widest">
-                    <i class="fa-solid fa-spinner fa-spin text-3xl mb-4 text-pink-500"></i>
-                    <p class="animate-pulse">FETCHING_DAILY_REPORTS...</p>
-                  </td>
-                </tr>
+                <tr><td colspan="8" class="text-center py-16 text-cyan-600 font-bold uppercase">FETCHING_DAILY_REPORTS...</td></tr>
               </tbody>
             </table>
           </div>
@@ -312,212 +242,325 @@
     </main>
   </div>
 
-  <!-- CONTENT VIEW 3: MAINTENANCE (DUMMY MODULE) -->
+  <!-- VIEW 3: MAINTENANCE -->
   <div id="view-maintenance" class="flex-1 flex-col hidden">
-    <main class="p-4 md:p-8 flex-1 flex flex-col items-center justify-center relative z-10 w-full max-w-[100vw]">
-      <div class="bg-gray-900/90 border-2 border-blue-500 rounded-sm p-6 md:p-10 w-full max-w-2xl shadow-[0_0_40px_rgba(59,130,246,0.3)] text-center space-y-4">
-        <div class="inline-flex p-3 bg-blue-950/80 border border-blue-400 text-blue-400 rounded-sm animate-pulse mb-2">
-          <i class="fa-solid fa-screwdriver-wrench text-3xl"></i>
+    <main class="p-3 md:p-6 flex-1 flex flex-col gap-4 relative z-10 w-full max-w-[100vw]">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-3 bg-gray-900/80 p-3 md:p-4 rounded-sm border-l-4 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="font-bold text-sm md:text-base text-blue-400 uppercase tracking-widest">>> MAINTENANCE MODULE: INFRASTRUCTURE & EQUIPMENT</h2>
+            <span class="px-2 py-0.5 text-[9px] bg-blue-500/20 border border-blue-400 text-blue-300 rounded-sm font-bold">SECURE ACCESS</span>
+          </div>
+          <p class="text-[10px] text-cyan-600">Pusat kendali pemeliharaan peralatan studio IT Broadcast 3TV.</p>
         </div>
-        <h2 class="text-lg md:text-2xl font-black text-blue-400 uppercase tracking-widest">>> MAINTENANCE MODULE: UNDER CONSTRUCTION</h2>
-        <p class="text-xs md:text-sm text-cyan-300 font-mono leading-relaxed">
-          Modul manajemen pemeliharaan infrastruktur dan peralatan IT Broadcast 3TV sedang dalam tahap perancangan arsitektur. Modul ini akan segera diintegrasikan ke sistem produksi utama.
-        </p>
-        <div class="pt-4 border-t border-blue-900/60">
-          <button onclick="switchTab('jadwal')" class="px-5 py-2.5 bg-blue-600 border border-blue-400 text-white hover:bg-blue-500 rounded-sm text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-            <i class="fa-solid fa-arrow-left mr-2"></i> KEMBALI KE DASHBOARD UTAMA
-          </button>
+        <div class="flex items-center gap-2">
+          <button onclick="exportMaintenancePDF()" class="px-3 py-2 bg-gray-950 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase"><i class="fa-solid fa-file-pdf"></i> EXPORT PDF</button>
+          <button onclick="openMntModal()" class="px-4 py-2 bg-blue-600 border border-blue-400 text-white hover:bg-blue-500 rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(59,130,246,0.5)]"><i class="fa-solid fa-plus-circle"></i> LAPOR KERUSAKAN</button>
+        </div>
+      </div>
+
+      <!-- Mnt Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div onclick="showMntDetailModal('QUEUE')" class="bg-gray-900 border border-blue-900 p-3 rounded-sm border-t-2 border-t-blue-400 flex items-center justify-between cursor-pointer aurora-card hover:border-blue-400 group">
+          <div>
+            <span class="text-[9px] text-blue-400 uppercase font-bold tracking-widest group-hover:text-blue-300 transition-colors">ALAT DALAM ANTREAN</span>
+            <span id="mnt-count-queue" class="text-xl font-black text-blue-300 mt-1 block">0</span>
+          </div>
+          <div class="p-2 bg-blue-950/60 border border-blue-800 rounded-sm shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+            <i class="fa-solid fa-clipboard-list text-xl text-blue-400"></i>
+          </div>
+        </div>
+
+        <div onclick="showMntDetailModal('REPAIR')" class="bg-gray-900 border border-yellow-900 p-3 rounded-sm border-t-2 border-t-yellow-400 flex items-center justify-between cursor-pointer aurora-card hover:border-yellow-400 group">
+          <div>
+            <span class="text-[9px] text-yellow-400 uppercase font-bold tracking-widest group-hover:text-yellow-300 transition-colors">SEDANG DIPERBAIKI</span>
+            <span id="mnt-count-repair" class="text-xl font-black text-yellow-300 mt-1 block">0</span>
+          </div>
+          <div class="p-2 bg-yellow-950/60 border border-yellow-800 rounded-sm shadow-[0_0_10px_rgba(250,204,21,0.3)]">
+            <i class="fa-solid fa-screwdriver-wrench text-xl text-yellow-400"></i>
+          </div>
+        </div>
+
+        <div onclick="showMntDetailModal('DONE')" class="bg-gray-900 border border-green-900 p-3 rounded-sm border-t-2 border-t-green-400 flex items-center justify-between cursor-pointer aurora-card hover:border-green-400 group">
+          <div>
+            <span class="text-[9px] text-green-400 uppercase font-bold tracking-widest group-hover:text-green-300 transition-colors">SELESAI (BULAN INI)</span>
+            <span id="mnt-count-done" class="text-xl font-black text-green-300 mt-1 block">0</span>
+          </div>
+          <div class="p-2 bg-green-950/60 border border-green-800 rounded-sm shadow-[0_0_10px_rgba(34,197,94,0.3)]">
+            <i class="fa-solid fa-circle-check text-xl text-green-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mnt Table -->
+      <div class="bg-gray-900 border border-blue-800 flex-1 flex flex-col rounded-sm overflow-hidden">
+        <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[calc(100vh-340px)] w-full">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead class="bg-gray-950 text-blue-400 text-[10px] md:text-xs uppercase sticky top-0 z-40">
+              <tr>
+                <th class="p-3 border-b-2 border-blue-600">WAKTU LAPOR</th>
+                <th class="p-3 border-b-2 border-blue-600">NAMA ALAT / PERANGKAT</th>
+                <th class="p-3 border-b-2 border-blue-600">LOKASI / STUDIO</th>
+                <th class="p-3 border-b-2 border-blue-600">KENDALA / MONITORING</th>
+                <th class="p-3 border-b-2 border-blue-600">TEKNISI</th>
+                <th class="p-3 border-b-2 border-blue-600">STATUS</th>
+                <th class="p-3 border-b-2 border-blue-600 text-center min-w-[130px]">AKSI</th>
+              </tr>
+            </thead>
+            <tbody id="mnt-table-body" class="divide-y divide-blue-950 text-xs">
+              <tr><td colspan="7" class="text-center py-12 text-blue-500 font-bold uppercase">MEMUAT DATA MAINTENANCE...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- MODAL POPUP WHATSAPP NOTIFIKASI JADWAL -->
-  <div id="wa-notif-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
-    <div class="bg-gray-900 border-2 border-green-500 rounded-sm p-4 md:p-6 w-full max-w-lg shadow-[0_0_35px_rgba(34,197,94,0.4)] relative">
-      <h3 class="text-sm md:text-base font-bold text-green-400 mb-3 uppercase tracking-widest border-b border-green-500/30 pb-2 flex items-center gap-2">
-        <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> >> WHATSAPP_DISPATCH_PROTOCOL
-      </h3>
-      <p class="text-xs text-cyan-400 mb-3">Jadwal bulanan telah diperbarui. Kirim notifikasi pesan ke WhatsApp crew terkait?</p>
-      
-      <div class="space-y-3 mb-4">
-        <div class="grid grid-cols-2 gap-2 text-xs bg-gray-950 p-3 rounded-sm border border-cyan-900">
-          <div><span class="text-gray-500 block text-[9px] uppercase">NAMA CREW</span><strong id="wa-modal-crew" class="text-cyan-300">-</strong></div>
-          <div><span class="text-gray-500 block text-[9px] uppercase">NOMOR HP/WA</span><strong id="wa-modal-hp" class="text-pink-400">-</strong></div>
-          <div class="col-span-2 mt-1 pt-1 border-t border-cyan-900/50"><span class="text-gray-500 block text-[9px] uppercase">TANGGAL / BULAN</span><strong id="wa-modal-tanggal" class="text-yellow-400">-</strong></div>
-        </div>
-
+  <!-- VIEW 4: SYSTEM LOGS -->
+  <div id="view-logs" class="flex-1 flex-col hidden">
+    <main class="p-3 md:p-6 flex-1 flex flex-col gap-4 relative z-10 w-full max-w-[100vw]">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-3 bg-gray-900/80 p-3 md:p-4 rounded-sm border-l-4 border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.15)]">
         <div>
-          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">DRAF PESAN WHATSAPP</label>
-          <textarea id="wa-modal-message" rows="4" class="w-full bg-gray-950 border border-green-700 p-2.5 text-green-300 text-xs focus:outline-none focus:border-green-400 rounded-sm uppercase font-mono"></textarea>
+          <div class="flex items-center gap-2">
+            <h2 class="font-bold text-sm md:text-base text-yellow-400 uppercase tracking-widest">>> AUDIT TRAIL: SYSTEM_LOGS TERMINAL</h2>
+            <span class="px-2 py-0.5 text-[9px] bg-yellow-500/20 border border-yellow-400 text-yellow-300 rounded-sm font-bold">SECURE RECORD</span>
+          </div>
+          <p class="text-[10px] text-cyan-600">Rekam jejak seluruh aktivitas operasional Maintenance dan Daily Report IT Broadcast 3TV.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="logs-search-input" onkeyup="filterLogsTable()" placeholder="CARI LOG AKTIVITAS..." class="bg-gray-950 border border-cyan-700 text-cyan-300 text-xs px-3 py-2 rounded-sm uppercase w-full sm:w-64">
         </div>
       </div>
 
-      <div class="flex flex-wrap justify-end gap-2 pt-2 border-t border-cyan-900">
-        <button type="button" onclick="cancelWaAction()" class="px-4 py-2 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase transition-all">
-          <i class="fa-solid fa-xmark mr-1"></i> BATAL (REVERT)
-        </button>
-        <button type="button" onclick="closeWaModal(false)" class="px-4 py-2 bg-transparent border border-gray-600 text-gray-400 hover:border-cyan-400 rounded-sm text-xs font-bold uppercase">SIMPAN SAJA</button>
-        <button type="button" onclick="closeWaModal(true)" class="px-5 py-2 bg-green-600 border border-green-400 text-gray-950 hover:bg-green-500 rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(34,197,94,0.5)]">KIRIM KE WA</button>
+      <!-- Logs Terminal Table -->
+      <div class="bg-gray-900 border border-yellow-600/60 flex-1 flex flex-col rounded-sm overflow-hidden">
+        <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[calc(100vh-250px)] w-full">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead class="bg-gray-950 text-yellow-400 text-[10px] md:text-xs uppercase sticky top-0 z-40">
+              <tr>
+                <th class="p-3 border-b-2 border-yellow-500 min-w-[160px]">WAKTU</th>
+                <th class="p-3 border-b-2 border-yellow-500 min-w-[130px]">MODUL</th>
+                <th class="p-3 border-b-2 border-yellow-500 min-w-[140px]">AKSI</th>
+                <th class="p-3 border-b-2 border-yellow-500 min-w-[140px]">PELAKU</th>
+                <th class="p-3 border-b-2 border-yellow-500">KETERANGAN AKTIVITAS</th>
+              </tr>
+            </thead>
+            <tbody id="audit-logs-table-body" class="divide-y divide-yellow-950/40 text-xs font-mono">
+              <tr><td colspan="5" class="text-center py-12 text-yellow-500/70 font-bold uppercase">MEMUAT SYSTEM LOGS...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 
-  <!-- Modal Login Sesi / Admin Universal -->
-  <div id="global-login-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
-    <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-md shadow-[0_0_35px_rgba(236,72,153,0.5)] relative">
-      <h3 class="text-sm md:text-base font-bold text-pink-500 mb-4 uppercase tracking-widest border-b border-pink-500/30 pb-2">>> ACCESS_CONTROL: PILIH SESI</h3>
-      
-      <div class="space-y-4">
+  <!-- MODAL: MAINTENANCE INPUT/EDIT -->
+  <div id="mnt-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
+    <div class="bg-gray-900 border-2 border-blue-500 rounded-sm p-4 md:p-6 w-full max-w-lg shadow-[0_0_35px_rgba(59,130,246,0.5)]">
+      <h3 id="mnt-modal-title" class="text-sm md:text-base font-bold text-blue-400 mb-4 uppercase tracking-widest border-b border-blue-500/30 pb-2">>> INPUT_MAINTENANCE_REPORT</h3>
+      <form id="mnt-form" onsubmit="submitMntReport(event)" class="space-y-3">
         <div>
-          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PERAN AKSES</label>
-          <select id="modal-login-role" onchange="toggleModalRoleSelect()" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase font-bold">
-            <option value="crew">CREW (PENGGUNA)</option>
-            <option value="admin">ADMIN (MASTER)</option>
-          </select>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase"><i class="fa-solid fa-clock mr-1"></i> WAKTU LAPOR MANUAL</label>
+          <input type="datetime-local" id="mnt-waktu-lapor" required class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm font-bold">
         </div>
-
-        <div id="modal-crew-select-wrapper">
-          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PILIH NAMA ANDA</label>
-          <select id="modal-login-crew-name" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase font-bold">
-            <option value="">-- PILIH CREW --</option>
-          </select>
-        </div>
-
-        <div id="modal-admin-pin-wrapper" class="hidden">
-          <label class="block text-[10px] font-bold text-pink-500 mb-1 uppercase">ADMIN SECURITY PIN</label>
-          <input type="password" id="modal-admin-pin" class="w-full bg-gray-950 border border-pink-700 p-2 text-pink-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm font-bold tracking-widest" placeholder="MASUKKAN PIN ADMIN">
-        </div>
-
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeGlobalLoginModal()" class="px-4 py-2 bg-transparent border border-gray-600 text-gray-400 rounded-sm text-xs font-bold uppercase">ABORT</button>
-          <button type="button" onclick="submitGlobalLogin()" class="px-5 py-2 bg-pink-600 border border-pink-400 text-white hover:bg-pink-500 rounded-sm text-xs font-bold uppercase shadow-[0_0_10px_rgba(236,72,153,0.5)]">MASUK SESI</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Input / Edit Daily Report -->
-  <div id="daily-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
-    <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-xl shadow-[0_0_35px_rgba(236,72,153,0.5)] relative">
-      <h3 id="daily-modal-title" class="text-sm md:text-base font-bold text-pink-500 mb-4 uppercase tracking-widest border-b border-pink-500/30 pb-2">>> SUBMIT_DAILY_REPORT</h3>
-      
-      <form id="daily-form" onsubmit="return false;" class="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
         <div>
-          <label class="block text-[10px] font-bold text-pink-400 mb-1 uppercase">
-            <i class="fa-solid fa-calendar-days mr-1 text-pink-500"></i> PILIH TANGGAL LAPORAN
-          </label>
-          <input type="date" id="daily-tanggal" class="w-full bg-gray-950 border border-pink-700/80 p-2 text-pink-300 text-xs focus:outline-none focus:border-pink-400 rounded-sm font-bold">
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">NAMA ALAT / PERANGKAT</label>
+          <input type="text" id="mnt-alat" required class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase" placeholder="CONTOH: SWITCHER ATEM">
         </div>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">NAMA PROGRAM</label>
-            <input type="text" id="daily-program" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase" placeholder="CONTOH: LIVE NEWS">
+            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">LOKASI / STUDIO</label>
+            <input type="text" id="mnt-lokasi" required class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase" placeholder="STUDIO 1">
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">LOKASI</label>
-            <input type="text" id="daily-lokasi" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase" placeholder="CONTOH: STUDIO 1">
+            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">TEKNISI</label>
+            <input type="text" id="mnt-teknisi" required class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase" value="SURYA ARDIANSYAH">
           </div>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">JAM ON SYSTEM</label>
-            <input type="time" id="daily-jamon" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">JAM OFF SYSTEM</label>
-            <input type="time" id="daily-jamoff" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm">
-          </div>
-        </div>
-
-        <div class="border border-cyan-900/60 p-3 rounded-sm bg-gray-950/40 space-y-2">
-          <div class="flex justify-between items-center">
-            <label class="text-[10px] font-bold text-cyan-400 uppercase"><i class="fa-solid fa-toolbox mr-1"></i> ALAT & QTY</label>
-            <button type="button" onclick="addAlatRow()" class="px-2.5 py-1 bg-cyan-600/80 hover:bg-cyan-500 text-gray-950 text-[10px] font-bold uppercase rounded-sm transition-all">
-              <i class="fa-solid fa-plus"></i> TAMBAH
-            </button>
-          </div>
-          <div id="alat-rows-container" class="space-y-2">
-            <div class="flex gap-2 items-center alat-row">
-              <input type="text" class="flex-1 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase alat-nama" placeholder="NAMA ALAT">
-              <input type="text" class="w-20 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase alat-qty" placeholder="QTY">
-              <button type="button" onclick="removeRow(this)" class="px-2.5 py-2 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 text-xs rounded-sm"><i class="fa-solid fa-trash"></i></button>
-            </div>
-          </div>
-        </div>
-
-        <div class="border border-cyan-900/60 p-3 rounded-sm bg-gray-950/40 space-y-2">
-          <label class="block text-[10px] font-bold text-cyan-400 uppercase"><i class="fa-solid fa-users mr-1"></i> CREW BERTUGAS</label>
-          <div id="crew-checkboxes-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-32 overflow-y-auto p-2 bg-gray-950 border border-cyan-900/80 rounded-sm"></div>
-        </div>
-
         <div>
-          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">CATATAN KENDALA</label>
-          <textarea id="daily-catatan" rows="2" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase" placeholder="AMAN"></textarea>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">KENDALA / MONITORING</label>
+          <textarea id="mnt-kendala" rows="3" required class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase" placeholder="JELASKAN KENDALA..."></textarea>
         </div>
-
-        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-3 border-t border-cyan-900">
-          <button type="button" onclick="closeDailyModal()" class="w-full sm:w-auto px-4 py-2 bg-transparent border border-gray-600 text-gray-400 hover:border-red-500 rounded-sm text-xs font-bold uppercase">ABORT</button>
-          <button type="button" onclick="submitDailyReport()" class="w-full sm:w-auto px-5 py-2 bg-pink-600 border border-pink-400 text-white hover:bg-pink-500 rounded-sm text-xs font-bold uppercase shadow-[0_0_10px_rgba(236,72,153,0.5)]">TRANSMIT</button>
+        <div class="flex justify-end gap-2 pt-3 border-t border-cyan-900">
+          <button type="button" onclick="closeMntModal()" class="px-4 py-2 border border-gray-600 text-gray-400 rounded-sm text-xs font-bold uppercase">ABORT</button>
+          <button type="submit" id="mnt-submit-btn" class="px-5 py-2 bg-blue-600 border border-blue-400 text-white rounded-sm text-xs font-bold uppercase shadow-[0_0_10px_rgba(59,130,246,0.5)]">TAMBAHKAN</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal Detail Statistik -->
+  <!-- MODAL: WHATSAPP NOTIFIKASI -->
+  <div id="wa-notif-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
+    <div class="bg-gray-900 border-2 border-green-500 rounded-sm p-4 md:p-6 w-full max-w-lg shadow-[0_0_35px_rgba(34,197,94,0.4)]">
+      <h3 class="text-sm md:text-base font-bold text-green-400 mb-3 uppercase tracking-widest border-b border-green-500/30 pb-2 flex items-center gap-2">
+        <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> >> WHATSAPP_DISPATCH
+      </h3>
+      <p class="text-xs text-cyan-400 mb-3">Kirim notifikasi pesan ke WhatsApp crew terkait?</p>
+      <div class="space-y-3 mb-4">
+        <div class="grid grid-cols-2 gap-2 text-xs bg-gray-950 p-3 rounded-sm border border-cyan-900">
+          <div><span class="text-gray-500 text-[9px] uppercase">CREW</span><strong id="wa-modal-crew" class="text-cyan-300 block">-</strong></div>
+          <div><span class="text-gray-500 text-[9px] uppercase">NOMOR HP</span><strong id="wa-modal-hp" class="text-pink-400 block">-</strong></div>
+          <div class="col-span-2 pt-1 border-t border-cyan-900"><span class="text-gray-500 text-[9px] uppercase">TANGGAL</span><strong id="wa-modal-tanggal" class="text-yellow-400 block">-</strong></div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">DRAF PESAN</label>
+          <textarea id="wa-modal-message" rows="4" class="w-full bg-gray-950 border border-green-700 p-2.5 text-green-300 text-xs rounded-sm uppercase font-mono"></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-cyan-900">
+        <button type="button" onclick="cancelWaAction()" class="px-4 py-2 border border-red-500 text-red-400 rounded-sm text-xs font-bold uppercase">BATAL</button>
+        <button type="button" onclick="closeWaModal(false)" class="px-4 py-2 border border-gray-600 text-gray-400 rounded-sm text-xs font-bold uppercase">SIMPAN SAJA</button>
+        <button type="button" onclick="closeWaModal(true)" class="px-5 py-2 bg-green-600 border border-green-400 text-gray-950 rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(34,197,94,0.5)]">KIRIM WA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FORCED PIN CHANGE -->
+  <div id="forced-pin-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
+    <div class="bg-gray-900 border-2 border-yellow-500 rounded-sm p-4 md:p-6 w-full max-w-md shadow-[0_0_35px_rgba(250,204,21,0.5)]">
+      <div class="flex items-center gap-3 border-b border-yellow-500/40 pb-3 mb-3">
+        <div class="p-2 bg-yellow-950 border border-yellow-500 text-yellow-400 rounded-sm animate-pulse"><i class="fa-solid fa-key text-lg"></i></div>
+        <div><h3 class="text-sm md:text-base font-bold text-yellow-400 uppercase">>> SECURITY_ALERT: GANTI PIN</h3><p class="text-[9px] text-cyan-600">MANDATORY_PASSWORD_RESET</p></div>
+      </div>
+      <p class="text-xs text-cyan-300 mb-4 uppercase">Akun Anda masih menggunakan PIN default (1234). Demi keamanan, silakan buat PIN pribadi baru (4 digit) sebelum melanjutkan.</p>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PIN BARU</label>
+          <input type="password" id="new-forced-pin" class="w-full bg-gray-950 border border-cyan-700 p-2.5 text-cyan-300 text-xs rounded-sm font-bold tracking-widest" placeholder="MASUKKAN PIN BARU">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">KONFIRMASI PIN BARU</label>
+          <input type="password" id="confirm-forced-pin" class="w-full bg-gray-950 border border-cyan-700 p-2.5 text-cyan-300 text-xs rounded-sm font-bold tracking-widest" placeholder="ULANGI PIN BARU">
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t border-cyan-900 mt-4">
+          <button type="button" onclick="submitForcedPinChange()" class="w-full py-2.5 bg-yellow-600 hover:bg-yellow-500 text-gray-950 rounded-sm text-xs font-bold uppercase transition-all shadow-[0_0_12px_rgba(250,204,21,0.5)]">
+            [ SIMPAN PIN BARU & MASUK ]
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GLOBAL LOGIN -->
+  <div id="global-login-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-3">
+    <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-md shadow-[0_0_35px_rgba(236,72,153,0.5)]">
+      <h3 class="text-sm md:text-base font-bold text-pink-500 mb-4 uppercase tracking-widest border-b border-pink-500/30 pb-2">>> SECURE_ACCESS: LOGIN WAJIB</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PERAN AKSES</label>
+          <select id="modal-login-role" onchange="toggleModalRoleSelect()" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase font-bold">
+            <option value="crew">CREW (PENGGUNA)</option>
+            <option value="admin">ADMIN (MASTER)</option>
+          </select>
+        </div>
+        <div id="modal-crew-select-wrapper">
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">PILIH NAMA CREW</label>
+          <select id="modal-login-crew-name" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase font-bold mb-3">
+            <option value="">-- PILIH CREW --</option>
+          </select>
+          <label class="block text-[10px] font-bold text-pink-400 mb-1 uppercase">PIN PRIBADI</label>
+          <input type="password" id="modal-crew-pin-input" class="w-full bg-gray-950 border border-pink-700 p-2 text-pink-300 text-xs rounded-sm font-bold tracking-widest" placeholder="PIN PRIBADI">
+        </div>
+        <div id="modal-admin-pin-wrapper" class="hidden">
+          <label class="block text-[10px] font-bold text-pink-500 mb-1 uppercase">ADMIN PIN</label>
+          <input type="password" id="modal-admin-pin" class="w-full bg-gray-950 border border-pink-700 p-2 text-pink-300 text-xs rounded-sm font-bold tracking-widest" placeholder="PIN ADMIN">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="submitGlobalLogin()" class="w-full py-2.5 bg-pink-600 border border-pink-400 text-white rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(236,72,153,0.5)]">[ MASUK SISTEM ]</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DAILY REPORT SUBMIT -->
+  <div id="daily-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
+    <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-xl shadow-[0_0_35px_rgba(236,72,153,0.5)]">
+      <h3 id="daily-modal-title" class="text-sm md:text-base font-bold text-pink-500 mb-4 uppercase tracking-widest border-b border-pink-500/30 pb-2">>> SUBMIT_DAILY_REPORT</h3>
+      <form id="daily-form" onsubmit="return false;" class="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+        <div>
+          <label class="block text-[10px] font-bold text-pink-400 mb-1 uppercase"><i class="fa-solid fa-calendar-days mr-1"></i> TANGGAL</label>
+          <input type="date" id="daily-tanggal" class="w-full bg-gray-950 border border-pink-700 p-2 text-pink-300 text-xs rounded-sm font-bold">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">NAMA PROGRAM</label>
+            <input type="text" id="daily-program" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase" placeholder="LIVE NEWS">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">LOKASI</label>
+            <input type="text" id="daily-lokasi" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase" placeholder="STUDIO 1">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">JAM ON</label>
+            <input type="time" id="daily-jamon" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">JAM OFF</label>
+            <input type="time" id="daily-jamoff" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm">
+          </div>
+        </div>
+        <div class="border border-cyan-900 p-3 rounded-sm bg-gray-950/40 space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-[10px] font-bold text-cyan-400 uppercase"><i class="fa-solid fa-toolbox mr-1"></i> ALAT & QTY</label>
+            <button type="button" onclick="addAlatRow()" class="px-2.5 py-1 bg-cyan-600 text-gray-950 text-[10px] font-bold uppercase rounded-sm"><i class="fa-solid fa-plus"></i> TAMBAH</button>
+          </div>
+          <div id="alat-rows-container" class="space-y-2">
+            <div class="flex gap-2 items-center alat-row">
+              <input type="text" class="flex-1 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase alat-nama" placeholder="NAMA ALAT">
+              <input type="text" class="w-20 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase alat-qty" placeholder="QTY">
+              <button type="button" onclick="removeRow(this)" class="px-2.5 py-2 bg-red-950 border border-red-500 text-red-400 text-xs rounded-sm"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="border border-cyan-900 p-3 rounded-sm bg-gray-950/40 space-y-2">
+          <label class="block text-[10px] font-bold text-cyan-400 uppercase"><i class="fa-solid fa-users mr-1"></i> CREW BERTUGAS (BISA PILIH LEBIH DARI SATU)</label>
+          <div id="crew-checkboxes-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-32 overflow-y-auto p-2 bg-gray-950 border border-cyan-900 rounded-sm"></div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">CATATAN</label>
+          <textarea id="daily-catatan" rows="2" class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase" placeholder="AMAN"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-cyan-900">
+          <button type="button" onclick="closeDailyModal()" class="px-4 py-2 border border-gray-600 text-gray-400 rounded-sm text-xs font-bold uppercase">ABORT</button>
+          <button type="button" onclick="submitDailyReport()" class="px-5 py-2 bg-pink-600 border border-pink-400 text-white rounded-sm text-xs font-bold uppercase shadow-[0_0_10px_rgba(236,72,153,0.5)]">TRANSMIT</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DETAIL STATS -->
   <div id="detail-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
-    <div class="bg-gray-900 border-2 border-cyan-400 rounded-sm p-4 md:p-6 w-full max-w-lg shadow-[0_0_35px_rgba(6,182,212,0.4)] relative">
+    <div class="bg-gray-900 border-2 border-cyan-400 rounded-sm p-4 md:p-6 w-full max-w-lg shadow-[0_0_35px_rgba(6,182,212,0.4)]">
       <h3 id="modal-title" class="text-sm md:text-base font-bold text-cyan-400 mb-4 uppercase tracking-widest border-b border-cyan-500/30 pb-2">>> STATS_DETAIL</h3>
       <div id="modal-content" class="max-h-[60vh] overflow-y-auto space-y-2 text-xs md:text-sm text-slate-300 pr-1"></div>
       <div class="flex justify-end pt-3 mt-3 border-t border-cyan-900">
-        <button onclick="closeDetailModal()" class="px-4 py-2 bg-cyan-600 border border-cyan-400 text-gray-950 rounded-sm text-xs font-bold uppercase">TUTUP</button>
+        <button onclick="closeDetailModal()" class="px-4 py-2 bg-cyan-600 text-gray-950 rounded-sm text-xs font-bold uppercase">TUTUP</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL PERINGATAN CYBERPUNK ACCESS DENIED -->
-  <div id="cyber-alert-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
-    <div class="bg-gray-900 border-2 border-red-500 rounded-sm p-5 md:p-6 w-full max-w-md shadow-[0_0_40px_rgba(239,68,68,0.5)] relative">
-      <div class="flex items-center gap-3 border-b border-red-500/40 pb-3 mb-3">
-        <div class="p-2 bg-red-950/80 border border-red-500 text-red-400 rounded-sm animate-pulse">
-          <i class="fa-solid fa-triangle-exclamation text-lg"></i>
-        </div>
-        <div>
-          <h3 class="text-sm md:text-base font-bold text-red-500 uppercase tracking-widest">>> ACCESS_DENIED</h3>
-          <p class="text-[9px] text-cyan-600 font-mono">SECURITY_PROTOCOL_ACTIVE</p>
-        </div>
-      </div>
-      
-      <p class="text-xs md:text-sm text-cyan-300 font-mono mb-5 leading-relaxed uppercase">
-        AKSES DITOLAK! Sesi login Crew sedang aktif. Silakan lakukan <strong class="text-pink-400">KELUAR SESI</strong> terlebih dahulu untuk mengakses menu Jadwal Bulanan.
-      </p>
-
-      <div class="flex justify-end gap-2 pt-2 border-t border-cyan-900/60">
-        <button type="button" onclick="closeCyberAlertModal()" class="px-5 py-2 bg-red-600 border border-red-400 text-white hover:bg-red-500 rounded-sm text-xs font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(239,68,68,0.6)] transition-all">
-          [ MENGERTI / ABORT ]
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Tambah Crew -->
+  <!-- MODAL: ADD CREW -->
   <div id="add-modal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-sm hidden items-center justify-center z-50 p-3">
-    <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-sm md:max-w-md shadow-[0_0_35px_rgba(236,72,153,0.5)] relative">
-      <h3 class="text-sm md:text-base font-bold text-pink-500 mb-4 uppercase tracking-widest border-b border-pink-500/30 pb-2">>> INJECT_NEW_CREW</h3>
+    <div class="bg-gray-900 border-2 border-pink-500 rounded-sm p-4 md:p-6 w-full max-w-md shadow-[0_0_35px_rgba(236,72,153,0.5)]">
+      <h3 class="text-sm md:text-base font-bold text-pink-500 mb-4 uppercase border-b border-pink-500/30 pb-2">>> INJECT_NEW_CREW</h3>
       <form onsubmit="submitNewCrew(event)" class="space-y-4">
         <div>
-          <label class="block text-[10px] md:text-xs font-bold text-cyan-500 mb-2 uppercase">NAMA CREW</label>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">NAMA CREW</label>
           <input type="text" id="new-nama" required class="w-full bg-gray-950 border border-cyan-700 p-2.5 text-cyan-300 text-xs rounded-sm uppercase">
         </div>
         <div>
-          <label class="block text-[10px] md:text-xs font-bold text-cyan-500 mb-2 uppercase">NOMOR HP / WA</label>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">NOMOR HP / WA</label>
           <input type="text" id="new-hp" required class="w-full bg-gray-950 border border-cyan-700 p-2.5 text-cyan-300 text-xs rounded-sm">
         </div>
-        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
-          <button type="button" onclick="closeAddModal()" class="w-full sm:w-auto px-4 py-2 bg-transparent border border-gray-600 text-gray-400 rounded-sm text-xs font-bold uppercase">ABORT</button>
-          <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-cyan-600 border border-cyan-400 text-gray-950 rounded-sm text-xs font-bold uppercase">EXECUTE</button>
+        <div>
+          <label class="block text-[10px] font-bold text-pink-400 mb-1 uppercase">PIN PRIBADI</label>
+          <input type="password" id="new-pin" required class="w-full bg-gray-950 border border-pink-700 p-2.5 text-pink-300 text-xs rounded-sm font-bold tracking-widest" placeholder="PIN 4 DIGIT">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 border border-gray-600 text-gray-400 rounded-sm text-xs font-bold uppercase">ABORT</button>
+          <button type="submit" class="px-4 py-2 bg-cyan-600 text-gray-950 rounded-sm text-xs font-bold uppercase">EXECUTE</button>
         </div>
       </form>
     </div>
@@ -529,345 +572,556 @@
     let globalHeaders = [];
     let globalCrewData = [];
     let globalDailyData = [];
+    let globalMaintenanceData = [];
+    let globalLogsData = [];
     let currentBulanTahun = "";
+    const bulanArr = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+    let currentMonthIndex = 9;
+    let selectedBulanTab = "OKTOBER";
     let currentSession = { role: null, name: null };
     let editingSheetRow = null;
     let pendingWaData = null;
+    let editingMntRowTr = null;
+    let pendingCrewObjForPinChange = null;
+    const DEFAULT_PIN = "1234";
+
+    function formatCleanTimestamp(rawStr) {
+      if (!rawStr) return '-';
+      const dt = new Date(rawStr);
+      if (isNaN(dt.getTime())) return rawStr;
+      const dd = String(dt.getDate()).padStart(2, '0');
+      const mm = String(dt.getMonth() + 1).padStart(2, '0');
+      const yyyy = dt.getFullYear();
+      const hh = String(dt.getHours()).padStart(2, '0');
+      const min = String(dt.getMinutes()).padStart(2, '0');
+      const ss = String(dt.getSeconds()).padStart(2, '0');
+      return `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
+    }
+
+    function renderAuditLogsTable() {
+      const tbody = document.getElementById('audit-logs-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!globalLogsData || globalLogsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-12 text-yellow-500/70 font-bold uppercase">BELUM ADA REKAM JEJAK LOG AKTIVITAS</td></tr>';
+        return;
+      }
+
+      globalLogsData.forEach(log => {
+        let badgeColor = 'text-cyan-400 bg-cyan-950/40 border-cyan-800';
+        const aksi = (log.aksi || '').toUpperCase();
+        const modul = (log.modul || '').toUpperCase();
+
+        if (aksi.includes('ADD') || aksi.includes('LAPOR')) badgeColor = 'text-pink-400 bg-pink-950/40 border-pink-800';
+        else if (aksi.includes('UPDATE') || aksi.includes('EDIT') || aksi.includes('PROSES')) badgeColor = 'text-yellow-400 bg-yellow-950/40 border-yellow-800';
+        else if (aksi.includes('SELESAI') || aksi.includes('DONE')) badgeColor = 'text-green-400 bg-green-950/40 border-green-800';
+        else if (aksi.includes('DELETE')) badgeColor = 'text-red-400 bg-red-950/40 border-red-800';
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-yellow-950/20 log-row';
+        tr.innerHTML = `
+          <td class="p-3 border-b border-yellow-950/40 text-cyan-400">${formatCleanTimestamp(log.waktu)}</td>
+          <td class="p-3 border-b border-yellow-950/40 font-bold text-blue-400 uppercase">${modul}</td>
+          <td class="p-3 border-b border-yellow-950/40"><span class="px-2 py-0.5 text-[9px] font-bold rounded-sm border ${badgeColor}">${log.aksi}</span></td>
+          <td class="p-3 border-b border-yellow-950/40 text-pink-400 uppercase">${log.pelaku || 'SYSTEM'}</td>
+          <td class="p-3 border-b border-yellow-950/40 text-slate-200 uppercase">${log.keterangan || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterLogsTable() {
+      const q = document.getElementById('logs-search-input').value.toLowerCase();
+      document.querySelectorAll('.log-row').forEach(r => {
+        r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
 
     function setBulanDanJamAktif() {
-      const bulanArr = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
       const date = new Date();
-      currentBulanTahun = `${bulanArr[date.getMonth()]} ${date.getFullYear()}`;
-      document.getElementById('current-month-display').innerText = `>> ${currentBulanTahun}`;
+      currentMonthIndex = date.getMonth();
+      updateMonthLabelDisplay();
 
       setInterval(() => {
         const now = new Date();
-        const timeStr = now.toTimeString().split(' ')[0] + ' WIB';
-        document.getElementById('system-clock').innerText = timeStr;
+        document.getElementById('system-clock').innerText = now.toTimeString().split(' ')[0] + ' WIB';
       }, 1000);
     }
 
-    function toggleRoleSelect() {
-      const role = document.getElementById('login-role').value;
-      const crewWrapper = document.getElementById('crew-select-wrapper');
-      const pinWrapper = document.getElementById('admin-pin-wrapper');
-      if (role === 'admin') {
-        crewWrapper.classList.add('hidden');
-        pinWrapper.classList.remove('hidden');
-      } else {
-        crewWrapper.classList.remove('hidden');
-        pinWrapper.classList.add('hidden');
-      }
+    function updateMonthLabelDisplay() {
+      selectedBulanTab = bulanArr[currentMonthIndex];
+      const date = new Date();
+      currentBulanTahun = `${selectedBulanTab} ${date.getFullYear()}`;
+      document.getElementById('current-month-display').innerText = `>> ${currentBulanTahun}`;
+      const labelEl = document.getElementById('month-display-label');
+      if (labelEl) labelEl.innerText = selectedBulanTab;
+    }
+
+    function navigateMonth(direction) {
+      currentMonthIndex += direction;
+      if (currentMonthIndex > 11) currentMonthIndex = 0;
+      else if (currentMonthIndex < 0) currentMonthIndex = 11;
+      updateMonthLabelDisplay();
+      fetchData();
     }
 
     function toggleModalRoleSelect() {
       const role = document.getElementById('modal-login-role').value;
-      const crewWrapper = document.getElementById('modal-crew-select-wrapper');
-      const pinWrapper = document.getElementById('modal-admin-pin-wrapper');
-      if (role === 'admin') {
-        crewWrapper.classList.add('hidden');
-        pinWrapper.classList.remove('hidden');
-      } else {
-        crewWrapper.classList.remove('hidden');
-        pinWrapper.classList.add('hidden');
-      }
+      document.getElementById('modal-crew-select-wrapper').classList.toggle('hidden', role === 'admin');
+      document.getElementById('modal-admin-pin-wrapper').classList.toggle('hidden', role !== 'admin');
     }
 
     function populateCrewDropdown() {
-      const select = document.getElementById('login-crew-name');
       const modalSelect = document.getElementById('modal-login-crew-name');
-      select.innerHTML = '<option value="">-- PILIH CREW --</option>';
       modalSelect.innerHTML = '<option value="">-- PILIH CREW --</option>';
-      
-      globalCrewData.forEach(c => {
-        const opt1 = document.createElement('option');
-        opt1.value = c.nama;
-        opt1.innerText = c.nama;
-        select.appendChild(opt1);
-
-        const opt2 = document.createElement('option');
-        opt2.value = c.nama;
-        opt2.innerText = c.nama;
-        modalSelect.appendChild(opt2);
-      });
+      const validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
+      validCrews.forEach(c => { modalSelect.add(new Option(c.nama, c.nama)); });
     }
 
     function openGlobalLoginModal() {
       document.getElementById('modal-login-role').value = 'crew';
       toggleModalRoleSelect();
+      document.getElementById('modal-crew-pin-input').value = '';
       document.getElementById('modal-admin-pin').value = '';
-      document.getElementById('global-login-modal').classList.remove('hidden');
-      document.getElementById('global-login-modal').classList.add('flex');
+      populateCrewDropdown();
+      const m = document.getElementById('global-login-modal');
+      m.classList.remove('hidden'); m.classList.add('flex');
     }
 
     function closeGlobalLoginModal() {
-      document.getElementById('global-login-modal').classList.add('hidden');
-      document.getElementById('global-login-modal').classList.remove('flex');
+      const m = document.getElementById('global-login-modal');
+      m.classList.add('hidden'); m.classList.remove('flex');
     }
 
     function submitGlobalLogin() {
       const role = document.getElementById('modal-login-role').value;
       if (role === 'crew') {
         const name = document.getElementById('modal-login-crew-name').value;
-        if (!name) {
-          alert("Silakan pilih nama crew terlebih dahulu!");
+        const pinInput = document.getElementById('modal-crew-pin-input').value.trim();
+        if (!name) return alert("Pilih nama crew terlebih dahulu!");
+        const crewObj = globalCrewData.find(c => c.nama.toUpperCase() === name.toUpperCase());
+        if (!crewObj) return alert("Crew tidak ditemukan!");
+        if (crewObj.pin && crewObj.pin !== pinInput) return alert("PIN PRIBADI SALAH!");
+
+        if (!crewObj.pin || crewObj.pin === DEFAULT_PIN || pinInput === DEFAULT_PIN) {
+          pendingCrewObjForPinChange = crewObj;
+          closeGlobalLoginModal();
+          document.getElementById('new-forced-pin').value = '';
+          document.getElementById('confirm-forced-pin').value = '';
+          const modal = document.getElementById('forced-pin-modal');
+          modal.classList.remove('hidden'); modal.classList.add('flex');
           return;
         }
-        currentSession = { role: 'crew', name: name };
+        currentSession = { role: 'crew', name: crewObj.nama };
       } else {
-        const pinInput = document.getElementById('modal-admin-pin');
-        const pin = pinInput.value;
-        pinInput.value = '';
-        
-        if (pin !== "3TV2026") {
-          alert("PIN ADMIN SALAH! Akses ditolak.");
-          return;
-        }
+        const pin = document.getElementById('modal-admin-pin').value;
+        document.getElementById('modal-admin-pin').value = '';
+        if (pin !== "3TV2026") return alert("PIN ADMIN SALAH!");
         currentSession = { role: 'admin', name: 'MASTER_ADMIN' };
       }
-
       closeGlobalLoginModal();
       updateHeaderAuthUI();
-
-      document.getElementById('login-role').value = currentSession.role;
-      toggleRoleSelect();
-      if(currentSession.role === 'crew') {
-        document.getElementById('login-crew-name').value = currentSession.name;
-      }
-
-      document.getElementById('session-login-box').classList.add('hidden');
-      document.getElementById('daily-main-panel').classList.remove('hidden');
-
-      const btnAdminExcel = document.getElementById('btn-admin-excel');
-      const btnAdminPdf = document.getElementById('btn-admin-pdf');
-
-      if (currentSession.role === 'admin') {
-        document.getElementById('session-title-label').innerText = ">> MASTER ADMIN REPORT PANEL";
-        document.getElementById('session-badge').innerText = "ADMIN ACCESS (FULL)";
-        document.getElementById('session-desc-label').innerText = "Melihat seluruh laporan harian crew.";
-        btnAdminExcel.classList.remove('hidden');
-        btnAdminPdf.classList.remove('hidden');
-      } else {
-        document.getElementById('session-title-label').innerText = `>> DAILY: ${currentSession.name}`;
-        document.getElementById('session-badge').innerText = "CREW ACCESS";
-        document.getElementById('session-desc-label').innerText = "Riwayat laporan harian pribadi Anda.";
-        btnAdminExcel.classList.add('hidden');
-        btnAdminPdf.classList.add('hidden');
-      }
-
-      renderTable();
-      renderDailyTable();
+      applySessionUIRender();
     }
 
-    function startSession() {
-      const role = document.getElementById('login-role').value;
-      if (role === 'crew') {
-        const name = document.getElementById('login-crew-name').value;
-        if (!name) {
-          alert("Silakan pilih nama crew terlebih dahulu!");
-          return;
-        }
-        currentSession = { role: 'crew', name: name };
-      } else {
-        const pinInput = document.getElementById('admin-pin');
-        const pin = pinInput.value;
-        pinInput.value = '';
-        
-        if (pin !== "3TV2026") {
-          alert("PIN ADMIN SALAH! Akses ditolak.");
-          return;
-        }
-        currentSession = { role: 'admin', name: 'MASTER_ADMIN' };
-      }
+    async function submitForcedPinChange() {
+      const newPin = document.getElementById('new-forced-pin').value.trim();
+      const confirmPin = document.getElementById('confirm-forced-pin').value.trim();
+      if (!newPin || newPin.length < 4) return alert("PIN baru minimal harus 4 digit!");
+      if (newPin !== confirmPin) return alert("Konfirmasi PIN tidak cocok!");
+      if (newPin === DEFAULT_PIN) return alert("PIN baru tidak boleh sama dengan PIN default!");
+      if (!pendingCrewObjForPinChange) return alert("Sesi error, silakan ulangi login.");
 
-      updateHeaderAuthUI();
-      document.getElementById('session-login-box').classList.add('hidden');
-      document.getElementById('daily-main-panel').classList.remove('hidden');
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'update_crew_pin', sheetName: selectedBulanTab, rowIndex: pendingCrewObjForPinChange.rowIndex, newPin: newPin, pelaku: pendingCrewObjForPinChange.nama })
+        });
+        pendingCrewObjForPinChange.pin = newPin;
+        currentSession = { role: 'crew', name: pendingCrewObjForPinChange.nama };
+        document.getElementById('forced-pin-modal').classList.add('hidden');
+        document.getElementById('forced-pin-modal').classList.remove('flex');
+        alert("PIN berhasil diperbarui! Selamat datang di sistem.");
+        updateHeaderAuthUI();
+        applySessionUIRender();
+        pendingCrewObjForPinChange = null;
+      } catch (err) { console.error(err); alert("Gagal memperbarui PIN."); }
+    }
 
-      const btnAdminExcel = document.getElementById('btn-admin-excel');
-      const btnAdminPdf = document.getElementById('btn-admin-pdf');
+    function applySessionUIRender() {
+      const btnExcel = document.getElementById('btn-admin-excel');
+      const btnPdf = document.getElementById('btn-admin-pdf');
 
       if (currentSession.role === 'admin') {
         document.getElementById('session-title-label').innerText = ">> MASTER ADMIN REPORT PANEL";
         document.getElementById('session-badge').innerText = "ADMIN ACCESS (FULL)";
         document.getElementById('session-desc-label').innerText = "Melihat seluruh laporan harian crew.";
-        btnAdminExcel.classList.remove('hidden');
-        btnAdminPdf.classList.remove('hidden');
+        if(btnExcel) btnExcel.classList.remove('hidden');
+        if(btnPdf) btnPdf.classList.remove('hidden');
       } else {
         document.getElementById('session-title-label').innerText = `>> DAILY: ${currentSession.name}`;
-        document.getElementById('session-badge').innerText = "CREW ACCESS";
+        document.getElementById('session-badge').innerText = "CREW ACCESS (SECURE)";
         document.getElementById('session-desc-label').innerText = "Riwayat laporan harian pribadi Anda.";
-        btnAdminExcel.classList.add('hidden');
-        btnAdminPdf.classList.add('hidden');
+        if(btnExcel) btnExcel.classList.add('hidden');
+        if(btnPdf) btnPdf.classList.add('hidden');
       }
-
+      document.getElementById('daily-main-panel').classList.remove('hidden');
       renderTable();
       renderDailyTable();
+      renderMaintenanceTable();
+      renderAuditLogsTable();
+      switchTab('jadwal');
     }
 
     function updateHeaderAuthUI() {
       const container = document.getElementById('header-auth-status');
       if (currentSession.role === 'admin') {
-        container.innerHTML = `
-          <div class="px-2.5 py-1 bg-yellow-500/20 border border-yellow-400 text-yellow-300 rounded-sm text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_10px_rgba(250,204,21,0.3)]">
-            <i class="fa-solid fa-shield-halved"></i> <span>ADMIN ACTIVE</span>
-            <button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 rounded-sm" title="Keluar Sesi">
-              <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-          </div>
-        `;
+        container.innerHTML = `<div class="px-2.5 py-1 bg-yellow-500/20 border border-yellow-400 text-yellow-300 rounded-sm text-[10px] font-bold uppercase flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> <span>ADMIN ACTIVE</span><button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950 border border-red-500 text-red-400 rounded-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>`;
       } else if (currentSession.role === 'crew') {
-        container.innerHTML = `
-          <div class="px-2.5 py-1 bg-cyan-500/20 border border-cyan-400 text-cyan-300 rounded-sm text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_10px_rgba(6,182,212,0.3)]">
-            <i class="fa-solid fa-user"></i> <span class="truncate max-w-[100px]">${currentSession.name}</span>
-            <button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 rounded-sm" title="Keluar Sesi">
-              <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-          </div>
-        `;
+        container.innerHTML = `<div class="px-2.5 py-1 bg-cyan-500/20 border border-cyan-400 text-cyan-300 rounded-sm text-[10px] font-bold uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-lock"></i> <span class="truncate max-w-[100px]">${currentSession.name}</span><button onclick="logoutSession()" class="ml-2 px-1.5 py-0.5 bg-red-950 border border-red-500 text-red-400 rounded-sm"><i class="fa-solid fa-right-from-bracket"></i></button></div>`;
       } else {
-        container.innerHTML = `
-          <button onclick="openGlobalLoginModal()" class="px-3 py-1.5 bg-pink-600/90 border border-pink-400 text-white hover:bg-pink-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_12px_rgba(236,72,153,0.5)] flex items-center gap-1.5">
-            <i class="fa-solid fa-lock"></i> <span>LOGIN SESI / ADMIN</span>
-          </button>
-        `;
+        container.innerHTML = `<button onclick="openGlobalLoginModal()" class="px-3 py-1.5 bg-pink-600 border border-pink-400 text-white rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(236,72,153,0.5)] flex items-center gap-1.5"><i class="fa-solid fa-lock"></i> <span>LOGIN SESI / ADMIN</span></button>`;
       }
     }
 
     function logoutSession() {
       currentSession = { role: null, name: null };
       updateHeaderAuthUI();
-      document.getElementById('daily-main-panel').classList.add('hidden');
-      document.getElementById('session-login-box').classList.remove('hidden');
-      
-      const roleSelect = document.getElementById('login-role');
-      if (roleSelect) roleSelect.value = 'crew';
-      toggleRoleSelect();
-      
-      const crewNameSelect = document.getElementById('login-crew-name');
-      if (crewNameSelect) crewNameSelect.value = "";
-      
-      const adminPinInput = document.getElementById('admin-pin');
-      if (adminPinInput) adminPinInput.value = "";
-
-      const modalRoleSelect = document.getElementById('modal-login-role');
-      if (modalRoleSelect) modalRoleSelect.value = 'crew';
-      toggleModalRoleSelect();
-
-      const modalCrewSelect = document.getElementById('modal-login-crew-name');
-      if (modalCrewSelect) modalCrewSelect.value = "";
-
-      const modalAdminPin = document.getElementById('modal-admin-pin');
-      if (modalAdminPin) modalAdminPin.value = "";
-      
-      renderTable();
+      openGlobalLoginModal();
     }
 
     function addAlatRow() {
       const container = document.getElementById('alat-rows-container');
       const row = document.createElement('div');
       row.className = 'flex gap-2 items-center alat-row';
-      row.innerHTML = `
-        <input type="text" class="flex-1 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase alat-nama" placeholder="NAMA ALAT">
-        <input type="text" class="w-20 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase alat-qty" placeholder="QTY">
-        <button type="button" onclick="removeRow(this)" class="px-2.5 py-2 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 text-xs rounded-sm"><i class="fa-solid fa-trash"></i></button>
-      `;
+      row.innerHTML = `<input type="text" class="flex-1 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase alat-nama" placeholder="NAMA ALAT"><input type="text" class="w-20 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase alat-qty" placeholder="QTY"><button type="button" onclick="removeRow(this)" class="px-2.5 py-2 bg-red-950 border border-red-500 text-red-400 text-xs rounded-sm"><i class="fa-solid fa-trash"></i></button>`;
       container.appendChild(row);
     }
 
     function removeRow(btn) {
       const row = btn.parentElement;
-      const container = row.parentElement;
-      if (container.children.length > 1) { row.remove(); }
-      else { alert("Minimal harus ada satu entri!"); }
+      if (row.parentElement.children.length > 1) row.remove();
+      else alert("Minimal harus ada satu entri!");
     }
 
     function resetAlatRows() {
-      document.getElementById('alat-rows-container').innerHTML = `
-        <div class="flex gap-2 items-center alat-row">
-          <input type="text" class="flex-1 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase alat-nama" placeholder="NAMA ALAT">
-          <input type="text" class="w-20 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase alat-qty" placeholder="QTY">
-          <button type="button" onclick="removeRow(this)" class="px-2.5 py-2 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 text-xs rounded-sm"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      `;
+      document.getElementById('alat-rows-container').innerHTML = `<div class="flex gap-2 items-center alat-row"><input type="text" class="flex-1 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase alat-nama" placeholder="NAMA ALAT"><input type="text" class="w-20 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase alat-qty" placeholder="QTY"><button type="button" onclick="removeRow(this)" class="px-2.5 py-2 bg-red-950 border border-red-500 text-red-400 text-xs rounded-sm"><i class="fa-solid fa-trash"></i></button></div>`;
     }
 
     function renderCrewCheckboxes(selectedNames = []) {
       const container = document.getElementById('crew-checkboxes-container');
       container.innerHTML = '';
-      if (globalCrewData.length === 0) {
-        container.innerHTML = '<span class="text-[10px] text-gray-500 col-span-2">Tidak ada data crew.</span>';
-        return;
-      }
-      globalCrewData.forEach(c => {
-        let isChecked = false;
-        if (selectedNames.length > 0) {
-          isChecked = selectedNames.includes(c.nama.toUpperCase());
-        } else if (currentSession.role === 'crew') {
-          isChecked = (c.nama.toUpperCase() === currentSession.name.toUpperCase());
-        }
-
+      const validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
+      if (validCrews.length === 0) { container.innerHTML = '<span class="text-[10px] text-gray-500 col-span-2">Tidak ada data crew.</span>'; return; }
+      validCrews.forEach(c => {
+        let isChecked = selectedNames.length > 0 ? selectedNames.includes(c.nama.toUpperCase()) : (currentSession.role === 'crew' && c.nama.toUpperCase() === currentSession.name.toUpperCase());
         const label = document.createElement('label');
-        label.className = 'flex items-center gap-2 text-xs text-cyan-300 cursor-pointer hover:text-pink-400 uppercase select-none p-1 bg-gray-900/50 rounded-sm border border-cyan-900/40';
-        label.innerHTML = `
-          <input type="checkbox" value="${c.nama}" ${isChecked ? 'checked' : ''} class="crew-checkbox w-4 h-4 accent-pink-600 bg-gray-900 border-cyan-700 rounded-sm focus:ring-0">
-          <span class="truncate">${c.nama}</span>
-        `;
+        label.className = 'flex items-center gap-2 text-xs text-cyan-300 cursor-pointer uppercase select-none p-1 bg-gray-900/50 rounded-sm border border-cyan-900/40';
+        label.innerHTML = `<input type="checkbox" value="${c.nama}" ${isChecked ? 'checked' : ''} class="crew-checkbox w-4 h-4 accent-pink-600 bg-gray-900 border-cyan-700 rounded-sm"><span class="truncate">${c.nama}</span>`;
         container.appendChild(label);
       });
     }
 
     function switchTab(tab) {
-      if (tab === 'jadwal' && currentSession.role === 'crew') {
-        openCyberAlertModal();
+      if (!currentSession.role) {
+        openGlobalLoginModal();
         return;
       }
+      document.getElementById('view-jadwal').classList.toggle('flex', tab === 'jadwal');
+      document.getElementById('view-jadwal').classList.toggle('hidden', tab !== 'jadwal');
+      document.getElementById('view-daily').classList.toggle('flex', tab === 'daily');
+      document.getElementById('view-daily').classList.toggle('hidden', tab !== 'daily');
+      document.getElementById('view-maintenance').classList.toggle('flex', tab === 'maintenance');
+      document.getElementById('view-maintenance').classList.toggle('hidden', tab !== 'maintenance');
+      document.getElementById('view-logs').classList.toggle('flex', tab === 'logs');
+      document.getElementById('view-logs').classList.toggle('hidden', tab !== 'logs');
 
       const btnJadwal = document.getElementById('tab-btn-jadwal');
       const btnDaily = document.getElementById('tab-btn-daily');
-      const btnMaintenance = document.getElementById('tab-btn-maintenance');
+      const btnMnt = document.getElementById('tab-btn-maintenance');
+      const btnLogs = document.getElementById('tab-btn-logs');
 
-      const viewJadwal = document.getElementById('view-jadwal');
-      const viewDaily = document.getElementById('view-daily');
-      const viewMaintenance = document.getElementById('view-maintenance');
-
-      // Reset all views & buttons
-      viewJadwal.classList.remove('flex'); viewJadwal.classList.add('hidden');
-      viewDaily.classList.remove('flex'); viewDaily.classList.add('hidden');
-      viewMaintenance.classList.remove('flex'); viewMaintenance.classList.add('hidden');
-
-      btnJadwal.className = "px-4 py-1.5 bg-gray-950 border border-cyan-900 text-cyan-600 hover:text-cyan-400 hover:border-cyan-700 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap";
-      btnDaily.className = "px-4 py-1.5 bg-gray-950 border border-cyan-900 text-cyan-600 hover:text-cyan-400 hover:border-cyan-700 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap";
-      btnMaintenance.className = "px-4 py-1.5 bg-gray-950 border border-cyan-900 text-blue-500 hover:text-blue-300 hover:border-blue-700 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap";
+      const inactiveClass = "bg-gray-950 border-cyan-900/80 text-cyan-700 hover:text-cyan-400 shadow-none";
+      btnJadwal.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'jadwal' ? '' : inactiveClass}`;
+      btnDaily.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'daily' ? '' : inactiveClass}`;
+      btnMnt.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'maintenance' ? '' : inactiveClass}`;
+      btnLogs.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'logs' ? '' : inactiveClass}`;
 
       if (tab === 'jadwal') {
-        btnJadwal.className = "px-4 py-1.5 bg-cyan-500/20 border border-cyan-400 text-cyan-300 text-xs font-bold uppercase tracking-wider rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.4)] flex items-center gap-2 whitespace-nowrap transition-all";
-        viewJadwal.classList.remove('hidden');
-        viewJadwal.classList.add('flex');
+        btnJadwal.className = "px-4 py-2 bg-cyan-500 border-2 border-cyan-300 text-gray-950 text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(6,182,212,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
       } else if (tab === 'daily') {
-        btnDaily.className = "px-4 py-1.5 bg-pink-500/20 border border-pink-400 text-pink-300 text-xs font-bold uppercase tracking-wider rounded-sm shadow-[0_0_10px_rgba(236,72,153,0.4)] flex items-center gap-2 whitespace-nowrap transition-all";
-        viewDaily.classList.remove('hidden');
-        viewDaily.classList.add('flex');
-        if (currentSession.role) {
-          renderDailyTable();
-        }
+        btnDaily.className = "px-4 py-2 bg-pink-600 border-2 border-pink-400 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(236,72,153,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
+        renderDailyTable();
       } else if (tab === 'maintenance') {
-        btnMaintenance.className = "px-4 py-1.5 bg-blue-500/20 border border-blue-400 text-blue-300 text-xs font-bold uppercase tracking-wider rounded-sm shadow-[0_0_10px_rgba(59,130,246,0.4)] flex items-center gap-2 whitespace-nowrap transition-all";
-        viewMaintenance.classList.remove('hidden');
-        viewMaintenance.classList.add('flex');
+        btnMnt.className = "px-4 py-2 bg-blue-600 border-2 border-blue-400 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(59,130,246,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
+        renderMaintenanceTable();
+      } else if (tab === 'logs') {
+        btnLogs.className = "px-4 py-2 bg-yellow-600 border-2 border-yellow-400 text-gray-950 text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(250,204,21,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
+        renderAuditLogsTable();
       }
     }
 
-    function openCyberAlertModal() {
-      const modal = document.getElementById('cyber-alert-modal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+    function openMntModal() {
+      if (!currentSession.role) {
+        alert("Silakan lakukan Login Sesi terlebih dahulu!");
+        openGlobalLoginModal();
+        return;
+      }
+      editingMntRowTr = null;
+      document.getElementById('mnt-modal-title').innerText = ">> INPUT_MAINTENANCE_REPORT";
+      document.getElementById('mnt-submit-btn').innerText = "TAMBAHKAN LAPORAN";
+      document.getElementById('mnt-form').reset();
+      
+      const now = new Date();
+      const tzOffset = now.getTimezoneOffset() * 60000;
+      const localISOTime = (new Date(now - tzOffset)).toISOString().slice(0, 16);
+      document.getElementById('mnt-waktu-lapor').value = localISOTime;
+      document.getElementById('mnt-teknisi').value = currentSession.name || "SURYA ARDIANSYAH";
+
+      const m = document.getElementById('mnt-modal');
+      m.classList.remove('hidden'); m.classList.add('flex');
     }
 
-    function closeCyberAlertModal() {
-      const modal = document.getElementById('cyber-alert-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+    function openEditMntModal(sheetRow, alat, lokasi, kendala, teknisi) {
+      editingMntRowTr = sheetRow;
+      document.getElementById('mnt-modal-title').innerText = `>> EDIT_MAINTENANCE [#${sheetRow}]`;
+      document.getElementById('mnt-submit-btn').innerText = "SIMPAN PERUBAHAN";
+      
+      const now = new Date();
+      const tzOffset = now.getTimezoneOffset() * 60000;
+      const localISOTime = (new Date(now - tzOffset)).toISOString().slice(0, 16);
+      document.getElementById('mnt-waktu-lapor').value = localISOTime;
+
+      document.getElementById('mnt-alat').value = alat;
+      document.getElementById('mnt-lokasi').value = lokasi;
+      document.getElementById('mnt-kendala').value = kendala;
+      document.getElementById('mnt-teknisi').value = teknisi;
+      const m = document.getElementById('mnt-modal');
+      m.classList.remove('hidden'); m.classList.add('flex');
+    }
+
+    function closeMntModal() {
+      const m = document.getElementById('mnt-modal');
+      m.classList.add('hidden'); m.classList.remove('flex');
+      editingMntRowTr = null;
+    }
+
+    async function submitMntReport(event) {
+      event.preventDefault();
+      const waktuInput = document.getElementById('mnt-waktu-lapor').value;
+      let formattedTime = waktuInput ? new Date(waktuInput).toString() : new Date().toString();
+
+      const alat = document.getElementById('mnt-alat').value.toUpperCase();
+      const lokasi = document.getElementById('mnt-lokasi').value.toUpperCase();
+      const teknisi = document.getElementById('mnt-teknisi').value.toUpperCase();
+      const kendala = document.getElementById('mnt-kendala').value.toUpperCase();
+      const isMonitoring = kendala.includes('MONITORING');
+      const initialStatus = isMonitoring ? 'MONITORING' : 'ANTREAN';
+      const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
+
+      closeMntModal();
+      try {
+        if (editingMntRowTr) {
+          await fetch(SCRIPT_URL, {
+            method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              action: 'edit_mnt_report', 
+              sheetRow: editingMntRowTr, 
+              customTime: formattedTime, 
+              namaAlat: alat, 
+              lokasi: lokasi, 
+              kendala: kendala, 
+              teknisi: teknisi, 
+              pelaku: pelakuName 
+            })
+          });
+        } else {
+          await fetch(SCRIPT_URL, {
+            method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              action: 'add_mnt_report', 
+              customTime: formattedTime, 
+              namaAlat: alat, 
+              lokasi: lokasi, 
+              kendala: kendala, 
+              teknisi: teknisi, 
+              status: initialStatus, 
+              pelaku: pelakuName 
+            })
+          });
+        }
+        setTimeout(() => fetchData(), 1500);
+        editingMntRowTr = null;
+      } catch (err) { console.error(err); }
+    }
+
+    async function toggleMntStatus(sheetRow, currentStatus) {
+      let newStatus = 'SEDANG DIPERBAIKI';
+      if (currentStatus === 'ANTREAN' || currentStatus === 'MONITORING') {
+        newStatus = 'SEDANG DIPERBAIKI';
+      } else if (currentStatus === 'SEDANG DIPERBAIKI') {
+        if (!confirm("Apakah perbaikan perangkat telah SELESAI?")) return;
+        newStatus = 'SELESAI';
+      }
+
+      const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'update_mnt_status', sheetRow: sheetRow, status: newStatus, pelaku: pelakuName })
+        });
+        setTimeout(() => fetchData(), 1500);
+      } catch (err) { console.error(err); }
+    }
+
+    async function deleteMaintenanceReport(sheetRow, namaAlat) {
+      if (!confirm(`Hapus laporan maintenance alat "${namaAlat || 'ini'}"?`)) return;
+      try {
+        const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
+        await fetch(SCRIPT_URL, { 
+          method: 'POST', mode: 'no-cors', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify({ 
+            action: 'delete_mnt_report', 
+            sheetRow: sheetRow, 
+            pelaku: pelakuName, 
+            namaAlat: namaAlat,
+            keterangan: `Menghapus Laporan Maintenance alat: ${namaAlat || 'ID #' + sheetRow}` 
+          }) 
+        });
+        setTimeout(() => fetchData(), 1500);
+      } catch (err) { console.error(err); }
+    }
+
+    function renderMaintenanceTable() {
+      const tbody = document.getElementById('mnt-table-body');
+      tbody.innerHTML = '';
+
+      if (globalMaintenanceData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-blue-500 font-bold uppercase">BELUM ADA LAPORAN MAINTENANCE</td></tr>';
+        updateMntCounters();
+        return;
+      }
+
+      const isAdmin = (currentSession.role === 'admin');
+      const isCrew = (currentSession.role === 'crew');
+
+      let displayedData = globalMaintenanceData;
+      if (isCrew) {
+        displayedData = globalMaintenanceData.filter(item => 
+          item.teknisi && item.teknisi.toUpperCase().includes(currentSession.name.toUpperCase())
+        );
+      }
+
+      if (displayedData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-gray-500 font-bold uppercase">TIDAK ADA LAPORAN MAINTENANCE UNTUK AKUN ANDA</td></tr>';
+        updateMntCounters();
+        return;
+      }
+
+      displayedData.forEach(item => {
+        let badgeClass = "bg-blue-500/20 border border-blue-400 text-blue-300";
+        if (item.status === 'MONITORING') badgeClass = "bg-cyan-500/20 border border-cyan-400 text-cyan-300";
+        if (item.status === 'SEDANG DIPERBAIKI') badgeClass = "bg-yellow-500/20 border border-yellow-400 text-yellow-300";
+        if (item.status === 'SELESAI') badgeClass = "bg-green-500/20 border border-green-400 text-green-300";
+
+        let actionBtn = '';
+        if (item.status === 'ANTREAN' || item.status === 'MONITORING') {
+          actionBtn = `<button onclick="toggleMntStatus(${item.sheetRow}, '${item.status}')" class="px-2.5 py-1 bg-blue-950 border border-blue-400 text-blue-300 text-[10px] rounded-sm font-bold uppercase">PROSES</button>`;
+        } else if (item.status === 'SEDANG DIPERBAIKI') {
+          actionBtn = `<button onclick="toggleMntStatus(${item.sheetRow}, '${item.status}')" class="px-2.5 py-1 bg-yellow-950 border border-yellow-400 text-yellow-300 text-[10px] rounded-sm font-bold uppercase">SELESAIKAN</button>`;
+        } else {
+          actionBtn = `<span class="text-green-400 font-bold text-[10px] uppercase">>> RESOLVED</span>`;
+        }
+
+        let controlBtns = '';
+        if (isAdmin || isCrew) {
+          controlBtns = `
+            <button onclick="openEditMntModal(${item.sheetRow}, '${escapeHtml(item.namaAlat)}', '${escapeHtml(item.lokasi)}', '${escapeHtml(item.kendala)}', '${escapeHtml(item.teknisi)}')" class="px-2 py-1 bg-cyan-950 border border-cyan-400 text-cyan-300 text-[10px] rounded-sm font-bold uppercase" title="Edit"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteMaintenanceReport(${item.sheetRow}, '${escapeHtml(item.namaAlat)}')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 text-[10px] rounded-sm font-bold uppercase" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+            ${actionBtn}
+          `;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-blue-950/20';
+        tr.innerHTML = `
+          <td class="p-3 text-cyan-500">${formatCleanTimestamp(item.timestamp)}</td>
+          <td class="p-3 font-bold text-white uppercase">${item.namaAlat}</td>
+          <td class="p-3 text-cyan-300 uppercase">${item.lokasi}</td>
+          <td class="p-3 text-yellow-300 uppercase">${item.kendala}</td>
+          <td class="p-3 text-pink-400 uppercase">${item.teknisi || '-'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 text-[9px] font-bold rounded-sm ${badgeClass}">${item.status}</span></td>
+          <td class="p-3 text-center flex items-center justify-center gap-1.5 flex-wrap">${controlBtns}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      updateMntCounters();
+    }
+
+    function updateMntCounters() {
+      let queue = 0, repair = 0, done = 0;
+      globalMaintenanceData.forEach(item => {
+        if (item.status === 'ANTREAN' || item.status === 'MONITORING') queue++;
+        if (item.status === 'SEDANG DIPERBAIKI') repair++;
+        if (item.status === 'SELESAI') done++;
+      });
+      document.getElementById('mnt-count-queue').innerText = queue;
+      document.getElementById('mnt-count-repair').innerText = repair;
+      document.getElementById('mnt-count-done').innerText = done;
+    }
+
+    function showMntDetailModal(type) {
+      const modal = document.getElementById('detail-modal');
+      const titleEl = document.getElementById('modal-title');
+      const contentEl = document.getElementById('modal-content');
+      let matchedItems = globalMaintenanceData.filter(item => {
+        if (type === 'QUEUE') return item.status === 'ANTREAN' || item.status === 'MONITORING';
+        if (type === 'REPAIR') return item.status === 'SEDANG DIPERBAIKI';
+        if (type === 'DONE') return item.status === 'SELESAI';
+        return false;
+      });
+
+      if (type === 'QUEUE') titleEl.innerText = '>> DETAIL: ALAT DALAM ANTREAN / MONITORING';
+      else if (type === 'REPAIR') titleEl.innerText = '>> DETAIL: ALAT SEDANG DIPERBAIKI';
+      else if (type === 'DONE') titleEl.innerText = '>> DETAIL: ALAT SELESAI DIPERBAIKI';
+
+      let html = '';
+      if (matchedItems.length === 0) {
+        html = '<p class="text-gray-500 uppercase">Tidak ada data perangkat pada kategori ini.</p>';
+      } else {
+        html = '<ul class="divide-y divide-cyan-900/60 space-y-2">';
+        matchedItems.forEach(item => {
+          html += `
+            <li class="py-2.5 px-3 bg-gray-950/60 border border-cyan-900/50 rounded-sm">
+              <div class="flex justify-between items-start mb-1">
+                <strong class="text-white uppercase">${item.namaAlat}</strong>
+                <span class="px-2 py-0.5 text-[9px] bg-cyan-500/20 border border-cyan-400 text-cyan-300 rounded-sm font-bold">${item.status}</span>
+              </div>
+              <p class="text-[10px] text-cyan-400 uppercase">LOKASI: ${item.lokasi} | TEKNISI: ${item.teknisi}</p>
+              <p class="text-[10px] text-yellow-300 uppercase mt-0.5">KENDALA: ${item.kendala}</p>
+            </li>
+          `;
+        });
+        html += '</ul>';
+      }
+      contentEl.innerHTML = html;
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+    }
+
+    function exportMaintenancePDF() {
+      if (globalMaintenanceData.length === 0) return alert("Tidak ada data maintenance!");
+      let dataList = globalMaintenanceData.map(i => [formatCleanTimestamp(i.timestamp), i.namaAlat, i.lokasi, i.kendala, i.teknisi, i.status]);
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('landscape', 'pt', 'a4');
+      doc.setFontSize(14); doc.text("IT BROADCAST 3TV - MAINTENANCE & MONITORING REPORT", 40, 35);
+      doc.autoTable({
+        head: [["WAKTU LAPOR", "NAMA ALAT", "LOKASI", "KENDALA", "TEKNISI", "STATUS"]],
+        body: dataList, startY: 65, theme: 'grid',
+        styles: { fontSize: 8.5, cellPadding: 6 }
+      });
+      doc.save(`Maintenance_Report_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
     function getColorClass(val) {
@@ -883,905 +1137,530 @@
       el.classList.add(getColorClass(el.value));
     }
 
-    function updateDashboardCardsAndRunningText() {
-      const totalCrew = globalCrewData.length;
-      const today = new Date().getDate().toString();
-      
-      let todayDuty = 0;
-      let todayMnt = 0;
-      let todayOff = 0;
-      let todayProgramsSet = new Set();
-      let monthProgramsSet = new Set();
-      let crewTaskCounts = {};
-      let todayScheduleDetails = [];
+    function parsePrograms(rawValue) {
+      if (!rawValue) return [];
+      const cleanVal = String(rawValue).trim().toUpperCase();
+      if (!cleanVal || cleanVal === 'OFF' || cleanVal === 'MNT' || cleanVal === 'PIN' || /^\d+$/.test(cleanVal)) return [];
+      if (cleanVal.includes('MNT') || cleanVal.includes('MONITORING') || cleanVal.includes('BAMS') || cleanVal.includes('BAM') || cleanVal.includes('ADMIN')) return [];
 
+      const parts = cleanVal.split(/\s+DAN\s+/);
+      let results = [];
+      parts.forEach(p => {
+        const trimmed = p.trim();
+        if (trimmed && trimmed !== 'OFF' && trimmed !== 'MNT' && !/^\d+$/.test(trimmed) && !trimmed.includes('MONITORING') && !trimmed.includes('BAM') && !trimmed.includes('ADMIN') && trimmed.length > 1) {
+          results.push(trimmed);
+        }
+      });
+      return results;
+    }
+
+    function formatTimeString(rawTime) {
+      if (!rawTime) return '-';
+      const str = String(rawTime);
+      if (str.includes('GMT') || str.includes('1899')) {
+        const match = str.match(/\d{2}:\d{2}/);
+        return match ? match[0] : str;
+      }
+      return str;
+    }
+
+    function updateDashboardCardsAndRunningText() {
+      const validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
+      const totalCrew = validCrews.length;
+      const today = new Date().getDate().toString();
+      let todayDuty = 0, todayMnt = 0, todayOff = 0;
+      let todayProgSet = new Set(), monthProgSet = new Set(), crewTaskCounts = {}, todayDetails = [];
       const headerToday = globalHeaders.find(h => String(h).trim() === today);
 
-      globalCrewData.forEach(crew => {
+      validCrews.forEach(crew => {
         crewTaskCounts[crew.nama] = 0;
         globalHeaders.forEach(dateStr => {
           const val = (crew.schedule[dateStr] || '').trim().toUpperCase();
-          // Filter pengecualian: Mengabaikan OFF, MNT, MONITORING, dan ADMIN BAM dari statistik tugas & top crew
-          const isExcluded = (val === '' || val === 'OFF' || val === 'MNT' || val.includes('MONITORING') || val.includes('ADMIN BAM'));
-          
-          if (!isExcluded) {
-            monthProgramsSet.add(val);
-            crewTaskCounts[crew.nama]++;
-            if (headerToday && String(dateStr).trim() === today) {
-              todayProgramsSet.add(val);
-            }
+          const subPrograms = parsePrograms(val);
+          if (subPrograms.length > 0) {
+            subPrograms.forEach(prog => {
+              monthProgSet.add(prog);
+              crewTaskCounts[crew.nama]++;
+              if (headerToday && String(dateStr).trim() === today) todayProgSet.add(prog);
+            });
           }
+          if (val === 'OFF' && headerToday && String(dateStr).trim() === today) todayOff++;
+          if (val === 'MNT' && headerToday && String(dateStr).trim() === today) todayMnt++;
         });
 
         if (headerToday) {
           const valToday = (crew.schedule[headerToday] || '').trim().toUpperCase();
-          if (valToday === 'OFF') {
-            todayOff++;
-          } else if (valToday === 'MNT') {
-            todayMnt++;
-          } else if (valToday !== '') {
+          if (valToday && valToday !== 'OFF' && valToday !== 'MNT') {
             todayDuty++;
-            todayScheduleDetails.push(`${crew.nama} [${valToday}]`);
+            todayDetails.push(`${crew.nama} [${valToday}]`);
           }
         }
       });
 
-      let topCrewName = "-";
-      let maxTasks = 0;
-      Object.entries(crewTaskCounts).forEach(([name, count]) => {
-        if (count > maxTasks) {
-          maxTasks = count;
-          topCrewName = name;
-        }
-      });
+      let maxT = 0;
+      Object.values(crewTaskCounts).forEach(count => { if (count > maxT) maxT = count; });
+      let topCrewList = [];
+      if (maxT > 0) {
+        Object.entries(crewTaskCounts).forEach(([name, count]) => { if (count === maxT) topCrewList.push(name); });
+      }
+
+      let topCrewDisplay = topCrewList.length > 0 ? (topCrewList.length === 1 ? `${topCrewList[0]} (${maxT}x program)` : `${topCrewList.join(', ')} (${maxT}x program)`) : "-";
 
       document.getElementById('card-total').innerText = totalCrew;
       document.getElementById('card-duty').innerText = todayDuty;
       document.getElementById('card-mnt').innerText = todayMnt;
       document.getElementById('card-off').innerText = todayOff;
-      document.getElementById('card-prog-today').innerText = todayProgramsSet.size;
-      document.getElementById('card-prog-month').innerText = monthProgramsSet.size;
-      document.getElementById('card-top-crew').innerText = topCrewName !== "-" ? `${topCrewName} (${maxTasks}x)` : "-";
+      document.getElementById('card-prog-today').innerText = todayProgSet.size;
+      document.getElementById('card-prog-month').innerText = monthProgSet.size;
+      
+      const topCrewEl = document.getElementById('card-top-crew');
+      topCrewEl.innerText = topCrewDisplay;
+      topCrewEl.title = topCrewDisplay;
 
-      const runningTextEl = document.getElementById('header-running-text');
-      if (todayScheduleDetails.length > 0) {
-        runningTextEl.innerHTML = `⚡ TANGGAL HARI INI (${today} ${currentBulanTahun}) — PENUGASAN CREW: &nbsp;&nbsp;&bull;&nbsp;&nbsp; ` + todayScheduleDetails.join(' &nbsp;&nbsp;&bull;&nbsp;&nbsp; ') + ` &nbsp;&nbsp;&bull;&nbsp;&nbsp; SEMUA SISTEM SIARAN BERJALAN NORMAL ⚡`;
-      } else {
-        runningTextEl.innerHTML = `⚡ TANGGAL HARI INI (${today} ${currentBulanTahun}) — TIDAK ADA PENUGASAN PROGRAM AKTIF HARI INI. STATUS: SIAGA ⚡`;
-      }
+      const rText = document.getElementById('header-running-text');
+      rText.innerHTML = todayDetails.length > 0 ? `⚡ TANGGAL HARI INI (${today} ${currentBulanTahun}) — CREW: &nbsp;&nbsp;&bull;&nbsp;&nbsp; ` + todayDetails.join(' &nbsp;&nbsp;&bull;&nbsp;&nbsp; ') + ` &nbsp;&nbsp;&bull;&nbsp;&nbsp; NORMAL ⚡` : `⚡ TANGGAL HARI INI (${today} ${currentBulanTahun}) — TIDAK ADA PENUGASAN AKTIF. SIAGA ⚡`;
     }
 
     async function fetchData() {
-      const refreshIcon = document.getElementById('refresh-icon');
-      refreshIcon.classList.add('fa-spin');
-      updateStatus('SYNCING...', 'yellow');
+      const icon = document.getElementById('refresh-icon');
+      if(icon) icon.classList.add('fa-spin');
       try {
-        const response = await fetch(SCRIPT_URL + "?t=" + new Date().getTime());
-        const data = await response.json();
+        const res = await fetch(`${SCRIPT_URL}?bulan=${selectedBulanTab}&t=` + new Date().getTime());
+        const data = await res.json();
         globalHeaders = data.headers;
-        globalCrewData = data.crew;
-        if (data.dailyReport) globalDailyData = data.dailyReport;
+        globalCrewData = (data.crew || []).filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
         
+        if (data.dailyReport) {
+          globalDailyData = data.dailyReport.filter(r => {
+            const prog = String(r.namaProgram || '').trim().toUpperCase();
+            return prog && prog !== "NAMA PROGRAM" && prog !== "PROGRAM";
+          });
+        }
+
+        if (data.maintenanceReport) globalMaintenanceData = data.maintenanceReport;
+        if (data.logsReport) globalLogsData = data.logsReport;
+        
+        populateCrewDropdown();
         renderTable();
         updateDashboardCardsAndRunningText();
-        populateCrewDropdown();
-        if (currentSession.role) renderDailyTable();
-        
-        updateStatus('LINK_ESTABLISHED', 'cyan');
-      } catch (err) {
-        console.error(err);
-        updateStatus('CONNECTION_FAILED', 'red');
-      } finally {
-        refreshIcon.classList.remove('fa-spin');
-      }
+        if (currentSession.role) {
+          renderDailyTable();
+          renderMaintenanceTable();
+          renderAuditLogsTable();
+        }
+      } catch (err) { console.error(err); }
+      finally { if(icon) icon.classList.remove('fa-spin'); }
     }
 
     function renderTable() {
       const headerRow = document.getElementById('table-headers');
       const body = document.getElementById('table-body');
       headerRow.querySelectorAll('.date-header').forEach(el => el.remove());
-
-      const currentDate = new Date();
-      const currentYear = currentDate.getFullYear();
-      const currentMonth = currentDate.getMonth(); 
-      const namaHariArr = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
+      const d = new Date(), curYear = d.getFullYear(), curMon = d.getMonth();
+      const namaHari = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
 
       globalHeaders.forEach(dateStr => {
         const th = document.createElement('th');
-        th.className = 'p-2 md:p-3 border-b-2 border-pink-600 font-bold text-center min-w-[100px] md:min-w-[150px] bg-gray-950 sticky top-0 z-40 date-header text-cyan-400 leading-tight whitespace-nowrap';
-        let headerContent = dateStr;
-        if (!isNaN(dateStr) && String(dateStr).trim() !== '') {
-            const dayNum = parseInt(dateStr);
-            if (dayNum >= 1 && dayNum <= 31) {
-                const dateObj = new Date(currentYear, currentMonth, dayNum);
-                const hari = namaHariArr[dateObj.getDay()];
-                headerContent = `<span class="block text-[8px] md:text-[10px] text-pink-500 tracking-wider mb-1">${hari}</span><span class="text-sm md:text-base">${dayNum}</span>`;
-            }
+        th.className = 'p-2 md:p-3 border-b-2 border-pink-600 font-bold text-center min-w-[100px] md:min-w-[150px] bg-gray-950 sticky top-0 z-40 date-header text-cyan-400 whitespace-nowrap';
+        let content = dateStr;
+        if (!isNaN(dateStr) && String(dateStr).trim()) {
+          const dayNum = parseInt(dateStr);
+          if (dayNum >= 1 && dayNum <= 31) {
+            content = `<span class="block text-[8px] md:text-[10px] text-pink-500 mb-1">${namaHari[new Date(curYear, curMon, dayNum).getDay()]}</span><span class="text-sm md:text-base">${dayNum}</span>`;
+          }
         }
-        th.innerHTML = headerContent;
+        th.innerHTML = content;
         headerRow.appendChild(th);
       });
 
       body.innerHTML = '';
-      if (globalCrewData.length === 0) {
-        body.innerHTML = `<tr><td colspan="${globalHeaders.length + 2}" class="text-center py-12 text-red-500 font-bold tracking-widest uppercase text-xs md:text-sm">DATA_NOT_FOUND</td></tr>`;
+      const validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
+
+      if (validCrews.length === 0) {
+        body.innerHTML = `<tr><td colspan="${globalHeaders.length + 2}" class="text-center py-12 text-red-500 font-bold uppercase text-xs">DATA_NOT_FOUND PADA TAB ${selectedBulanTab}</td></tr>`;
         return;
       }
 
-      const isAdminLoggedIn = (currentSession.role === 'admin');
-
-      globalCrewData.forEach((crew, crewIdx) => {
+      const isAdmin = (currentSession.role === 'admin');
+      validCrews.forEach((crew) => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-cyan-900/20 transition-all duration-200 crew-row group';
+        tr.className = 'hover:bg-cyan-900/20 crew-row group';
+        let waNum = (crew.hp || '').replace(/\D/g, '');
+        if (waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
 
         let tdNama = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 font-bold text-cyan-300 sticky left-0 bg-gray-900 z-30 group-hover:bg-gray-800 uppercase text-[10px] md:text-xs min-w-[110px] max-w-[110px] md:min-w-[180px] md:max-w-[180px] truncate">${crew.nama}</td>`;
-        
-        let rawHp = String(crew.hp || '').trim();
-        let waNumber = rawHp.replace(/\D/g, '');
-        if (waNumber.startsWith('0')) {
-          waNumber = '62' + waNumber.slice(1);
-        }
-        let tdHp = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 sticky left-[110px] md:left-[180px] bg-gray-900 z-30 group-hover:bg-gray-800 text-[10px] md:text-xs min-w-[100px] max-w-[100px] md:min-w-[140px] md:max-w-[140px] truncate shadow-[4px_0_10px_rgba(0,0,0,0.6)]">
-          <a href="https://wa.me/${waNumber}?text=Halo%20${encodeURIComponent(crew.nama)},%20terdapat%20pembaruan%20pada%20Jadwal%20Bulanan%20IT%20Broadcast%203TV." target="_blank" class="text-pink-400 hover:text-green-400 flex items-center gap-1.5 transition-colors" title="Kirim WhatsApp Notifikasi">
-            <i class="fa-brands fa-whatsapp text-green-400"></i> ${crew.hp}
-          </a>
-        </td>`;
+        let tdHp = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 sticky left-[110px] md:left-[180px] bg-gray-900 z-30 group-hover:bg-gray-800 text-[10px] md:text-xs min-w-[100px] max-w-[100px] md:min-w-[140px] md:max-w-[140px] truncate"><a href="https://wa.me/${waNum}?text=Halo%20${encodeURIComponent(crew.nama)},%20pembaruan%20jadwal%20ITB%203TV." target="_blank" class="text-pink-400 hover:text-green-400 flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-400"></i> ${crew.hp}</a></td>`;
 
-        let tdShifts = globalHeaders.map((dateStr, colIdx) => {
+        let tdShifts = globalHeaders.map((dateStr, cIdx) => {
           const val = crew.schedule[dateStr] || '';
-          const colIndexInSheet = colIdx + 3;
-          const colorClass = getColorClass(val);
-          
-          if (isAdminLoggedIn) {
-            return `
-              <td class="p-1 md:p-2 border-b border-cyan-900/40 text-center">
-                <input type="text" value="${val}" id="input-${crewIdx}-${dateStr}"
-                  oninput="this.value = this.value.toUpperCase(); updateInputColor(this);"
-                  onchange="handleInputChange(${crewIdx}, '${dateStr}', ${crew.rowIndex}, ${colIndexInSheet}, this.value)" 
-                  class="w-full bg-gray-950 border border-cyan-900/80 rounded-sm text-center py-1.5 md:py-2 px-2 text-[10px] md:text-xs focus:outline-none focus:border-pink-500 font-bold uppercase placeholder-cyan-950 ${colorClass}" placeholder="-">
-              </td>
-            `;
+          const colNum = cIdx + 4;
+          const color = getColorClass(val);
+          if (isAdmin) {
+            return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" id="input-${crew.rowIndex}-${dateStr}" oninput="this.value=this.value.toUpperCase();updateInputColor(this);" onchange="handleInputChange(${crew.rowIndex},'${dateStr}',${crew.rowIndex},${colNum},this.value)" class="w-full bg-gray-950 border border-cyan-900 rounded-sm text-center py-1.5 px-2 text-[10px] md:text-xs font-bold uppercase ${color}" placeholder="-"></td>`;
           } else {
-            return `
-              <td class="p-1 md:p-2 border-b border-cyan-900/40 text-center">
-                <input type="text" value="${val}" readonly
-                  class="w-full bg-gray-950/60 border border-cyan-900/40 rounded-sm text-center py-1.5 md:py-2 px-2 text-[10px] md:text-xs font-bold uppercase cursor-default select-none ${colorClass}" placeholder="-">
-              </td>
-            `;
+            return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" readonly class="w-full bg-gray-950/60 border border-cyan-900/40 rounded-sm text-center py-1.5 px-2 text-[10px] md:text-xs font-bold uppercase cursor-default ${color}" placeholder="-"></td>`;
           }
         }).join('');
-        
+
         tr.innerHTML = tdNama + tdHp + tdShifts;
         body.appendChild(tr);
       });
-
-      setTimeout(() => {
-        scrollToTodayColumn();
-      }, 300);
+      setTimeout(() => scrollToTodayColumn(), 300);
     }
 
     function scrollToTodayColumn() {
       const todayDate = new Date().getDate().toString();
       const container = document.getElementById('table-scroll-container');
       if (!container) return;
-
-      const todayIndex = globalHeaders.findIndex(h => String(h).trim() === todayDate);
-      if (todayIndex !== -1) {
-        const approxColWidth = 140; 
-        const targetScrollLeft = 320 + (todayIndex * approxColWidth) - (container.clientWidth / 2);
-        container.scrollTo({ left: Math.max(0, targetScrollLeft), behavior: 'smooth' });
-      }
+      const idx = globalHeaders.findIndex(h => String(h).trim() === todayDate);
+      if (idx !== -1) container.scrollTo({ left: Math.max(0, 320 + (idx * 140) - (container.clientWidth / 2)), behavior: 'smooth' });
     }
 
-    function handleInputChange(crewIdx, dateStr, rowIndex, colIndex, value) {
-      const upperVal = value.toUpperCase();
-      const oldVal = globalCrewData[crewIdx].schedule[dateStr] || ''; 
-
-      globalCrewData[crewIdx].schedule[dateStr] = upperVal;
+    function handleInputChange(crewRowIndex, dateStr, rowIndex, colIndex, value) {
+      const upper = value.toUpperCase();
+      const crewObj = globalCrewData.find(c => c.rowIndex === crewRowIndex);
+      if (!crewObj) return;
+      const oldVal = crewObj.schedule[dateStr] || '';
+      crewObj.schedule[dateStr] = upper;
       updateDashboardCardsAndRunningText();
 
-      const crewObj = globalCrewData[crewIdx];
-      let rawHp = String(crewObj.hp || '').trim();
-      let waNumber = rawHp.replace(/\D/g, '');
-      if (waNumber.startsWith('0')) {
-        waNumber = '62' + waNumber.slice(1);
-      }
+      let waNum = (crewObj.hp || '').replace(/\D/g, '');
+      if (waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
+      const progText = upper || 'LIBUR';
+      const msg = `Halo ${crewObj.nama}, pembaruan jadwal siaran ITB 3TV tgl ${dateStr} ${currentBulanTahun}: *${progText}*. Terima kasih!`;
 
-      const statusProgram = upperVal === '' ? 'LIBUR / KOSONG' : upperVal;
-      const defaultMsg = `Halo ${crewObj.nama}, terdapat pembaruan jadwal siaran IT Broadcast 3TV untuk tanggal ${dateStr} ${currentBulanTahun}. Jadwal/Program Anda: *${statusProgram}*. Mohon dipersiapkan. Terima kasih!`;
-
-      pendingWaData = {
-        crewIdx: crewIdx,
-        dateStr: dateStr,
-        rowIndex: rowIndex,
-        colIndex: colIndex,
-        oldVal: oldVal,
-        newVal: upperVal,
-        name: crewObj.nama,
-        hpFormatted: crewObj.hp,
-        waNumber: waNumber,
-        message: defaultMsg
-      };
-
+      pendingWaData = { crewRowIndex, dateStr, rowIndex, colIndex, sheetName: selectedBulanTab, oldVal, newVal: upper, name: crewObj.nama, hp: crewObj.hp, waNum, message: msg };
       document.getElementById('wa-modal-crew').innerText = crewObj.nama;
       document.getElementById('wa-modal-hp').innerText = crewObj.hp;
       document.getElementById('wa-modal-tanggal').innerText = `${dateStr} ${currentBulanTahun}`;
-      document.getElementById('wa-modal-message').value = defaultMsg;
+      document.getElementById('wa-modal-message').value = msg;
 
-      const modal = document.getElementById('wa-notif-modal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      const m = document.getElementById('wa-notif-modal');
+      m.classList.remove('hidden'); m.classList.add('flex');
     }
 
     function cancelWaAction() {
       if (!pendingWaData) return;
-
-      globalCrewData[pendingWaData.crewIdx].schedule[pendingWaData.dateStr] = pendingWaData.oldVal;
-
-      const inputEl = document.getElementById(`input-${pendingWaData.crewIdx}-${pendingWaData.dateStr}`);
-      if (inputEl) {
-        inputEl.value = pendingWaData.oldVal;
-        updateInputColor(inputEl);
-      }
-
+      const crewObj = globalCrewData.find(c => c.rowIndex === pendingWaData.crewRowIndex);
+      if (crewObj) crewObj.schedule[pendingWaData.dateStr] = pendingWaData.oldVal;
+      const inp = document.getElementById(`input-${pendingWaData.crewRowIndex}-${pendingWaData.dateStr}`);
+      if (inp) { inp.value = pendingWaData.oldVal; updateInputColor(inp); }
       updateDashboardCardsAndRunningText();
-
-      const modal = document.getElementById('wa-notif-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+      document.getElementById('wa-notif-modal').classList.add('hidden');
+      document.getElementById('wa-notif-modal').classList.remove('flex');
       pendingWaData = null;
     }
 
     function closeWaModal(sendWa) {
-      const modal = document.getElementById('wa-notif-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-
+      document.getElementById('wa-notif-modal').classList.add('hidden');
+      document.getElementById('wa-notif-modal').classList.remove('flex');
       if (pendingWaData) {
-        updateCell(pendingWaData.rowIndex, pendingWaData.colIndex, pendingWaData.newVal);
-
-        if (sendWa) {
-          const finalMsg = document.getElementById('wa-modal-message').value;
-          const waUrl = `https://wa.me/${pendingWaData.waNumber}?text=${encodeURIComponent(finalMsg)}`;
-          window.open(waUrl, '_blank');
-        }
+        updateCell(pendingWaData.rowIndex, pendingWaData.colIndex, pendingWaData.newVal, pendingWaData.sheetName, pendingWaData.dateStr);
+        if (sendWa) window.open(`https://wa.me/${pendingWaData.waNum}?text=${encodeURIComponent(document.getElementById('wa-modal-message').value)}`, '_blank');
       }
       pendingWaData = null;
     }
 
     function renderDailyTable() {
       const body = document.getElementById('daily-table-body');
+      if(!body) return;
       body.innerHTML = '';
-
-      let filteredData = globalDailyData;
+      
+      let list = globalDailyData;
       if (currentSession.role === 'crew') {
-        filteredData = globalDailyData.filter(row => {
-          return row.crewBertugas.toUpperCase().includes(currentSession.name.toUpperCase());
+        const currentCrewName = (currentSession.name || '').trim().toUpperCase();
+        list = globalDailyData.filter(r => {
+          if (!r.crewBertugas) return false;
+          const crewsInReport = String(r.crewBertugas).split('+').map(s => s.trim().toUpperCase());
+          return crewsInReport.some(cName => cName.includes(currentCrewName) || currentCrewName.includes(cName));
         });
       }
 
-      if (filteredData.length === 0) {
-        body.innerHTML = `<tr><td colspan="8" class="text-center py-12 text-gray-500 font-bold uppercase tracking-widest">BELUM ADA LAPORAN HARIAN TERSEDIA</td></tr>`;
+      if (list.length === 0) {
+        body.innerHTML = `<tr><td colspan="8" class="text-center py-12 text-gray-500 font-bold uppercase">BELUM ADA LAPORAN HARIAN UNTUK AKUN ANDA</td></tr>`;
         return;
       }
 
-      filteredData.forEach(row => {
+      list.forEach(row => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-cyan-900/20 transition-all daily-row';
+        tr.className = 'hover:bg-cyan-900/20 daily-row';
+        let act = '';
         
-        let actionBtnHtml = '';
+        const crewsInReport = String(row.crewBertugas || '').toUpperCase();
+        const currentCrewName = (currentSession.name || '').toUpperCase();
+        const isMyReport = currentSession.role === 'crew' && (crewsInReport.includes(currentCrewName));
+
         if (currentSession.role === 'admin') {
-          actionBtnHtml = `
-            <div class="flex items-center justify-center gap-1.5">
-              <button onclick="deleteDailyReport(${row.sheetRow})" class="px-2 py-1 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 text-[10px] rounded-sm" title="Hapus">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-              <button onclick="exportSingleDailyExcel(${row.sheetRow})" class="px-2 py-1 bg-green-950/80 border border-green-500 text-green-400 hover:bg-green-500 hover:text-gray-950 text-[10px] rounded-sm" title="Excel">
-                <i class="fa-solid fa-file-excel"></i>
-              </button>
-              <button onclick="exportSingleDailyPDF(${row.sheetRow})" class="px-2 py-1 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 text-[10px] rounded-sm" title="PDF">
-                <i class="fa-solid fa-file-pdf"></i>
-              </button>
-            </div>
-          `;
-        } else if (currentSession.role === 'crew') {
-          actionBtnHtml = `
-            <div class="flex items-center justify-center gap-1.5">
-              <button onclick="openEditDailyModal(${row.sheetRow}, '${escapeHtml(row.namaProgram)}', '${escapeHtml(row.lokasi)}', '${row.jamOn}', '${row.jamOff}', '${escapeHtml(row.alat)}', '${escapeHtml(row.qty)}', '${escapeHtml(row.crewBertugas)}', '${escapeHtml(row.catatan)}', '${row.timestamp ? row.timestamp.split(' ')[0] : ''}')" class="px-2 py-1 bg-cyan-950/80 border border-cyan-400 text-cyan-300 hover:bg-cyan-500 hover:text-gray-950 text-[10px] rounded-sm" title="Edit">
-                <i class="fa-solid fa-pen-to-square"></i>
-              </button>
-              <button onclick="exportSingleDailyExcel(${row.sheetRow})" class="px-2 py-1 bg-green-950/80 border border-green-500 text-green-400 hover:bg-green-500 hover:text-gray-950 text-[10px] rounded-sm" title="Excel">
-                <i class="fa-solid fa-file-excel"></i>
-              </button>
-              <button onclick="exportSingleDailyPDF(${row.sheetRow})" class="px-2 py-1 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 text-[10px] rounded-sm" title="PDF">
-                <i class="fa-solid fa-file-pdf"></i>
-              </button>
-            </div>
-          `;
+          act = `<div class="flex items-center justify-center gap-1"><button onclick="deleteDailyReport(${row.sheetRow}, '${escapeHtml(row.namaProgram)}')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 rounded-sm text-[10px]"><i class="fa-solid fa-trash"></i></button></div>`;
+        } else if (currentSession.role === 'crew' && isMyReport) {
+          act = `<div class="flex items-center justify-center gap-1"><button onclick="openEditDailyModal(${row.sheetRow}, '${escapeHtml(row.namaProgram)}', '${escapeHtml(row.lokasi)}', '${row.jamOn}', '${row.jamOff}', '${escapeHtml(row.alat)}', '${escapeHtml(row.qty)}', '${escapeHtml(row.crewBertugas)}', '${escapeHtml(row.catatan)}', '${row.timestamp ? row.timestamp.split(' ')[0] : ''}')" class="px-2 py-1 bg-cyan-950 border border-cyan-400 text-cyan-300 rounded-sm text-[10px]" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteDailyReport(${row.sheetRow}, '${escapeHtml(row.namaProgram)}')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 rounded-sm text-[10px]" title="Hapus"><i class="fa-solid fa-trash"></i></button></div>`;
         }
 
-        let alatFormatted = '-';
+        let alatF = '-';
         if (row.alat) {
-          const alatArr = String(row.alat).split('+').map(s => s.trim());
-          const qtyArr = String(row.qty).split('+').map(s => s.trim());
-          alatFormatted = alatArr.map((item, idx) => {
-            const q = qtyArr[idx] || '1';
-            return `<span class="block text-green-400 font-bold">${item} <span class="text-cyan-400 font-normal">(${q} Unit)</span></span>`;
-          }).join('');
+          const aArr = String(row.alat).split('+').map(s => s.trim());
+          const qArr = String(row.qty).split('+').map(s => s.trim());
+          alatF = aArr.map((it, i) => `<span class="block text-green-400 font-bold">${it} <span class="text-cyan-400">(${qArr[i] || '1'})</span></span>`).join('');
         }
+
+        let cleanJamOn = formatTimeString(row.jamOn);
+        let cleanJamOff = formatTimeString(row.jamOff);
 
         tr.innerHTML = `
-          <td class="p-3 border-b border-cyan-900/40 text-cyan-500">${row.timestamp || '-'}</td>
+          <td class="p-3 border-b border-cyan-900/40 text-cyan-500">${formatCleanTimestamp(row.timestamp)}</td>
           <td class="p-3 border-b border-cyan-900/40 font-bold text-pink-400 uppercase">${row.namaProgram || '-'}</td>
           <td class="p-3 border-b border-cyan-900/40 text-cyan-300 uppercase">${row.lokasi || '-'}</td>
-          <td class="p-3 border-b border-cyan-900/40 text-yellow-400">${row.jamOn || '-'} s/d ${row.jamOff || '-'}</td>
-          <td class="p-3 border-b border-cyan-900/40 uppercase">${alatFormatted}</td>
+          <td class="p-3 border-b border-cyan-900/40 text-yellow-400">${cleanJamOn} s/d ${cleanJamOff}</td>
+          <td class="p-3 border-b border-cyan-900/40 uppercase">${alatF}</td>
           <td class="p-3 border-b border-cyan-900/40 text-cyan-200 uppercase">${row.crewBertugas || '-'}</td>
           <td class="p-3 border-b border-cyan-900/40 text-slate-300 uppercase">${row.catatan || '-'}</td>
-          <td class="p-3 border-b border-cyan-900/40 text-center">${actionBtnHtml}</td>
+          <td class="p-3 border-b border-cyan-900/40 text-center">${act}</td>
         `;
         body.appendChild(tr);
       });
     }
 
     function filterDailyTable() {
-      const query = document.getElementById('daily-search-input').value.toLowerCase();
-      const rows = document.querySelectorAll('.daily-row');
-      rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        if (text.includes(query)) { row.style.display = ''; } 
-        else { row.style.display = 'none'; }
-      });
+      const q = document.getElementById('daily-search-input').value.toLowerCase();
+      document.querySelectorAll('.daily-row').forEach(r => r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none');
     }
 
-    function escapeHtml(str) {
-      return str ? String(str).replace(/'/g, "&#39;").replace(/"/g, "&quot;") : "";
-    }
+    function escapeHtml(str) { return str ? String(str).replace(/'/g, "&#39;").replace(/"/g, "&quot;") : ""; }
 
     function openDailyModal() {
       editingSheetRow = null;
       document.getElementById('daily-modal-title').innerText = ">> SUBMIT_DAILY_REPORT";
       document.getElementById('daily-form').reset();
-      
-      const todayIso = new Date().toISOString().split('T')[0];
-      document.getElementById('daily-tanggal').value = todayIso;
-
+      document.getElementById('daily-tanggal').value = new Date().toISOString().split('T')[0];
       resetAlatRows();
       renderCrewCheckboxes();
-      document.getElementById('daily-modal').classList.remove('hidden');
-      document.getElementById('daily-modal').classList.add('flex');
+      const m = document.getElementById('daily-modal');
+      m.classList.remove('hidden'); m.classList.add('flex');
     }
 
     function openEditDailyModal(sheetRow, prog, lok, jamOn, jamOff, alat, qty, crewBertugas, catatan, tgl) {
       editingSheetRow = sheetRow;
-      document.getElementById('daily-modal-title').innerText = `>> EDIT_REPORT [BARIS #${sheetRow}]`;
-      
+      document.getElementById('daily-modal-title').innerText = `>> EDIT_REPORT [#${sheetRow}]`;
       document.getElementById('daily-tanggal').value = tgl || new Date().toISOString().split('T')[0];
       document.getElementById('daily-program').value = prog;
       document.getElementById('daily-lokasi').value = lok;
-      document.getElementById('daily-jamon').value = jamOn !== '-' ? jamOn : '';
-      document.getElementById('daily-jamoff').value = jamOff !== '-' ? jamOff : '';
+      document.getElementById('daily-jamon').value = formatTimeString(jamOn);
+      document.getElementById('daily-jamoff').value = formatTimeString(jamOff);
       document.getElementById('daily-catatan').value = catatan !== '-' ? catatan : '';
 
-      const alatContainer = document.getElementById('alat-rows-container');
-      alatContainer.innerHTML = '';
-      const alatArr = alat.split('+').map(s => s.trim());
-      const qtyArr = qty.split('+').map(s => s.trim());
-      
-      alatArr.forEach((item, idx) => {
-        const q = qtyArr[idx] || "1";
+      const container = document.getElementById('alat-rows-container');
+      container.innerHTML = '';
+      const aArr = alat.split('+').map(s => s.trim());
+      const qArr = qty.split('+').map(s => s.trim());
+      aArr.forEach((it, i) => {
         const row = document.createElement('div');
         row.className = 'flex gap-2 items-center alat-row';
-        row.innerHTML = `
-          <input type="text" value="${item}" class="flex-1 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase alat-nama" placeholder="NAMA ALAT">
-          <input type="text" value="${q}" class="w-20 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs focus:outline-none focus:border-pink-500 rounded-sm uppercase alat-qty" placeholder="QTY">
-          <button type="button" onclick="removeRow(this)" class="px-2.5 py-2 bg-red-950/80 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 text-xs rounded-sm"><i class="fa-solid fa-trash"></i></button>
-        `;
-        alatContainer.appendChild(row);
+        row.innerHTML = `<input type="text" value="${it}" class="flex-1 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase alat-nama"><input type="text" value="${qArr[i] || '1'}" class="w-20 bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase alat-qty"><button type="button" onclick="removeRow(this)" class="px-2.5 py-2 bg-red-950 border border-red-500 text-red-400 text-xs rounded-sm"><i class="fa-solid fa-trash"></i></button>`;
+        container.appendChild(row);
       });
-
-      const selectedCrewArr = crewBertugas.split('+').map(s => s.trim().toUpperCase());
-      renderCrewCheckboxes(selectedCrewArr);
-
-      document.getElementById('daily-modal').classList.remove('hidden');
-      document.getElementById('daily-modal').classList.add('flex');
+      renderCrewCheckboxes(crewBertugas.split('+').map(s => s.trim().toUpperCase()));
+      const m = document.getElementById('daily-modal');
+      m.classList.remove('hidden'); m.classList.add('flex');
     }
 
     async function submitDailyReport() {
       closeDailyModal();
-
       try {
-        const tglInput = document.getElementById('daily-tanggal').value;
-        const program = document.getElementById('daily-program').value.trim() || "PROGRAM UTAMA";
-        const lokasi = document.getElementById('daily-lokasi').value.trim() || "STUDIO 1";
-        const jamOn = document.getElementById('daily-jamon').value || "08:00";
-        const jamOff = document.getElementById('daily-jamoff').value || "17:00";
+        const tgl = document.getElementById('daily-tanggal').value;
+        const prog = document.getElementById('daily-program').value.trim() || "PROGRAM UTAMA";
+        const lok = document.getElementById('daily-lokasi').value.trim() || "STUDIO 1";
+        const jOn = document.getElementById('daily-jamon').value || "08:00";
+        const jOff = document.getElementById('daily-jamoff').value || "17:00";
+        const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
 
-        const alatRows = document.querySelectorAll('.alat-row');
-        let alatList = [];
-        let qtyList = [];
-        alatRows.forEach(r => {
-          const namaEl = r.querySelector('.alat-nama');
-          const qtyEl = r.querySelector('.alat-qty');
-          const namaAlat = namaEl ? namaEl.value.trim().toUpperCase() : "";
-          const qtyAlat = qtyEl ? qtyEl.value.trim().toUpperCase() : "";
-          if (namaAlat) {
-            alatList.push(namaAlat);
-            qtyList.push(qtyAlat || "1");
-          }
+        let aL = [], qL = [];
+        document.querySelectorAll('.alat-row').forEach(r => {
+          const n = r.querySelector('.alat-nama').value.trim().toUpperCase();
+          const q = r.querySelector('.alat-qty').value.trim().toUpperCase();
+          if (n) { aL.push(n); qL.push(q || "1"); }
         });
-        if (alatList.length === 0) { alatList.push("KAMERA UTAMA"); qtyList.push("1"); }
+        if (aL.length === 0) { aL.push("KAMERA UTAMA"); qL.push("1"); }
 
-        const checkedCrews = document.querySelectorAll('.crew-checkbox:checked');
-        let crewList = [];
-        checkedCrews.forEach(cb => { crewList.push(cb.value.toUpperCase()); });
-
-        if (crewList.length === 0) {
-          if (currentSession.role === 'crew') { crewList.push(currentSession.name.toUpperCase()); }
-          else { crewList.push("SURYA ARDIANSYAH"); }
+        let selectedCrews = [];
+        document.querySelectorAll('.crew-checkbox:checked').forEach(cb => {
+          selectedCrews.push(cb.value.toUpperCase());
+        });
+        if (selectedCrews.length === 0) {
+          selectedCrews.push(currentSession.role === 'crew' ? currentSession.name.toUpperCase() : "SURYA ARDIANSYAH");
         }
 
-        const actionType = editingSheetRow ? 'edit_daily_report' : 'add_daily_report';
+        const alatStr = aL.join(' + ');
+        const qtyStr = qL.join(' + ');
+        const catatanStr = document.getElementById('daily-catatan').value.trim().toUpperCase() || "AMAN";
 
-        const payload = {
-          action: actionType,
-          sheetRow: editingSheetRow,
-          customDate: tglInput,
-          namaProgram: program.toUpperCase(),
-          lokasi: lokasi.toUpperCase(),
-          jamOn: jamOn,
-          jamOff: jamOff,
-          alat: alatList.join(' + '),
-          qty: qtyList.join(' + '),
-          crewBertugas: crewList.join(' + '),
-          catatan: document.getElementById('daily-catatan').value.trim().toUpperCase() || "AMAN"
-        };
+        if (editingSheetRow) {
+          const payload = {
+            action: 'edit_daily_report',
+            sheetRow: editingSheetRow, customDate: tgl,
+            namaProgram: prog.toUpperCase(), lokasi: lok.toUpperCase(),
+            jamOn: jOn, jamOff: jOff, alat: alatStr, qty: qtyStr,
+            crewBertugas: selectedCrews[0], catatan: catatanStr,
+            pelaku: pelakuName
+          };
+          await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        } else {
+          for (let i = 0; i < selectedCrews.length; i++) {
+            const crewName = selectedCrews[i];
+            const payload = {
+              action: 'add_daily_report',
+              customDate: tgl,
+              namaProgram: prog.toUpperCase(), 
+              lokasi: lok.toUpperCase(),
+              jamOn: jOn, 
+              jamOff: jOff, 
+              alat: alatStr, 
+              qty: qtyStr,
+              crewBertugas: crewName,
+              catatan: catatanStr,
+              pelaku: pelakuName
+            };
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            await new Promise(resolve => setTimeout(resolve, 400));
+          }
+        }
 
-        updateStatus(editingSheetRow ? 'UPDATING...' : 'TRANSMITTING...', 'yellow');
-
-        await fetch(SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        
-        setTimeout(() => { fetchData(); }, 1500);
+        setTimeout(() => fetchData(), 1800);
         document.getElementById('daily-form').reset();
         resetAlatRows();
         editingSheetRow = null;
-      } catch (err) {
-        console.error("Error transmit:", err);
-        updateStatus('TRANSMIT_FAILED', 'red');
-      }
+      } catch (err) { console.error(err); }
     }
 
-    async function deleteDailyReport(sheetRow) {
-      if (!confirm("Apakah Anda yakin ingin menghapus laporan ini?")) return;
-
-      updateStatus('DELETING...', 'yellow');
+    async function deleteDailyReport(sheetRow, namaProg) {
+      if (!confirm(`Hapus laporan program "${namaProg || 'ini'}"?`)) return;
       try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'delete_daily_report', sheetRow: sheetRow })
+        const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
+        await fetch(SCRIPT_URL, { 
+          method: 'POST', mode: 'no-cors', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify({ 
+            action: 'delete_daily_report', 
+            sheetRow: sheetRow, 
+            pelaku: pelakuName, 
+            namaProgram: namaProg,
+            keterangan: `Menghapus Daily Report program: ${namaProg || 'ID #' + sheetRow}` 
+          }) 
         });
-        globalDailyData = globalDailyData.filter(d => d.sheetRow !== sheetRow);
-        renderDailyTable();
-        updateStatus('DELETED', 'cyan');
-      } catch (err) {
-        console.error(err);
-        updateStatus('DELETE_FAILED', 'red');
-      }
+        setTimeout(() => fetchData(), 1500);
+      } catch (err) { console.error(err); }
     }
 
-    function getTableDataForExport() {
-      const rows = document.querySelectorAll('#daily-table-body tr');
-      let dataList = [];
-      rows.forEach(tr => {
-        const tds = tr.querySelectorAll('td');
-        if (tds.length >= 7) {
-          dataList.push({
-            timestamp: tds[0].innerText.trim(),
-            namaProgram: tds[1].innerText.trim(),
-            lokasi: tds[2].innerText.trim(),
-            jam: tds[3].innerText.trim(),
-            alat: tds[4].innerText.trim().replace(/\n/g, ' | '),
-            crewBertugas: tds[5].innerText.trim(),
-            catatan: tds[6].innerText.trim()
-          });
-        }
-      });
-      return dataList;
-    }
-
-    function exportDailyExcel() {
-      const dataToExport = getTableDataForExport();
-      if (dataToExport.length === 0 || dataToExport[0].timestamp.includes("FETCHING")) {
-        return alert("Tidak ada data laporan untuk diexport!");
-      }
-
-      const title = currentSession.role === 'admin' ? "REKAPITULASI DAILY REPORT - ITB 3TV" : `DAILY REPORT - ${currentSession.name}`;
-      const wsData = [
-        [title], [],
-        ["TIMESTAMP", "NAMA PROGRAM", "LOKASI", "JAM ON/OFF", "ALAT & QTY", "CREW BERTUGAS", "CATATAN"]
-      ];
-
-      dataToExport.forEach(r => {
-        wsData.push([r.timestamp, r.namaProgram, r.lokasi, r.jam, r.alat, r.crewBertugas, r.catatan]);
-      });
-
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      if(!ws['!merges']) ws['!merges'] = [];
-      ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } });
-      ws['!rows'] = [{ hpt: 30 }, { hpt: 15 }, { hpt: 22 }];
-      ws['!cols'] = [{ wch: 18 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 25 }, { wch: 25 }];
-
-      XLSX.utils.book_append_sheet(wb, ws, "Daily Report");
-      XLSX.writeFile(wb, `Daily_Report_${currentSession.role.toUpperCase()}_${new Date().toISOString().slice(0,10)}.xlsx`);
-    }
-
-    function exportDailyPDF() {
-      const dataToExport = getTableDataForExport();
-      if (dataToExport.length === 0 || dataToExport[0].timestamp.includes("FETCHING")) {
-        return alert("Tidak ada data laporan untuk diexport!");
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('landscape', 'pt', 'a4');
-      doc.setFontSize(14);
-      doc.text("REKAPITULASI DAILY REPORT - ITB 3TV", 40, 35);
-      doc.setFontSize(9);
-      doc.setTextColor(100);
-      doc.text(`Generated: ${new Date().toLocaleString('id-ID')}`, 40, 50);
-
-      const tableHead = [["TIMESTAMP", "PROGRAM", "LOKASI", "JAM", "ALAT & QTY", "CREW BERTUGAS", "CATATAN"]];
-      const tableBody = dataToExport.map(r => [r.timestamp, r.namaProgram, r.lokasi, r.jam, r.alat, r.crewBertugas, r.catatan]);
-
-      doc.autoTable({
-        head: tableHead, body: tableBody, startY: 60, theme: 'grid',
-        styles: { fontSize: 8, cellPadding: 4, valign: 'middle' },
-        headStyles: { fillColor: [236, 72, 153], textColor: [255, 255, 255], fontStyle: 'bold' }
-      });
-      doc.save(`Daily_Report_${new Date().toISOString().slice(0,10)}.pdf`);
-    }
-
-    function exportSingleDailyExcel(sheetRow) {
-      const rowData = globalDailyData.find(r => r.sheetRow === sheetRow);
-      if (!rowData) return alert("Data tidak ditemukan!");
-
-      let formattedAlat = '-';
-      if (rowData.alat) {
-        const alatArr = String(rowData.alat).split('+').map(s => s.trim());
-        const qtyArr = String(rowData.qty).split('+').map(s => s.trim());
-        formattedAlat = alatArr.map((item, idx) => `${item} (${qtyArr[idx] || '1'} Unit)`).join(' | ');
-      }
-
-      const wsData = [
-        [`DETAIL REPORT - #${sheetRow}`], [],
-        ["KETERANGAN", "DETAIL"],
-        ["TIMESTAMP", rowData.timestamp],
-        ["NAMA PROGRAM", rowData.namaProgram],
-        ["LOKASI", rowData.lokasi],
-        ["JAM", `${rowData.jamOn} - ${rowData.jamOff}`],
-        ["ALAT", formattedAlat],
-        ["CREW", rowData.crewBertugas],
-        ["CATATAN", rowData.catatan]
-      ];
-
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      ws['!cols'] = [{ wch: 20 }, { wch: 40 }];
-      XLSX.utils.book_append_sheet(wb, ws, "Detail");
-      XLSX.writeFile(wb, `Detail_Report_${sheetRow}.xlsx`);
-    }
-
-    function exportSingleDailyPDF(sheetRow) {
-      const rowData = globalDailyData.find(r => r.sheetRow === sheetRow);
-      if (!rowData) return alert("Data tidak ditemukan!");
-
-      let formattedAlat = '-';
-      if (rowData.alat) {
-        const alatArr = String(rowData.alat).split('+').map(s => s.trim());
-        const qtyArr = String(rowData.qty).split('+').map(s => s.trim());
-        formattedAlat = alatArr.map((item, idx) => `${item} (${qtyArr[idx] || '1'} Unit)`).join('\n');
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('portrait', 'pt', 'a4');
-      doc.setFontSize(14);
-      doc.text("ITB 3TV - DETAIL DAILY REPORT", 40, 40);
-
-      const tableData = [
-        ["Program", rowData.namaProgram],
-        ["Lokasi", rowData.lokasi],
-        ["Jam", `${rowData.jamOn} - ${rowData.jamOff}`],
-        ["Alat & Qty", formattedAlat],
-        ["Crew Bertugas", rowData.crewBertugas],
-        ["Catatan", rowData.catatan]
-      ];
-
-      doc.autoTable({
-        body: tableData, startY: 60, theme: 'grid',
-        styles: { fontSize: 10, cellPadding: 6 },
-        columnStyles: { 0: { fontStyle: 'bold', cellWidth: 120 } }
-      });
-      doc.save(`Detail_Report_${sheetRow}.pdf`);
-    }
-
-    async function updateCell(rowIndex, colIndex, value) {
-      updateStatus('SAVING...', 'yellow');
+    async function updateCell(rowIndex, colIndex, value, sheetName, dateStr) {
       try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'update_cell', rowIndex: rowIndex, colIndex: colIndex, value: value })
-        });
-        updateStatus('SAVED', 'cyan');
-      } catch (err) {
-        console.error(err);
-        updateStatus('ERROR', 'red');
-      }
+        const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'update_cell', rowIndex, colIndex, value, sheetName, dateStr, pelaku: pelakuName }) });
+      } catch (err) { console.error(err); }
     }
 
     async function submitNewCrew(e) {
       e.preventDefault();
       const nama = document.getElementById('new-nama').value.toUpperCase();
       const hp = document.getElementById('new-hp').value;
+      const pin = document.getElementById('new-pin').value.trim();
+      const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
       closeAddModal();
-      updateStatus('INJECTING...', 'yellow');
       try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'add_crew', nama: nama, hp: hp })
-        });
-        document.getElementById('new-nama').value = '';
-        document.getElementById('new-hp').value = '';
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'add_crew', nama, hp, pin, pelaku: pelakuName }) });
         fetchData();
-      } catch (err) {
-        console.error(err);
-        updateStatus('FAILED', 'red');
-      }
+      } catch (err) { console.error(err); }
     }
 
     function exportExcel() {
-      if (globalCrewData.length === 0) return alert("Data tidak tersedia!");
-      updateStatus('BUILDING...', 'yellow');
-
-      const currentDate = new Date();
-      const currentYear = currentDate.getFullYear();
-      const currentMonth = currentDate.getMonth(); 
-      const namaHariArr = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
-
-      const excelHeaders = ['NAMA CREW', 'NOMOR HP'];
-      globalHeaders.forEach(dateStr => {
-        let headerText = dateStr;
-        if (!isNaN(dateStr) && String(dateStr).trim() !== '') {
-          const dayNum = parseInt(dateStr);
-          if (dayNum >= 1 && dayNum <= 31) {
-            const dateObj = new Date(currentYear, currentMonth, dayNum);
-            const hari = namaHariArr[dateObj.getDay()];
-            headerText = `${hari}, ${dayNum}`; 
-          }
-        }
-        excelHeaders.push(headerText);
-      });
-
-      const wsData = [[`JADWAL BULANAN ITB 3TV - ${currentBulanTahun}`], [], excelHeaders];
-      globalCrewData.forEach(crew => {
-        const rowData = [crew.nama, crew.hp];
-        globalHeaders.forEach(date => { rowData.push(crew.schedule[date] || '-'); });
-        wsData.push(rowData);
-      });
-
+      const validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
+      if (validCrews.length === 0) return alert("Data kosong!");
+      const headers = ['NAMA CREW', 'NOMOR HP', ...globalHeaders];
+      const wsData = [[`JADWAL BULANAN ITB 3TV - ${currentBulanTahun}`], [], headers];
+      validCrews.forEach(c => wsData.push([c.nama, c.hp, ...globalHeaders.map(h => c.schedule[h] || '-')]));
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
-      if(!ws['!merges']) ws['!merges'] = [];
-      ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: excelHeaders.length - 1 } });
-      
-      const colWidths = [{ wch: 20 }, { wch: 14 }]; 
-      globalHeaders.forEach(() => colWidths.push({ wch: 12 })); 
-      ws['!cols'] = colWidths;
-
-      XLSX.utils.book_append_sheet(wb, ws, "Jadwal");
-      XLSX.writeFile(wb, `Jadwal_ITB_3TV_${currentBulanTahun.replace(" ", "_")}.xlsx`);
-      updateStatus('DOWNLOADED', 'cyan');
+      XLSX.utils.book_append_sheet(wb, ws, selectedBulanTab);
+      XLSX.writeFile(wb, `Jadwal_ITB_3TV_${selectedBulanTab}.xlsx`);
     }
 
     function exportPDF() {
-      if (globalCrewData.length === 0) return alert("Data tidak tersedia!");
-      updateStatus('BUILDING...', 'yellow');
-
+      const validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
+      if (validCrews.length === 0) return alert("Data kosong!");
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('landscape', 'pt', 'a3'); 
-      const currentDate = new Date();
-      const currentYear = currentDate.getFullYear();
-      const currentMonth = currentDate.getMonth(); 
-      const namaHariArr = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
-
-      const pdfHeaders = ['NAMA CREW', 'NOMOR HP'];
-      globalHeaders.forEach(dateStr => {
-        let headerText = dateStr;
-        if (!isNaN(dateStr) && String(dateStr).trim() !== '') {
-          const dayNum = parseInt(dateStr);
-          if (dayNum >= 1 && dayNum <= 31) {
-            const dateObj = new Date(currentYear, currentMonth, dayNum);
-            const hari = namaHariArr[dateObj.getDay()];
-            headerText = `${hari}\n${dayNum}`;
-          }
-        }
-        pdfHeaders.push(headerText);
-      });
-
-      const tableHead = [pdfHeaders];
-      const tableBody = [];
-      globalCrewData.forEach(crew => {
-        const rowData = [crew.nama, crew.hp];
-        globalHeaders.forEach(date => { rowData.push(crew.schedule[date] || '-'); });
-        tableBody.push(rowData);
-      });
-
-      doc.setFontSize(14);
-      doc.text(`JADWAL BULANAN ITB 3TV - ${currentBulanTahun}`, 40, 35);
-      
-      const totalDateCols = globalHeaders.length;
-      const dateColWidth = 940 / totalDateCols;
-      const colStyles = { 0: { cellWidth: 100, halign: 'left' }, 1: { cellWidth: 70, halign: 'left' } };
-      for(let i = 0; i < totalDateCols; i++) { colStyles[i + 2] = { cellWidth: dateColWidth }; }
-
-      doc.autoTable({
-        head: tableHead, body: tableBody, startY: 55, theme: 'grid', tableLayout: 'fixed',
-        styles: { fontSize: 6.5, cellPadding: 2, valign: 'middle', halign: 'center' },
-        headStyles: { fillColor: [236, 72, 153], textColor: [255, 255, 255], fontStyle: 'bold' },
-        columnStyles: colStyles
-      });
-      doc.save(`Jadwal_ITB_3TV_${currentBulanTahun.replace(" ", "_")}.pdf`);
-      updateStatus('DOWNLOADED', 'cyan');
+      const doc = new jsPDF('landscape', 'pt', 'a3');
+      const headers = ['NAMA CREW', 'NOMOR HP', ...globalHeaders];
+      const body = validCrews.map(c => [c.nama, c.hp, ...globalHeaders.map(h => c.schedule[h] || '-')]);
+      doc.setFontSize(14); doc.text(`JADWAL BULANAN ITB 3TV - ${currentBulanTahun}`, 40, 35);
+      doc.autoTable({ head: [headers], body, startY: 55, theme: 'grid', styles: { fontSize: 6.5, cellPadding: 2, halign: 'center' } });
+      doc.save(`Jadwal_ITB_3TV_${selectedBulanTab}.pdf`);
     }
 
     function filterTable() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      const rows = document.querySelectorAll('.crew-row');
-      rows.forEach(row => {
-        const nameCell = row.cells[0].innerText.toLowerCase();
-        if (nameCell.includes(query)) { row.style.display = ''; } 
-        else { row.style.display = 'none'; }
-      });
+      const q = document.getElementById('search-input').value.toLowerCase();
+      document.querySelectorAll('.crew-row').forEach(r => r.style.display = r.cells[0].innerText.toLowerCase().includes(q) ? '' : 'none');
     }
 
     function showDetailModal(type) {
       const modal = document.getElementById('detail-modal');
       const titleEl = document.getElementById('modal-title');
       const contentEl = document.getElementById('modal-content');
-      
       const today = new Date().getDate().toString();
-      const headerToday = globalHeaders.find(h => String(h).trim() === today);
+      const hToday = globalHeaders.find(h => String(h).trim() === today);
       let html = '';
+      const validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
 
       if (type === 'TOTAL_CREW') {
         titleEl.innerText = '>> DETAIL: TOTAL CREW';
-        if (globalCrewData.length === 0) { html = '<p>Tidak ada data.</p>'; }
-        else {
-          html = `<ul class="divide-y divide-cyan-900/60">`;
-          globalCrewData.forEach(c => {
-            html += `<li class="py-2 flex justify-between items-center"><span class="font-bold text-cyan-300">${c.nama}</span><span class="text-pink-400 text-xs">${c.hp}</span></li>`;
-          });
-          html += `</ul>`;
-        }
+        const cleanCrews = validCrews.filter(c => { const n = c.nama.toUpperCase(); return n !== "NAMA CREW" && n !== "NAMA" && n !== ""; });
+        html = `<ul class="divide-y divide-cyan-900">` + cleanCrews.map((c, idx) => `<li class="py-2 flex justify-between"><span class="font-bold text-cyan-300">${idx+1}. ${c.nama}</span><span class="text-pink-400 text-xs">${c.hp}</span></li>`).join('') + `</ul>`;
       } else if (type === 'ON_DUTY') {
         titleEl.innerText = `>> DETAIL: ON DUTY (TGL ${today})`;
         let list = [];
-        if (headerToday) {
-          globalCrewData.forEach(c => {
-            const v = (c.schedule[headerToday] || '').trim().toUpperCase();
-            if (v !== '' && v !== 'OFF' && v !== 'MNT') list.push({ nama: c.nama, prog: v });
-          });
-        }
-        if (list.length === 0) { html = '<p class="text-gray-500">Tidak ada yang bertugas hari ini.</p>'; }
-        else {
-          html = `<ul class="divide-y divide-cyan-900/60">`;
-          list.forEach(i => {
-            html += `<li class="py-2 flex justify-between items-center"><span class="font-bold text-green-400">${i.nama}</span><span class="text-yellow-400 text-xs bg-gray-950 px-2 py-0.5 border border-cyan-900">${i.prog}</span></li>`;
-          });
-          html += `</ul>`;
-        }
+        if (hToday) validCrews.forEach(c => { const v = (c.schedule[hToday] || '').trim().toUpperCase(); if (v && v !== 'OFF' && v !== 'MNT') list.push({ name: c.nama, prog: v }); });
+        html = list.length === 0 ? '<p class="text-gray-500">Tidak ada yang bertugas.</p>' : `<ul class="divide-y divide-cyan-900">` + list.map(i => `<li class="py-2 flex justify-between"><span class="font-bold text-green-400">${i.name}</span><span class="text-yellow-400 text-xs">${i.prog}</span></li>`).join('') + `</ul>`;
       } else if (type === 'MAINTENANCE') {
         titleEl.innerText = `>> DETAIL: MAINTENANCE (TGL ${today})`;
         let list = [];
-        if (headerToday) {
-          globalCrewData.forEach(c => {
-            if ((c.schedule[headerToday] || '').trim().toUpperCase() === 'MNT') list.push(c.nama);
-          });
-        }
-        if (list.length === 0) { html = '<p class="text-gray-500">Tidak ada maintenance hari ini.</p>'; }
-        else {
-          html = `<ul class="divide-y divide-cyan-900/60">`;
-          list.forEach(name => { html += `<li class="py-2 text-blue-400 font-bold">${name}</li>`; });
-          html += `</ul>`;
-        }
+        if (hToday) validCrews.forEach(c => { if ((c.schedule[hToday] || '').trim().toUpperCase() === 'MNT') list.push(c.nama); });
+        html = list.length === 0 ? '<p class="text-gray-500">Tidak ada maintenance.</p>' : `<ul class="divide-y divide-cyan-900">` + list.map(n => `<li class="py-2 text-blue-400 font-bold">${n}</li>`).join('') + `</ul>`;
       } else if (type === 'OFF') {
         titleEl.innerText = `>> DETAIL: OFF (TGL ${today})`;
         let list = [];
-        if (headerToday) {
-          globalCrewData.forEach(c => {
-            if ((c.schedule[headerToday] || '').trim().toUpperCase() === 'OFF') list.push(c.nama);
-          });
-        }
-        if (list.length === 0) { html = '<p class="text-gray-500">Tidak ada yang off hari ini.</p>'; }
-        else {
-          html = `<ul class="divide-y divide-cyan-900/60">`;
-          list.forEach(name => { html += `<li class="py-2 text-red-400 font-bold">${name}</li>`; });
-          html += `</ul>`;
-        }
+        if (hToday) validCrews.forEach(c => { if ((c.schedule[hToday] || '').trim().toUpperCase() === 'OFF') list.push(c.nama); });
+        html = list.length === 0 ? '<p class="text-gray-500">Tidak ada yang off.</p>' : `<ul class="divide-y divide-cyan-900">` + list.map(n => `<li class="py-2 text-red-400 font-bold">${n}</li>`).join('') + `</ul>`;
       } else if (type === 'PROGRAM_STATS') {
-        titleEl.innerText = `>> DETAIL: PROGRAM SIARAN (${currentBulanTahun})`;
-        let progCounts = {};
-        globalCrewData.forEach(c => {
-          globalHeaders.forEach(d => {
-            const v = (c.schedule[d] || '').trim().toUpperCase();
-            const isExcluded = (v === '' || v === 'OFF' || v === 'MNT' || v.includes('MONITORING') || v.includes('ADMIN BAM'));
-            if (!isExcluded) { progCounts[v] = (progCounts[v] || 0) + 1; }
-          });
-        });
-        const entries = Object.entries(progCounts);
-        if (entries.length === 0) { html = '<p class="text-gray-500">Belum ada program bulan ini.</p>'; }
-        else {
-          html = `<ul class="divide-y divide-cyan-900/60 space-y-1">`;
-          entries.forEach(([prog, count]) => {
-            html += `<li class="py-2 flex justify-between items-center text-green-400 font-bold">
-                       <span>${prog}</span>
-                       <span class="bg-green-950 px-2 py-0.5 rounded text-xs text-green-300">TOTAL: ${count}</span>
-                     </li>`;
-          });
-          html += `</ul>`;
-        }
+        titleEl.innerText = `>> DETAIL: PROGRAM SIARAN`;
+        let counts = {};
+        validCrews.forEach(c => globalHeaders.forEach(d => {
+          const subProgs = parsePrograms(c.schedule[d]);
+          subProgs.forEach(p => { counts[p] = (counts[p] || 0) + 1; });
+        }));
+        html = Object.keys(counts).length === 0 ? '<p class="text-gray-500">Belum ada program.</p>' : `<ul class="divide-y divide-cyan-900">` + Object.entries(counts).map(([p, cnt]) => `<li class="py-2 flex justify-between text-green-400 font-bold"><span>${p}</span><span>${cnt}X</span></li>`).join('') + `</ul>`;
       } else if (type === 'TOP_CREW') {
-        titleEl.innerText = `>> DETAIL: STATISTIK PENUGASAN CREW (${currentBulanTahun})`;
-        let crewTaskCounts = {};
-        globalCrewData.forEach(c => {
-          crewTaskCounts[c.nama] = 0;
-          globalHeaders.forEach(d => {
-            const v = (c.schedule[d] || '').trim().toUpperCase();
-            const isExcluded = (v === '' || v === 'OFF' || v === 'MNT' || v.includes('MONITORING') || v.includes('ADMIN BAM'));
-            if (!isExcluded) { crewTaskCounts[c.nama]++; }
-          });
+        titleEl.innerText = `>> DETAIL: TOP CREW RANKING`;
+        let counts = {};
+        validCrews.forEach(c => {
+          counts[c.nama] = 0;
+          globalHeaders.forEach(d => { const subProgs = parsePrograms(c.schedule[d]); counts[c.nama] += subProgs.length; });
         });
-        const sortedCrew = Object.entries(crewTaskCounts).sort((a, b) => b[1] - a[1]);
-        if (sortedCrew.length === 0) { html = '<p class="text-gray-500">Belum ada data penugasan.</p>'; }
-        else {
-          html = `<ul class="divide-y divide-cyan-900/60 space-y-1">`;
-          sortedCrew.forEach(([name, count], idx) => {
-            html += `<li class="py-2 flex justify-between items-center font-bold">
-                       <span class="text-cyan-300">${idx + 1}. ${name}</span>
-                       <span class="bg-yellow-950/80 border border-yellow-500 px-2 py-0.5 rounded text-xs text-yellow-300">${count} PROGRAM</span>
-                     </li>`;
-          });
-          html += `</ul>`;
-        }
+        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+        let maxCount = sorted.length > 0 ? sorted[0][1] : 0;
+
+        html = `<ul class="divide-y divide-cyan-900">` + sorted.map(([n, cnt], idx) => {
+          let rankIndicator = `<span class="text-yellow-300">${idx+1}.</span>`;
+          let isTop = (cnt > 0 && cnt === maxCount);
+          let badge = isTop ? `<span class="px-2 py-0.5 text-[9px] bg-yellow-500/25 border border-yellow-400 text-yellow-300 rounded-sm font-bold uppercase tracking-wider ml-2 shadow-[0_0_8px_rgba(250,204,21,0.4)]">⭐ TOP CREW</span>` : '';
+          return `<li class="py-2.5 flex justify-between items-center font-bold"><span class="text-cyan-300 flex items-center gap-1.5">${rankIndicator} <span class="${isTop ? 'text-yellow-300 underline' : ''}">${n}</span> ${badge}</span><span class="text-yellow-300">${cnt} PROGRAM</span></li>`;
+        }).join('') + `</ul>`;
       }
 
       contentEl.innerHTML = html;
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      modal.classList.remove('hidden'); modal.classList.add('flex');
     }
 
     function closeDetailModal() { document.getElementById('detail-modal').classList.add('hidden'); document.getElementById('detail-modal').classList.remove('flex'); }
     function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); document.getElementById('add-modal').classList.add('flex'); }
     function closeAddModal() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-modal').classList.remove('flex'); }
     function closeDailyModal() { document.getElementById('daily-modal').classList.add('hidden'); document.getElementById('daily-modal').classList.remove('flex'); }
-
-    function updateStatus(text, color) {
-      const el = document.getElementById('sync-status');
-      const colors = {
-        cyan: 'text-cyan-400 border-cyan-400',
-        yellow: 'text-yellow-400 border-yellow-400',
-        red: 'text-red-500 border-red-500'
-      };
-      const dotColor = color === 'cyan' ? 'bg-cyan-400' : (color === 'yellow' ? 'bg-yellow-400' : 'bg-red-500');
-      el.className = `inline-flex items-center gap-2 px-2.5 py-1 text-[10px] font-bold uppercase bg-transparent border ${colors[color]}`;
-      el.innerHTML = `<span class="w-2 h-2 ${dotColor} animate-ping"></span> ${text}`;
-    }
 
     setBulanDanJamAktif();
     fetchData();
