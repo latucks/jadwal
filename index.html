@@ -2,6 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#030712">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>IT Broadcast 3TV</title>
   
@@ -301,7 +303,7 @@
                 <th class="p-3 border-b-2 border-blue-600">WAKTU LAPOR</th>
                 <th class="p-3 border-b-2 border-blue-600">NAMA ALAT / PERANGKAT</th>
                 <th class="p-3 border-b-2 border-blue-600">LOKASI / STUDIO</th>
-                <th class="p-3 border-b-2 border-blue-600">KENDALA / MONITORING</th>
+                <th class="p-3 border-b-2 border-blue-600">MAINTENANCE / MONITORING</th>
                 <th class="p-3 border-b-2 border-blue-600">TEKNISI</th>
                 <th class="p-3 border-b-2 border-blue-600">STATUS</th>
                 <th class="p-3 border-b-2 border-blue-600 text-center min-w-[130px]">AKSI</th>
@@ -378,7 +380,7 @@
           </div>
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">KENDALA / MONITORING</label>
+          <label class="block text-[10px] font-bold text-cyan-500 mb-1 uppercase">MAINTENANCE / MONITORING</label>
           <textarea id="mnt-kendala" rows="3" required class="w-full bg-gray-950 border border-cyan-700 p-2 text-cyan-300 text-xs rounded-sm uppercase" placeholder="JELASKAN KENDALA..."></textarea>
         </div>
         <div class="flex justify-end gap-2 pt-3 border-t border-cyan-900">
@@ -591,8 +593,15 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxA6T1ZUHDgWNm0xRCbNORutIcUsUMAqnvg3_YOgcw6p5RQyqSkj5zqLijOR_Y6qN4e/exec";
+  if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then((reg) => console.log('PWA Service Worker registered!', reg))
+      .catch((err) => console.log('PWA Registration failed:', err));
+  });
+}
 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxA6T1ZUHDgWNm0xRCbNORutIcUsUMAqnvg3_YOgcw6p5RQyqSkj5zqLijOR_Y6qN4e/exec";
     let globalHeaders = [];
     let globalCrewData = [];
     let globalDailyData = [];
