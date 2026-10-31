@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#030712">
   <title>IT Broadcast 3TV</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -593,15 +591,7 @@
   </div>
 
   <script>
-    if ('serviceWorker' in navigator) {
-	  window.addEventListener('load', () => {
-		navigator.serviceWorker.register('./sw.js')
-		  .then((reg) => console.log('PWA Service Worker registered!', reg))
-		  .catch((err) => console.log('PWA Registration failed:', err));
-	  });
-	}
-	
-	const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxA6T1ZUHDgWNm0xRCbNORutIcUsUMAqnvg3_YOgcw6p5RQyqSkj5zqLijOR_Y6qN4e/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxA6T1ZUHDgWNm0xRCbNORutIcUsUMAqnvg3_YOgcw6p5RQyqSkj5zqLijOR_Y6qN4e/exec";
 
     let globalHeaders = [];
     let globalCrewData = [];
@@ -618,7 +608,6 @@
     let editingMntRowTr = null;
     let pendingCrewObjForPinChange = null;
     const DEFAULT_PIN = "1234";
-	
 	
 	function openSecretRootModal() {
       const rootPin = prompt(">> SECURITY_CHECK: MASUKKAN ROOT MASTER PIN:");
@@ -1393,7 +1382,9 @@
       const headerRow = document.getElementById('table-headers');
       const body = document.getElementById('table-body');
       headerRow.querySelectorAll('.date-header').forEach(el => el.remove());
-      const d = new Date(), curYear = d.getFullYear(), curMon = d.getMonth();
+        const d = new Date(), curYear = d.getFullYear();
+      // Ambil indeks bulan aktif dari variabel aplikasi Anda (jika ada, jika tidak pakai bulan saat ini)
+      const curMon = typeof currentMonthIndex !== 'undefined' ? currentMonthIndex : d.getMonth();
       const namaHari = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
 
       globalHeaders.forEach(dateStr => {
