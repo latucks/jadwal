@@ -12,6 +12,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <!-- Pustaka untuk unduh PDF instan tanpa dialog print -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     body::before {
@@ -1043,157 +1045,351 @@
     }
 
     async function submitMntReport(event) {
-      event.preventDefault();
-      const waktuInput = document.getElementById('mnt-waktu-lapor').value;
-      let formattedTime = waktuInput ? new Date(waktuInput).toString() : new Date().toString();
+	  if (event) event.preventDefault();
 
-      const alat = document.getElementById('mnt-alat').value.toUpperCase();
-      const lokasi = document.getElementById('mnt-lokasi').value.toUpperCase();
-      const teknisi = document.getElementById('mnt-teknisi').value.toUpperCase();
-      const kendala = document.getElementById('mnt-kendala').value.toUpperCase();
-      const isMonitoring = kendala.includes('MONITORING');
-      const initialStatus = isMonitoring ? 'MONITORING' : 'ANTREAN';
-      const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
+	  const waktuInput = document.getElementById('mnt-waktu-lapor').value;
+	  let formattedTime = waktuInput ? new Date(waktuInput).toString() : new Date().toString();
 
-      closeMntModal();
-      try {
-        if (editingMntRowTr) {
-          await fetch(SCRIPT_URL, {
-            method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              action: 'edit_mnt_report', 
-              sheetRow: editingMntRowTr, 
-              customTime: formattedTime, 
-              namaAlat: alat, 
-              lokasi: lokasi, 
-              kendala: kendala, 
-              teknisi: teknisi, 
-              pelaku: pelakuName 
-            })
-          });
-        } else {
-          await fetch(SCRIPT_URL, {
-            method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              action: 'add_mnt_report', 
-              customTime: formattedTime, 
-              namaAlat: alat, 
-              lokasi: lokasi, 
-              kendala: kendala, 
-              teknisi: teknisi, 
-              status: initialStatus, 
-              pelaku: pelakuName 
-            })
-          });
-        }
-        setTimeout(() => fetchData(), 1500);
-        editingMntRowTr = null;
-      } catch (err) { console.error(err); }
-    }
+	  const alat = document.getElementById('mnt-alat').value.toUpperCase();
+	  const lokasi = document.getElementById('mnt-lokasi').value.toUpperCase();
+	  const teknisi = document.getElementById('mnt-teknisi').value.toUpperCase();
+	  const kendala = document.getElementById('mnt-kendala').value.toUpperCase();
+	  const isMonitoring = kendala.includes('MONITORING');
+	  const initialStatus = isMonitoring ? 'MONITORING' : 'ANTREAN';
+	  const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
+
+	  // 1. [INSTAN 0 DETIK] Tutup Modal Seketika
+	  closeMntModal();
+
+	  try {
+		const currentEditRow = editingMntRowTr;
+		editingMntRowTr = null;
+
+		// Tentukan variabel array lokal maintenance Anda (gunakan fallback ke nama array yang aktif)
+		const mntDataList = (typeof globalMntData !== 'undefined') ? globalMntData : (typeof globalMaintenanceData !== 'undefined' ? globalMaintenanceData : null);
+
+		// =========================================================================
+		// 2. [OPTIMISTIC UI UPDATE] UPDATE MEMORI LOKAL & RENDER TABEL INSTAN
+		// =========================================================================
+		if (mntDataList) {
+		  if (currentEditRow) {
+			// Moda Edit: Update baris yang cocok di memori lokal
+			const target = mntDataList.find(item => item.sheetRow == currentEditRow);
+			if (target) {
+			  target.waktuLapor = formattedTime;
+			  target.timestamp = formattedTime;
+			  target.namaAlat = alat;
+			  target.lokasi = lokasi;
+			  target.kendala = kendala;
+			  target.teknisi = teknisi;
+			}
+		  } else {
+			// Moda Tambah Baru: Disisipkan langsung ke urutan teratas array lokal
+			const tempObject = {
+			  sheetRow: 'TEMP_MNT_' + Date.now(),
+			  waktuLapor: formattedTime,
+			  timestamp: formattedTime,
+			  namaAlat: alat,
+			  lokasi: lokasi,
+			  kendala: kendala,
+			  teknisi: teknisi,
+			  status: initialStatus
+			};
+			mntDataList.unshift(tempObject);
+		  }
+
+		  // Re-render tabel maintenance langsung di layar (0 detik)
+		  if (typeof renderMntTable === 'function') {
+			renderMntTable();
+		  } else if (typeof renderMaintenanceTable === 'function') {
+			renderMaintenanceTable();
+		  }
+		}
+
+		// Reset Form Maintenance
+		const mntForm = document.getElementById('mnt-form') || document.getElementById('maintenance-form');
+		if (mntForm) mntForm.reset();
+
+		// =========================================================================
+		// 3. [BACKGROUND PROCESS] KIRIM DATA KE GOOGLE APPS SCRIPT (NON-BLOCKING)
+		// =========================================================================
+		let payload = {};
+		if (currentEditRow) {
+		  payload = {
+			action: 'edit_mnt_report',
+			sheetRow: currentEditRow,
+			customTime: formattedTime,
+			namaAlat: alat,
+			lokasi: lokasi,
+			kendala: kendala,
+			teknisi: teknisi,
+			pelaku: pelakuName
+		  };
+		} else {
+		  payload = {
+			action: 'add_mnt_report',
+			customTime: formattedTime,
+			namaAlat: alat,
+			lokasi: lokasi,
+			kendala: kendala,
+			teknisi: teknisi,
+			status: initialStatus,
+			pelaku: pelakuName
+		  };
+		}
+
+		// Kirim fetch ke background tanpa menggunakan await
+		fetch(SCRIPT_URL, {
+		  method: 'POST',
+		  mode: 'no-cors',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify(payload)
+		})
+		.then(() => {
+		  // Sync senyap di background setelah 3 detik
+		  setTimeout(() => {
+			if (typeof fetchData === 'function') fetchData();
+		  }, 3000);
+		})
+		.catch(err => console.error("Sync maintenance error:", err));
+
+	  } catch (err) {
+		console.error("Optimistic submitMntReport error:", err);
+	  }
+	}
 
     async function toggleMntStatus(sheetRow, currentStatus) {
-      let newStatus = 'SEDANG DIPERBAIKI';
-      if (currentStatus === 'ANTREAN' || currentStatus === 'MONITORING') {
-        newStatus = 'SEDANG DIPERBAIKI';
-      } else if (currentStatus === 'SEDANG DIPERBAIKI') {
-        if (!confirm("Apakah perbaikan perangkat telah SELESAI?")) return;
-        newStatus = 'SELESAI';
-      }
+	  let newStatus = 'SEDANG DIPERBAIKI';
+	  if (currentStatus === 'ANTREAN' || currentStatus === 'MONITORING') {
+		newStatus = 'SEDANG DIPERBAIKI';
+	  } else if (currentStatus === 'SEDANG DIPERBAIKI') {
+		if (!confirm("Apakah perbaikan perangkat telah SELESAI?")) return;
+		newStatus = 'SELESAI';
+	  }
 
-      const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'update_mnt_status', sheetRow: sheetRow, status: newStatus, pelaku: pelakuName })
-        });
-        setTimeout(() => fetchData(), 1500);
-      } catch (err) { console.error(err); }
-    }
+	  const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
 
-    async function deleteMaintenanceReport(sheetRow, namaAlat) {
-      if (!confirm(`Hapus laporan maintenance alat "${namaAlat || 'ini'}"?`)) return;
-      try {
-        const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
-        await fetch(SCRIPT_URL, { 
-          method: 'POST', mode: 'no-cors', 
-          headers: { 'Content-Type': 'application/json' }, 
-          body: JSON.stringify({ 
-            action: 'delete_mnt_report', 
-            sheetRow: sheetRow, 
-            pelaku: pelakuName, 
-            namaAlat: namaAlat,
-            keterangan: `Menghapus Laporan Maintenance alat: ${namaAlat || 'ID #' + sheetRow}` 
-          }) 
-        });
-        setTimeout(() => fetchData(), 1500);
-      } catch (err) { console.error(err); }
-    }
+	  try {
+		// Tentukan array data maintenance lokal yang aktif
+		const mntDataList = (typeof globalMntData !== 'undefined') ? globalMntData : (typeof globalMaintenanceData !== 'undefined' ? globalMaintenanceData : null);
+
+		let oldStatus = null;
+		let targetItem = null;
+
+		// 1. [INSTAN 0 DETIK] Update memori lokal & render ulang tabel seketika
+		if (mntDataList) {
+		  targetItem = mntDataList.find(item => item.sheetRow == sheetRow);
+		  if (targetItem) {
+			oldStatus = targetItem.status; // Simpan backup untuk rollback jika gagal
+			targetItem.status = newStatus;
+
+			// Re-render tabel maintenance langsung di layar saat ini juga
+			if (typeof renderMntTable === 'function') {
+			  renderMntTable();
+			} else if (typeof renderMaintenanceTable === 'function') {
+			  renderMaintenanceTable();
+			}
+		  }
+		}
+
+		const payload = { 
+		  action: 'update_mnt_status', 
+		  sheetRow: sheetRow, 
+		  status: newStatus, 
+		  pelaku: pelakuName 
+		};
+
+		// 2. [BACKGROUND PROCESS] Kirim request ke backend tanpa await / blocking
+		fetch(SCRIPT_URL, {
+		  method: 'POST',
+		  mode: 'no-cors',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify(payload)
+		})
+		.then(() => {
+		  // Sync senyap di background setelah 3 detik
+		  setTimeout(() => {
+			if (typeof fetchData === 'function') fetchData();
+		  }, 3000);
+		})
+		.catch(err => {
+		  console.error("Gagal update status di server:", err);
+		  alert("Gagal memperbarui status di server! Tampilan akan dikembalikan.");
+
+		  // Rollback tampilan lokal jika server error
+		  if (targetItem && oldStatus) {
+			targetItem.status = oldStatus;
+			if (typeof renderMntTable === 'function') {
+			  renderMntTable();
+			} else if (typeof renderMaintenanceTable === 'function') {
+			  renderMaintenanceTable();
+			}
+		  }
+		});
+
+	  } catch (err) {
+		console.error("Error toggleMntStatus:", err);
+	  }
+	}
+
+    async function deleteMntReport(sheetRowId, namaAlat) {
+	  const alatName = namaAlat || 'Laporan maintenance ini';
+	  
+	  // Konfirmasi sebelum hapus
+	  if (!confirm(`Apakah Anda yakin ingin menghapus data maintenance untuk ${alatName}?`)) {
+		return;
+	  }
+
+	  try {
+		let backupIndex = -1;
+		let deletedItem = null;
+
+		// 1. Dapatkan referensi array data maintenance lokal yang sedang aktif
+		let mntDataList = null;
+		if (typeof globalMntData !== 'undefined' && Array.isArray(globalMntData)) {
+		  mntDataList = globalMntData;
+		} else if (typeof globalMaintenanceData !== 'undefined' && Array.isArray(globalMaintenanceData)) {
+		  mntDataList = globalMaintenanceData;
+		}
+
+		// 2. [INSTAN 0 DETIK] Hapus dari memori lokal & render ulang tabel seketika
+		if (mntDataList) {
+		  // Pencarian presisi dengan mengonversi kedua ID ke String
+		  backupIndex = mntDataList.findIndex(item => String(item.sheetRow) === String(sheetRowId));
+		  
+		  if (backupIndex !== -1) {
+			deletedItem = mntDataList[backupIndex];
+			
+			// Hapus item dari array lokal
+			
+			mntDataList.splice(backupIndex, 1);
+			// Re-render tabel maintenance langsung di layar
+			if (typeof renderMntTable === 'function') {
+			  renderMntTable();
+			} else if (typeof renderMaintenanceTable === 'function') {
+			  renderMaintenanceTable();
+			}
+		  } else {
+			console.warn("Row ID tidak ditemukan di array lokal:", sheetRowId);
+		  }
+		}
+
+		const pelakuName = (typeof currentSession !== 'undefined' && currentSession && currentSession.name) 
+		  ? currentSession.name 
+		  : 'USER';
+
+		const payload = {
+		  action: 'delete_mnt_report',
+		  sheetRow: sheetRowId,
+		  pelaku: pelakuName
+		};
+
+		// 3. [BACKGROUND PROCESS] Kirim request hapus ke server tanpa await/blocking
+		fetch(SCRIPT_URL, {
+		  method: 'POST',
+		  mode: 'no-cors',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify(payload)
+		})
+		.then(() => {
+		  // Sync senyap di background setelah beberapa detik
+		  setTimeout(() => {
+			if (typeof fetchData === 'function') fetchData();
+		  }, 3000);
+		})
+		.catch(err => {
+		  console.error("Gagal hapus maintenance di server:", err);
+		  alert("Gagal menghapus data dari server! Tampilan akan dikembalikan.");
+		  
+		  // Rollback jika server error
+		  if (deletedItem && backupIndex !== -1 && mntDataList) {
+			mntDataList.splice(backupIndex, 0, deletedItem);
+			if (typeof renderMntTable === 'function') {
+			  renderMntTable();
+			} else if (typeof renderMaintenanceTable === 'function') {
+			  renderMaintenanceTable();
+			}
+		  }
+		});
+
+	  } catch (err) {
+		console.error("Error deleteMntReport:", err);
+	  }
+	}
 
     function renderMaintenanceTable() {
-      const tbody = document.getElementById('mnt-table-body');
-      tbody.innerHTML = '';
+	  const tbody = document.getElementById('mnt-table-body');
+	  if (!tbody) return;
+	  tbody.innerHTML = '';
 
-      if (globalMaintenanceData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-blue-500 font-bold uppercase">BELUM ADA LAPORAN MAINTENANCE</td></tr>';
-        updateMntCounters();
-        return;
-      }
+	  if (!globalMaintenanceData || globalMaintenanceData.length === 0) {
+		tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-blue-500 font-bold uppercase">BELUM ADA LAPORAN MAINTENANCE</td></tr>';
+		if (typeof updateMntCounters === 'function') updateMntCounters();
+		return;
+	  }
 
-      const isAdmin = (currentSession.role === 'admin');
-      const isCrew = (currentSession.role === 'crew');
+	  const isAdmin = (typeof currentSession !== 'undefined' && currentSession.role === 'admin');
+	  const isCrew = (typeof currentSession !== 'undefined' && currentSession.role === 'crew');
 
-      let displayedData = globalMaintenanceData;
-      if (isCrew) {
-        displayedData = globalMaintenanceData.filter(item => 
-          item.teknisi && item.teknisi.toUpperCase().includes(currentSession.name.toUpperCase())
-        );
-      }
+	  let displayedData = globalMaintenanceData;
+	  if (isCrew && currentSession.name) {
+		displayedData = globalMaintenanceData.filter(item => 
+		  item.teknisi && item.teknisi.toUpperCase().includes(currentSession.name.toUpperCase())
+		);
+	  }
 
-      if (displayedData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-gray-500 font-bold uppercase">TIDAK ADA LAPORAN MAINTENANCE UNTUK AKUN ANDA</td></tr>';
-        updateMntCounters();
-        return;
-      }
+	  if (displayedData.length === 0) {
+		tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-gray-500 font-bold uppercase">TIDAK ADA LAPORAN MAINTENANCE UNTUK AKUN ANDA</td></tr>';
+		if (typeof updateMntCounters === 'function') updateMntCounters();
+		return;
+	  }
 
-      displayedData.forEach(item => {
-        let badgeClass = "bg-blue-500/20 border border-blue-400 text-blue-300";
-        if (item.status === 'MONITORING') badgeClass = "bg-cyan-500/20 border border-cyan-400 text-cyan-300";
-        if (item.status === 'SEDANG DIPERBAIKI') badgeClass = "bg-yellow-500/20 border border-yellow-400 text-yellow-300";
-        if (item.status === 'SELESAI') badgeClass = "bg-green-500/20 border border-green-400 text-green-300";
+	  // Fungsi pembantu escape string untuk keamanan onclick HTML
+	  const safeStr = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
-        let actionBtn = '';
-        if (item.status === 'ANTREAN' || item.status === 'MONITORING') {
-          actionBtn = `<button onclick="toggleMntStatus(${item.sheetRow}, '${item.status}')" class="px-2.5 py-1 bg-blue-950 border border-blue-400 text-blue-300 text-[10px] rounded-sm font-bold uppercase">PROSES</button>`;
-        } else if (item.status === 'SEDANG DIPERBAIKI') {
-          actionBtn = `<button onclick="toggleMntStatus(${item.sheetRow}, '${item.status}')" class="px-2.5 py-1 bg-yellow-950 border border-yellow-400 text-yellow-300 text-[10px] rounded-sm font-bold uppercase">SELESAIKAN</button>`;
-        } else {
-          actionBtn = `<span class="text-green-400 font-bold text-[10px] uppercase">>> RESOLVED</span>`;
-        }
+	  displayedData.forEach(item => {
+		let badgeClass = "bg-blue-500/20 border border-blue-400 text-blue-300";
+		if (item.status === 'MONITORING') badgeClass = "bg-cyan-500/20 border border-cyan-400 text-cyan-300";
+		if (item.status === 'SEDANG DIPERBAIKI') badgeClass = "bg-yellow-500/20 border border-yellow-400 text-yellow-300";
+		if (item.status === 'SELESAI') badgeClass = "bg-green-500/20 border border-green-400 text-green-300";
 
-        let controlBtns = '';
-        if (isAdmin || isCrew) {
-          controlBtns = `
-            <button onclick="openEditMntModal(${item.sheetRow}, '${escapeHtml(item.namaAlat)}', '${escapeHtml(item.lokasi)}', '${escapeHtml(item.kendala)}', '${escapeHtml(item.teknisi)}')" class="px-2 py-1 bg-cyan-950 border border-cyan-400 text-cyan-300 text-[10px] rounded-sm font-bold uppercase" title="Edit"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteMaintenanceReport(${item.sheetRow}, '${escapeHtml(item.namaAlat)}')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 text-[10px] rounded-sm font-bold uppercase" title="Hapus"><i class="fa-solid fa-trash"></i></button>
-            ${actionBtn}
-          `;
-        }
+		// Pastikan sheetRow selalu terbungkus tanda petik agar ID string/TEMP aman
+		const rowIdStr = String(item.sheetRow);
 
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-blue-950/20';
-        tr.innerHTML = `
-          <td class="p-3 text-cyan-500">${formatCleanTimestamp(item.timestamp)}</td>
-          <td class="p-3 font-bold text-white uppercase">${item.namaAlat}</td>
-          <td class="p-3 text-cyan-300 uppercase">${item.lokasi}</td>
-          <td class="p-3 text-yellow-300 uppercase">${item.kendala}</td>
-          <td class="p-3 text-pink-400 uppercase">${item.teknisi || '-'}</td>
-          <td class="p-3"><span class="px-2 py-0.5 text-[9px] font-bold rounded-sm ${badgeClass}">${item.status}</span></td>
-          <td class="p-3 text-center flex items-center justify-center gap-1.5 flex-wrap">${controlBtns}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-      updateMntCounters();
-    }
+		let actionBtn = '';
+		if (item.status === 'ANTREAN' || item.status === 'MONITORING') {
+		  actionBtn = `<button onclick="toggleMntStatus('${rowIdStr}', '${safeStr(item.status)}')" class="px-2.5 py-1 bg-blue-950 border border-blue-400 text-blue-300 text-[10px] rounded-sm font-bold uppercase">PROSES</button>`;
+		} else if (item.status === 'SEDANG DIPERBAIKI') {
+		  actionBtn = `<button onclick="toggleMntStatus('${rowIdStr}', '${safeStr(item.status)}')" class="px-2.5 py-1 bg-yellow-950 border border-yellow-400 text-yellow-300 text-[10px] rounded-sm font-bold uppercase">SELESAIKAN</button>`;
+		} else {
+		  actionBtn = `<span class="text-green-400 font-bold text-[10px] uppercase">>> RESOLVED</span>`;
+		}
+
+		let controlBtns = '';
+		if (isAdmin || isCrew) {
+		  controlBtns = `
+			<button onclick="openEditMntModal('${rowIdStr}', '${safeStr(item.namaAlat)}', '${safeStr(item.lokasi)}', '${safeStr(item.kendala)}', '${safeStr(item.teknisi)}')" class="px-2 py-1 bg-cyan-950 border border-cyan-400 text-cyan-300 text-[10px] rounded-sm font-bold uppercase" title="Edit"><i class="fa-solid fa-pen"></i></button>
+			<button onclick="deleteMntReport('${rowIdStr}', '${safeStr(item.namaAlat)}')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 text-[10px] rounded-sm font-bold uppercase" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+			${actionBtn}
+		  `;
+		}
+
+		const tr = document.createElement('tr');
+		tr.className = 'hover:bg-blue-950/20';
+		tr.innerHTML = `
+		  <td class="p-3 text-cyan-500">${typeof formatCleanTimestamp === 'function' ? formatCleanTimestamp(item.timestamp) : (item.timestamp || '-')}</td>
+		  <td class="p-3 font-bold text-white uppercase">${item.namaAlat || '-'}</td>
+		  <td class="p-3 text-cyan-300 uppercase">${item.lokasi || '-'}</td>
+		  <td class="p-3 text-yellow-300 uppercase">${item.kendala || '-'}</td>
+		  <td class="p-3 text-pink-400 uppercase">${item.teknisi || '-'}</td>
+		  <td class="p-3"><span class="px-2 py-0.5 text-[9px] font-bold rounded-sm ${badgeClass}">${item.status || 'ANTREAN'}</span></td>
+		  <td class="p-3 text-center flex items-center justify-center gap-1.5 flex-wrap">${controlBtns}</td>
+		`;
+		tbody.appendChild(tr);
+	  });
+
+	  if (typeof updateMntCounters === 'function') updateMntCounters();
+	}
 
     function updateMntCounters() {
       let queue = 0, repair = 0, done = 0;
@@ -1387,63 +1583,117 @@
       finally { if(icon) icon.classList.remove('fa-spin'); }
     }
 
-    function renderTable() {
-      const headerRow = document.getElementById('table-headers');
-      const body = document.getElementById('table-body');
-      headerRow.querySelectorAll('.date-header').forEach(el => el.remove());
-        const d = new Date(), curYear = d.getFullYear();
-      // Ambil indeks bulan aktif dari variabel aplikasi Anda (jika ada, jika tidak pakai bulan saat ini)
-      const curMon = typeof currentMonthIndex !== 'undefined' ? currentMonthIndex : d.getMonth();
-      const namaHari = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
+    // Daftar nama crew yang DISAMBUNYIKAN dari tampilan crew biasa (Hanya Admin/Root yang bisa lihat)
+	const HIDDEN_CREWS = ["SHINDI MEGA PURNAMA"]; // Silakan ganti dengan nama crew yang ingin di-hide
 
-      globalHeaders.forEach(dateStr => {
-        const th = document.createElement('th');
-        th.className = 'p-2 md:p-3 border-b-2 border-pink-600 font-bold text-center min-w-[100px] md:min-w-[150px] bg-gray-950 sticky top-0 z-40 date-header text-cyan-400 whitespace-nowrap';
-        let content = dateStr;
-        if (!isNaN(dateStr) && String(dateStr).trim()) {
-          const dayNum = parseInt(dateStr);
-          if (dayNum >= 1 && dayNum <= 31) {
-            content = `<span class="block text-[8px] md:text-[10px] text-pink-500 mb-1">${namaHari[new Date(curYear, curMon, dayNum).getDay()]}</span><span class="text-sm md:text-base">${dayNum}</span>`;
-          }
-        }
-        th.innerHTML = content;
-        headerRow.appendChild(th);
-      });
+	function renderTable() {
+	  const headerRow = document.getElementById('table-headers');
+	  const body = document.getElementById('table-body');
+	  headerRow.querySelectorAll('.date-header').forEach(el => el.remove());
+	  
+	  const d = new Date(), curYear = d.getFullYear();
+	  const curMon = typeof currentMonthIndex !== 'undefined' ? currentMonthIndex : d.getMonth();
+	  const namaHari = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
 
-      body.innerHTML = '';
-      const validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
+	  // Render Header Tanggal
+	  globalHeaders.forEach(dateStr => {
+		const th = document.createElement('th');
+		th.className = 'p-2 md:p-3 border-b-2 border-pink-600 font-bold text-center min-w-[100px] md:min-w-[150px] bg-gray-950 sticky top-0 z-40 date-header text-cyan-400 whitespace-nowrap';
+		let content = dateStr;
+		if (!isNaN(dateStr) && String(dateStr).trim()) {
+		  const dayNum = parseInt(dateStr);
+		  if (dayNum >= 1 && dayNum <= 31) {
+			content = `<span class="block text-[8px] md:text-[10px] text-pink-500 mb-1">${namaHari[new Date(curYear, curMon, dayNum).getDay()]}</span><span class="text-sm md:text-base">${dayNum}</span>`;
+		  }
+		}
+		th.innerHTML = content;
+		headerRow.appendChild(th);
+	  });
 
-      if (validCrews.length === 0) {
-        body.innerHTML = `<tr><td colspan="${globalHeaders.length + 2}" class="text-center py-12 text-red-500 font-bold uppercase text-xs">DATA_NOT_FOUND PADA TAB ${selectedBulanTab}</td></tr>`;
-        return;
-      }
+	  body.innerHTML = '';
 
-      const isAdmin = (currentSession.role === 'admin');
-      validCrews.forEach((crew) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-cyan-900/20 crew-row group';
-        let waNum = (crew.hp || '').replace(/\D/g, '');
-        if (waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
+	  // 1. Cek Role Akses
+	  const isAdmin = (typeof currentSession !== 'undefined' && (currentSession.role === 'admin' || currentSession.role === 'root'));
 
-        let tdNama = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 font-bold text-cyan-300 sticky left-0 bg-gray-900 z-30 group-hover:bg-gray-800 uppercase text-[10px] md:text-xs min-w-[110px] max-w-[110px] md:min-w-[180px] md:max-w-[180px] truncate">${crew.nama}</td>`;
-        let tdHp = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 sticky left-[110px] md:left-[180px] bg-gray-900 z-30 group-hover:bg-gray-800 text-[10px] md:text-xs min-w-[100px] max-w-[100px] md:min-w-[140px] md:max-w-[140px] truncate"><a href="https://wa.me/${waNum}?text=Halo%20${encodeURIComponent(crew.nama)},%20pembaruan%20jadwal%20ITB%203TV." target="_blank" class="text-pink-400 hover:text-green-400 flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-400"></i> ${crew.hp}</a></td>`;
+	  // 2. Filter Crew Valid
+	  let validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
 
-        let tdShifts = globalHeaders.map((dateStr, cIdx) => {
-          const val = crew.schedule[dateStr] || '';
-          const colNum = cIdx + 4;
-          const color = getColorClass(val);
-          if (isAdmin) {
-            return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" id="input-${crew.rowIndex}-${dateStr}" oninput="this.value=this.value.toUpperCase();updateInputColor(this);" onchange="handleInputChange(${crew.rowIndex},'${dateStr}',${crew.rowIndex},${colNum},this.value)" class="w-full bg-gray-950 border border-cyan-900 rounded-sm text-center py-1.5 px-2 text-[10px] md:text-xs font-bold uppercase ${color}" placeholder="-"></td>`;
-          } else {
-            return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" readonly class="w-full bg-gray-950/60 border border-cyan-900/40 rounded-sm text-center py-1.5 px-2 text-[10px] md:text-xs font-bold uppercase cursor-default ${color}" placeholder="-"></td>`;
-          }
-        }).join('');
+	  // 3. LOGIKA HIDE: Jika BUKAN ADMIN, filter/hilangkan nama crew yang ada di daftar HIDDEN_CREWS
+	  if (!isAdmin) {
+		validCrews = validCrews.filter(crew => {
+		  const nameUpper = (crew.nama || '').trim().toUpperCase();
+		  return !HIDDEN_CREWS.some(hidden => hidden.toUpperCase() === nameUpper);
+		});
+	  }
 
-        tr.innerHTML = tdNama + tdHp + tdShifts;
-        body.appendChild(tr);
-      });
-      setTimeout(() => scrollToTodayColumn(), 300);
-    }
+	  if (validCrews.length === 0) {
+		body.innerHTML = `<tr><td colspan="${globalHeaders.length + 2}" class="text-center py-12 text-red-500 font-bold uppercase text-xs">DATA_NOT_FOUND PADA TAB ${selectedBulanTab}</td></tr>`;
+		return;
+	  }
+
+	  // 4. Render Baris Tabel
+	  validCrews.forEach((crew) => {
+		const tr = document.createElement('tr');
+		tr.className = 'hover:bg-cyan-900/20 crew-row group';
+		let waNum = (crew.hp || '').replace(/\D/g, '');
+		if (waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
+
+		// Hitung Rekapitulasi Beban Kerja Bulanan
+		let mntCount = 0;
+		let offCount = 0;
+		let progCount = 0;
+		let adminBamsCount = 0;
+		let monitoringCount = 0;
+
+		if (crew.schedule) {
+		  Object.values(crew.schedule).forEach(val => {
+			const v = String(val).trim().toUpperCase();
+			if (v === 'MNT') mntCount++;
+			else if (v === 'OFF') offCount++;
+			else if (v.includes('ADMIN BAMS')) adminBamsCount++;
+			else if (v.includes('MONITORING')) monitoringCount++;
+			else if (v && v !== '-') progCount++;
+		  });
+		}
+
+		// Badge Khusus Admin
+		let badgeHtml = '';
+		if (isAdmin) {
+		  badgeHtml = `
+			<div class="flex items-center gap-1 mt-1.5 flex-wrap">
+			  <span class="text-[8px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1 py-0.5 rounded-sm font-mono" title="Total Program">P:${progCount}</span>
+			  <span class="text-[8px] bg-amber-950 text-amber-300 border border-amber-800 px-1 py-0.5 rounded-sm font-mono" title="Maintenance">MNT:${mntCount}</span>
+			  <span class="text-[8px] bg-gray-900 text-gray-400 border border-gray-700 px-1 py-0.5 rounded-sm font-mono" title="OFF">OFF:${offCount}</span>
+			  ${adminBamsCount > 0 ? `<span class="text-[8px] bg-pink-950 text-pink-300 border border-pink-800 px-1 py-0.5 rounded-sm font-mono" title="Admin BAMS">BAMS:${adminBamsCount}</span>` : ''}
+			  ${monitoringCount > 0 ? `<span class="text-[8px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 py-0.5 rounded-sm font-mono" title="Monitoring">MON:${monitoringCount}</span>` : ''}
+			</div>
+		  `;
+		}
+
+		let tdNama = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 font-bold text-cyan-300 sticky left-0 bg-gray-900 z-30 group-hover:bg-gray-800 uppercase text-[10px] md:text-xs min-w-[110px] max-w-[110px] md:min-w-[180px] md:max-w-[180px]">
+		  <div>${crew.nama}</div>
+		  ${badgeHtml}
+		</td>`;
+		
+		let tdHp = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 sticky left-[110px] md:left-[180px] bg-gray-900 z-30 group-hover:bg-gray-800 text-[10px] md:text-xs min-w-[100px] max-w-[100px] md:min-w-[140px] md:max-w-[140px] truncate"><a href="https://wa.me/${waNum}?text=Halo%20${encodeURIComponent(crew.nama)},%20pembaruan%20jadwal%20ITB%203TV." target="_blank" class="text-pink-400 hover:text-green-400 flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-400"></i> ${crew.hp}</a></td>`;
+
+		let tdShifts = globalHeaders.map((dateStr, cIdx) => {
+		  const val = (crew.schedule && crew.schedule[dateStr]) ? crew.schedule[dateStr] : '';
+		  const colNum = cIdx + 4;
+		  const color = getColorClass(val);
+		  if (isAdmin) {
+			return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" id="input-${crew.rowIndex}-${dateStr}" oninput="this.value=this.value.toUpperCase();updateInputColor(this);" onchange="handleInputChange(${crew.rowIndex},'${dateStr}',${crew.rowIndex},${colNum},this.value)" class="w-full bg-gray-950 border border-cyan-900 rounded-sm text-center py-1.5 px-2 text-[10px] md:text-xs font-bold uppercase ${color}" placeholder="-"></td>`;
+		  } else {
+			return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" readonly class="w-full bg-gray-950/60 border border-cyan-900/40 rounded-sm text-center py-1.5 px-2 text-[10px] md:text-xs font-bold uppercase cursor-default ${color}" placeholder="-"></td>`;
+		  }
+		}).join('');
+
+		tr.innerHTML = tdNama + tdHp + tdShifts;
+		body.appendChild(tr);
+	  });
+
+	  setTimeout(() => scrollToTodayColumn(), 300);
+	}
 
     function scrollToTodayColumn() {
       const todayDate = new Date().getDate().toString();
@@ -1527,10 +1777,22 @@
         const currentCrewName = (currentSession.name || '').toUpperCase();
         const isMyReport = currentSession.role === 'crew' && (crewsInReport.includes(currentCrewName));
 
+        // Tombol Export PDF Aman
+        const btnPdf = '<button onclick="exportDailyPdf(' + row.sheetRow + ')" class="px-2 py-1 bg-emerald-950 border border-emerald-500 text-emerald-400 rounded-sm text-[10px] hover:bg-emerald-900 transition-colors" title="Export PDF"><i class="fa-solid fa-file-pdf"></i></button>';
+
         if (currentSession.role === 'admin') {
-          act = `<div class="flex items-center justify-center gap-1"><button onclick="deleteDailyReport(${row.sheetRow}, '${escapeHtml(row.namaProgram)}')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 rounded-sm text-[10px]"><i class="fa-solid fa-trash"></i></button></div>`;
+          act = '<div class="flex items-center justify-center gap-1">' +
+                '<button onclick="deleteDailyReport(' + row.sheetRow + ', \'' + escapeHtml(row.namaProgram || '') + '\')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 rounded-sm text-[10px]" title="Hapus"><i class="fa-solid fa-trash"></i></button>' +
+                btnPdf +
+                '</div>';
         } else if (currentSession.role === 'crew' && isMyReport) {
-          act = `<div class="flex items-center justify-center gap-1"><button onclick="openEditDailyModal(${row.sheetRow}, '${escapeHtml(row.namaProgram)}', '${escapeHtml(row.lokasi)}', '${row.jamOn}', '${row.jamOff}', '${escapeHtml(row.alat)}', '${escapeHtml(row.qty)}', '${escapeHtml(row.crewBertugas)}', '${escapeHtml(row.catatan)}', '${row.timestamp ? row.timestamp.split(' ')[0] : ''}')" class="px-2 py-1 bg-cyan-950 border border-cyan-400 text-cyan-300 rounded-sm text-[10px]" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteDailyReport(${row.sheetRow}, '${escapeHtml(row.namaProgram)}')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 rounded-sm text-[10px]" title="Hapus"><i class="fa-solid fa-trash"></i></button></div>`;
+          act = '<div class="flex items-center justify-center gap-1">' +
+                '<button onclick="openEditDailyModal(' + row.sheetRow + ', \'' + escapeHtml(row.namaProgram || '') + '\', \'' + escapeHtml(row.lokasi || '') + '\', \'' + (row.jamOn || '') + '\', \'' + (row.jamOff || '') + '\', \'' + escapeHtml(row.alat || '') + '\', \'' + escapeHtml(row.qty || '') + '\', \'' + escapeHtml(row.crewBertugas || '') + '\', \'' + escapeHtml(row.catatan || '') + '\', \'' + (row.timestamp ? row.timestamp.split(' ')[0] : '') + '\')" class="px-2 py-1 bg-cyan-950 border border-cyan-400 text-cyan-300 rounded-sm text-[10px]" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>' +
+                '<button onclick="deleteDailyReport(' + row.sheetRow + ', \'' + escapeHtml(row.namaProgram || '') + '\')" class="px-2 py-1 bg-red-950 border border-red-500 text-red-400 rounded-sm text-[10px]" title="Hapus"><i class="fa-solid fa-trash"></i></button>' +
+                btnPdf +
+                '</div>';
+        } else {
+          act = '<div class="flex items-center justify-center gap-1">' + btnPdf + '</div>';
         }
 
         let alatF = '-';
@@ -1601,91 +1863,221 @@
     }
 
     async function submitDailyReport() {
-      closeDailyModal();
-      try {
-        const tgl = document.getElementById('daily-tanggal').value;
-        const prog = document.getElementById('daily-program').value.trim() || "PROGRAM UTAMA";
-        const lok = document.getElementById('daily-lokasi').value.trim() || "STUDIO 1";
-        const jOn = document.getElementById('daily-jamon').value || "08:00";
-        const jOff = document.getElementById('daily-jamoff').value || "17:00";
-        const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
+	  // 1. [INSTAN] Tutup modal di awal
+	  closeDailyModal();
 
-        let aL = [], qL = [];
-        document.querySelectorAll('.alat-row').forEach(r => {
-          const n = r.querySelector('.alat-nama').value.trim().toUpperCase();
-          const q = r.querySelector('.alat-qty').value.trim().toUpperCase();
-          if (n) { aL.push(n); qL.push(q || "1"); }
-        });
-        if (aL.length === 0) { aL.push("KAMERA UTAMA"); qL.push("1"); }
+	  try {
+		const tgl = document.getElementById('daily-tanggal').value;
+		const prog = (document.getElementById('daily-program').value.trim() || "PROGRAM UTAMA").toUpperCase();
+		const lok = (document.getElementById('daily-lokasi').value.trim() || "STUDIO 1").toUpperCase();
+		const jOn = document.getElementById('daily-jamon').value || "08:00";
+		const jOff = document.getElementById('daily-jamoff').value || "17:00";
+		const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
 
-        let selectedCrews = [];
-        document.querySelectorAll('.crew-checkbox:checked').forEach(cb => {
-          selectedCrews.push(cb.value.toUpperCase());
-        });
-        if (selectedCrews.length === 0) {
-          selectedCrews.push(currentSession.role === 'crew' ? currentSession.name.toUpperCase() : "SURYA ARDIANSYAH");
-        }
+		let aL = [], qL = [];
+		document.querySelectorAll('.alat-row').forEach(r => {
+		  const n = r.querySelector('.alat-nama').value.trim().toUpperCase();
+		  const q = r.querySelector('.alat-qty').value.trim().toUpperCase();
+		  if (n) { aL.push(n); qL.push(q || "1"); }
+		});
+		if (aL.length === 0) { aL.push("KAMERA UTAMA"); qL.push("1"); }
 
-        const alatStr = aL.join(' + ');
-        const qtyStr = qL.join(' + ');
-        const catatanStr = document.getElementById('daily-catatan').value.trim().toUpperCase() || "AMAN";
+		let selectedCrews = [];
+		document.querySelectorAll('.crew-checkbox:checked').forEach(cb => {
+		  selectedCrews.push(cb.value.toUpperCase());
+		});
+		if (selectedCrews.length === 0) {
+		  selectedCrews.push(currentSession.role === 'crew' ? currentSession.name.toUpperCase() : "SURYA ARDIANSYAH");
+		}
 
-        if (editingSheetRow) {
-          const payload = {
-            action: 'edit_daily_report',
-            sheetRow: editingSheetRow, customDate: tgl,
-            namaProgram: prog.toUpperCase(), lokasi: lok.toUpperCase(),
-            jamOn: jOn, jamOff: jOff, alat: alatStr, qty: qtyStr,
-            crewBertugas: selectedCrews[0], catatan: catatanStr,
-            pelaku: pelakuName
-          };
-          await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        } else {
-          for (let i = 0; i < selectedCrews.length; i++) {
-            const crewName = selectedCrews[i];
-            const payload = {
-              action: 'add_daily_report',
-              customDate: tgl,
-              namaProgram: prog.toUpperCase(), 
-              lokasi: lok.toUpperCase(),
-              jamOn: jOn, 
-              jamOff: jOff, 
-              alat: alatStr, 
-              qty: qtyStr,
-              crewBertugas: crewName,
-              catatan: catatanStr,
-              pelaku: pelakuName
-            };
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            await new Promise(resolve => setTimeout(resolve, 400));
-          }
-        }
+		const alatStr = aL.join(' + ');
+		const qtyStr = qL.join(' + ');
+		const catatanStr = document.getElementById('daily-catatan').value.trim().toUpperCase() || "AMAN";
+		const displayTimestamp = tgl ? tgl : new Date().toISOString().split('T')[0];
 
-        setTimeout(() => fetchData(), 1800);
-        document.getElementById('daily-form').reset();
-        resetAlatRows();
-        editingSheetRow = null;
-      } catch (err) { console.error(err); }
-    }
+		// =========================================================================
+		// 2. [OPTIMISTIC UI UPDATE] PERBARUI MEMORI LOKAL & RENDER TABEL SEKETIKA
+		// =========================================================================
+		if (typeof globalDailyData !== 'undefined') {
+		  if (editingSheetRow) {
+			// Jika Moda Edit: Perbarui baris lokal secara langsung
+			const target = globalDailyData.find(item => item.sheetRow == editingSheetRow);
+			if (target) {
+			  target.timestamp = displayTimestamp;
+			  target.namaProgram = prog;
+			  target.lokasi = lok;
+			  target.jamOn = jOn;
+			  target.jamOff = jOff;
+			  target.alat = alatStr;
+			  target.qty = qtyStr;
+			  target.crewBertugas = selectedCrews.join(' + ');
+			  target.catatan = catatanStr;
+			}
+		  } else {
+			// Jika Input Baru: Sisipkan objek baru langsung ke urutan teratas array lokal
+			selectedCrews.forEach((crewName, index) => {
+			  const tempObject = {
+				sheetRow: 'TEMP_' + Date.now() + '_' + index,
+				timestamp: displayTimestamp,
+				namaProgram: prog,
+				lokasi: lok,
+				jamOn: jOn,
+				jamOff: jOff,
+				alat: alatStr,
+				qty: qtyStr,
+				crewBertugas: crewName,
+				catatan: catatanStr
+			  };
+			  globalDailyData.unshift(tempObject);
+			});
+		  }
 
-    async function deleteDailyReport(sheetRow, namaProg) {
-      if (!confirm(`Hapus laporan program "${namaProg || 'ini'}"?`)) return;
-      try {
-        const pelakuName = currentSession.name || (currentSession.role === 'admin' ? 'MASTER_ADMIN' : 'CREW');
-        await fetch(SCRIPT_URL, { 
-          method: 'POST', mode: 'no-cors', 
-          headers: { 'Content-Type': 'application/json' }, 
-          body: JSON.stringify({ 
-            action: 'delete_daily_report', 
-            sheetRow: sheetRow, 
-            pelaku: pelakuName, 
-            namaProgram: namaProg,
-            keterangan: `Menghapus Daily Report program: ${namaProg || 'ID #' + sheetRow}` 
-          }) 
-        });
-        setTimeout(() => fetchData(), 1500);
-      } catch (err) { console.error(err); }
-    }
+		  // Re-render tabel langsung di layar saat ini juga (0 detik)
+		  if (typeof renderDailyTable === 'function') {
+			renderDailyTable();
+		  }
+		}
+
+		// Reset Form & Variabel Edit
+		document.getElementById('daily-form').reset();
+		if (typeof resetAlatRows === 'function') resetAlatRows();
+		const currentEditRow = editingSheetRow;
+		editingSheetRow = null;
+
+		// =========================================================================
+		// 3. [BACKGROUND PROCESS] KIRIM DATA KE GOOGLE APPS SCRIPT TANPA AWAIT/DELAY
+		// =========================================================================
+		if (currentEditRow) {
+		  const payload = {
+			action: 'edit_daily_report',
+			sheetRow: currentEditRow, 
+			customDate: tgl,
+			namaProgram: prog, 
+			lokasi: lok,
+			jamOn: jOn, 
+			jamOff: jOff, 
+			alat: alatStr, 
+			qty: qtyStr,
+			crewBertugas: selectedCrews.join(' + '), 
+			catatan: catatanStr,
+			pelaku: pelakuName
+		  };
+
+		  // Kirim tanpa menahan fungsi (Non-blocking)
+		  fetch(SCRIPT_URL, {
+			method: 'POST',
+			mode: 'no-cors',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload)
+		  }).catch(err => console.error("Sync edit error:", err));
+
+		} else {
+		  // Kirim semua request secara paralel di background (tanpa perulangan await 400ms)
+		  const requests = selectedCrews.map(crewName => {
+			const payload = {
+			  action: 'add_daily_report',
+			  customDate: tgl,
+			  namaProgram: prog,
+			  lokasi: lok,
+			  jamOn: jOn,
+			  jamOff: jOff,
+			  alat: alatStr,
+			  qty: qtyStr,
+			  crewBertugas: crewName,
+			  catatan: catatanStr,
+			  pelaku: pelakuName
+			};
+
+			return fetch(SCRIPT_URL, {
+			  method: 'POST',
+			  mode: 'no-cors',
+			  headers: { 'Content-Type': 'application/json' },
+			  body: JSON.stringify(payload)
+			});
+		  });
+
+		  // Jalankan semua request di background
+		  Promise.all(requests)
+			.then(() => {
+			  // Sync senyap di background setelah beberapa detik jika diperlukan
+			  setTimeout(() => {
+				if (typeof fetchData === 'function') fetchData();
+			  }, 3000);
+			})
+			.catch(err => console.error("Sync add error:", err));
+		}
+
+	  } catch (err) { 
+		console.error("Optimistic submit error:", err); 
+	  }
+	}
+
+    async function deleteDailyReport(sheetRowId, namaProgram) {
+	  const progName = namaProgram || 'Laporan ini';
+	  
+	  // Konfirmasi sebelum hapus
+	  if (!confirm(`Apakah Anda yakin ingin menghapus ${progName}?`)) {
+		return;
+	  }
+
+	  try {
+		// 1. Simpan backup data sementara untuk rollback jika server gagal
+		let backupIndex = -1;
+		let deletedItem = null;
+
+		if (typeof globalDailyData !== 'undefined' && globalDailyData) {
+		  backupIndex = globalDailyData.findIndex(item => item.sheetRow == sheetRowId);
+		  if (backupIndex !== -1) {
+			deletedItem = globalDailyData[backupIndex];
+			
+			// 2. [INSTAN 0 DETIK] Hapus dari memori lokal & render ulang tabel seketika
+			globalDailyData.splice(backupIndex, 1);
+			if (typeof renderDailyTable === 'function') {
+			  renderDailyTable();
+			}
+		  }
+		}
+
+		const pelakuName = (typeof currentSession !== 'undefined' && currentSession.name) 
+		  ? currentSession.name 
+		  : 'USER';
+
+		const payload = {
+		  action: 'delete_daily_report',
+		  sheetRow: sheetRowId,
+		  pelaku: pelakuName
+		};
+
+		// 3. [BACKGROUND PROCESS] Kirim request hapus ke server tanpa await/blocking
+		fetch(SCRIPT_URL, {
+		  method: 'POST',
+		  mode: 'no-cors',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify(payload)
+		})
+		.then(() => {
+		  // Sync senyap di background setelah beberapa detik jika diperlukan
+		  setTimeout(() => {
+			if (typeof fetchData === 'function') fetchData();
+		  }, 3000);
+		})
+		.catch(err => {
+		  console.error("Gagal hapus di server:", err);
+		  alert("Gagal menghapus data dari server! Tampilan akan dikembalikan.");
+		  
+		  // Rollback jika koneksi server gagal
+		  if (deletedItem && backupIndex !== -1) {
+			globalDailyData.splice(backupIndex, 0, deletedItem);
+			if (typeof renderDailyTable === 'function') {
+			  renderDailyTable();
+			}
+		  }
+		});
+
+	  } catch (err) {
+		console.error("Error deleteDailyReport:", err);
+	  }
+	}
 
     async function updateCell(rowIndex, colIndex, value, sheetName, dateStr) {
       try {
@@ -1808,6 +2200,109 @@
 
     setBulanDanJamAktif();
     fetchData();
-  </script>
+	
+	// Fungsi Export PDF Per Baris Crew (Langsung Download Tanpa Dialog Print)
+	function exportDailyPdf(sheetRowId) {
+	  try {
+		if (typeof globalDailyData === 'undefined' || !globalDailyData) {
+		  alert("Data laporan harian belum dimuat sempurna.");
+		  return;
+		}
+
+		const reportData = globalDailyData.find(function(item) {
+		  return item.sheetRow == sheetRowId;
+		});
+		
+		if (!reportData) {
+		  alert("Data laporan tidak ditemukan.");
+		  return;
+		}
+
+		const crewName = reportData.crewBertugas || 'Crew IT Broadcast';
+		
+		// Formatter Tanggal Lengkap
+		let tgl = '-';
+		const rawTgl = reportData.tanggal || reportData.timestamp || '';
+		if (rawTgl) {
+		  const cleanTglStr = rawTgl.split(' ')[0];
+		  const parsedDate = new Date(cleanTglStr);
+		  if (!isNaN(parsedDate) && cleanTglStr.includes('-')) {
+			tgl = parsedDate.toLocaleDateString('id-ID', {
+			  weekday: 'long',
+			  day: 'numeric',
+			  month: 'long',
+			  year: 'numeric'
+			});
+		  } else {
+			tgl = rawTgl; // Menampilkan teks tanggal asli jika sudah dalam bentuk string tanggal
+		  }
+		}
+
+		const program = reportData.namaProgram || '-';
+		const lokasi = reportData.lokasi || '-';
+		
+		let jamOn = reportData.jamOn || '-';
+		let jamOff = reportData.jamOff || '-';
+		if (typeof formatTimeString === 'function') {
+		  jamOn = formatTimeString(jamOn);
+		  jamOff = formatTimeString(jamOff);
+		}
+		const jam = jamOn + ' s/d ' + jamOff;
+		const catatan = reportData.catatan || 'Tidak ada catatan khusus.';
+		
+		let detailAlat = '-';
+		if (reportData.alat) {
+		  const aArr = String(reportData.alat).split('+').map(function(s) { return s.trim(); });
+		  const qArr = String(reportData.qty || '').split('+').map(function(s) { return s.trim(); });
+		  detailAlat = aArr.map(function(it, i) {
+			return it + ' (' + (qArr[i] || '1') + ')';
+		  }).join(', ');
+		}
+
+		// Buat element cetak sementara
+		const element = document.createElement('div');
+		element.style.padding = '20px';
+		element.style.fontFamily = 'Arial, sans-serif';
+		element.style.color = '#111';
+		element.style.background = '#fff';
+		
+		element.innerHTML = 
+		  '<div style="border-bottom: 2px solid #0891b2; padding-bottom: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">' +
+			'<h2 style="margin: 0; color: #0891b2; font-size: 16px; text-transform: uppercase;">IT BROADCAST 3TV - DAILY REPORT</h2>' +
+			'<span style="font-size: 10px; color: #64748b;">Dicetak: ' + new Date().toLocaleDateString('id-ID') + '</span>' +
+		  '</div>' +
+		  '<table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px;">' +
+			'<tr><td style="padding: 6px 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold; width: 28%; color: #334155;">Tanggal Laporan</td><td style="padding: 6px 8px; border: 1px solid #cbd5e1;">' + tgl + '</td></tr>' +
+			'<tr><td style="padding: 6px 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold; color: #334155;">Nama Program</td><td style="padding: 6px 8px; border: 1px solid #cbd5e1;"><b>' + program + '</b></td></tr>' +
+			'<tr><td style="padding: 6px 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold; color: #334155;">Lokasi / Studio</td><td style="padding: 6px 8px; border: 1px solid #cbd5e1;">' + lokasi + '</td></tr>' +
+			'<tr><td style="padding: 6px 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold; color: #334155;">Jam Operasional</td><td style="padding: 6px 8px; border: 1px solid #cbd5e1;">' + jam + '</td></tr>' +
+			'<tr><td style="padding: 6px 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold; color: #334155;">Peralatan (Qty)</td><td style="padding: 6px 8px; border: 1px solid #cbd5e1;">' + detailAlat + '</td></tr>' +
+			'<tr><td style="padding: 6px 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold; color: #334155;">Crew Bertugas</td><td style="padding: 6px 8px; border: 1px solid #cbd5e1;">' + crewName + '</td></tr>' +
+		  '</table>' +
+		  '<div style="font-weight: bold; font-size: 12px; color: #334155; margin-top: 10px; margin-bottom: 5px;">Catatan / Detail Pekerjaan:</div>' +
+		  '<div style="border: 1px solid #cbd5e1; padding: 10px; border-radius: 4px; background: #fafafa; font-size: 12px; min-height: 60px; line-height: 1.4;">' + catatan + '</div>' +
+		  '<div style="margin-top: 25px; font-size: 9px; text-align: right; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 4px;"><p>Sistem Operasional IT Broadcast 3TV &copy; 2026</p></div>';
+
+		const cleanFileName = 'Daily_Report_' + (program.replace(/[^a-zA-Z0-9]/g, '_')) + '.pdf';
+		const opt = {
+		  margin:       10,
+		  filename:     cleanFileName,
+		  image:        { type: 'jpeg', quality: 0.98 },
+		  html2canvas:  { scale: 2 },
+		  jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+		};
+
+		if (typeof html2pdf !== 'undefined') {
+		  html2pdf().set(opt).from(element).save();
+		} else {
+		  alert("Pustaka html2pdf belum terpasang di bagian <head> file HTML Anda.");
+		}
+
+	  } catch (err) {
+		console.error("Gagal cetak PDF:", err);
+		alert("Terjadi kesalahan saat mengunduh PDF.");
+	  }
+	}
+	</script>
 </body>
 </html>
