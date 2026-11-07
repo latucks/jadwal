@@ -94,6 +94,50 @@
 	  animation-play-state: paused !important;
 	  -webkit-animation-play-state: paused !important;
 	}
+	
+	/* ==========================================
+   PERBAIKAN RESPONSIVITAS MOBILE (HP ANDROID)
+   ========================================== */
+html, body {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Penyesuaian Kolom Tabel Sticky di Layar Smartphone (< 640px) */
+@media (max-width: 639px) {
+  /* Mengecilkan ukuran sel & padding di HP */
+  #table-scroll-container th, 
+  #table-scroll-container td {
+    padding: 6px 4px !important;
+    font-size: 10px !important;
+  }
+  
+  /* Kolom 1: NAMA CREW */
+  #table-headers th:nth-child(1),
+  #table-body td:nth-child(1) {
+    min-width: 100px !important;
+    max-width: 100px !important;
+    left: 0 !important;
+    z-index: 35 !important;
+  }
+  
+  /* Kolom 2: NOMOR HP */
+  #table-headers th:nth-child(2),
+  #table-body td:nth-child(2) {
+    min-width: 90px !important;
+    max-width: 90px !important;
+    left: 100px !important; /* Presisi berada setelah 100px kolom Nama */
+    z-index: 35 !important;
+  }
+
+  /* Input sel tanggal agar ringkas & tidak membuat tabel melebar */
+  #table-body td:nth-child(n+3) input {
+    min-width: 70px !important;
+    padding: 4px 2px !important;
+    font-size: 9px !important;
+  }
+}
   </style>
 </head>
 <body class="bg-gray-950 text-cyan-400 min-h-screen font-mono flex flex-col relative overflow-x-hidden selection:bg-pink-500 selection:text-white">
@@ -381,78 +425,98 @@
   </div>
 
   <!-- VIEW 3: MAINTENANCE -->
-  <div id="view-maintenance" class="flex-1 flex-col hidden">
-    <main class="p-3 md:p-6 flex-1 flex flex-col gap-4 relative z-10 w-full max-w-[100vw]">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-3 bg-gray-900/80 p-3 md:p-4 rounded-sm border-l-4 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
-        <div>
-          <div class="flex items-center gap-2">
-            <h2 class="font-bold text-sm md:text-base text-blue-400 uppercase tracking-widest">>> MAINTENANCE MODULE: INFRASTRUCTURE & EQUIPMENT</h2>
-            <span class="px-2 py-0.5 text-[9px] bg-blue-500/20 border border-blue-400 text-blue-300 rounded-sm font-bold">SECURE ACCESS</span>
-          </div>
-          <p class="text-[10px] text-cyan-600">Pusat kendali pemeliharaan peralatan studio IT Broadcast 3TV.</p>
-        </div>
+<div id="view-maintenance" class="flex-1 flex-col hidden">
+  <main class="p-3 md:p-6 flex-1 flex flex-col gap-4 relative z-10 w-full max-w-[100vw]">
+    
+    <!-- HEADER CONTROL PANEL WITH SEARCH & DATE FILTER -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-gray-900/80 p-3 md:p-4 rounded-sm border-l-4 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+      <div>
         <div class="flex items-center gap-2">
-          <button onclick="exportMaintenancePDF()" class="px-3 py-2 bg-gray-950 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase"><i class="fa-solid fa-file-pdf"></i> EXPORT PDF</button>
-          <button onclick="openMntModal()" class="px-4 py-2 bg-blue-600 border border-blue-400 text-white hover:bg-blue-500 rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(59,130,246,0.5)]"><i class="fa-solid fa-plus-circle"></i> INPUT LAPORAN</button>
+          <h2 class="font-bold text-sm md:text-base text-blue-400 uppercase tracking-widest">>> MAINTENANCE MODULE: INFRASTRUCTURE & EQUIPMENT</h2>
+          <span class="px-2 py-0.5 text-[9px] bg-blue-500/20 border border-blue-400 text-blue-300 rounded-sm font-bold">SECURE ACCESS</span>
+        </div>
+        <p class="text-[10px] text-cyan-600">Pusat kendali pemeliharaan peralatan studio IT Broadcast 3TV.</p>
+      </div>
+
+      <div class="flex flex-wrap lg:flex-nowrap items-center gap-2 w-full lg:w-auto">
+        <!-- FILTER PERIODE TANGGAL -->
+        <div class="flex items-center gap-1.5 bg-gray-950 border border-cyan-700/80 p-1 rounded-sm text-xs w-full sm:w-auto">
+          <span class="text-[9px] text-blue-400 font-mono font-bold px-1 uppercase">PERIODE:</span>
+          <input type="date" id="mnt-date-from" onchange="filterMntTable()" title="Dari Tanggal" class="bg-gray-900 text-cyan-300 text-xs px-1.5 py-1 rounded-sm border border-cyan-900 focus:border-blue-400 focus:outline-none font-mono">
+          <span class="text-blue-400 font-bold">-</span>
+          <input type="date" id="mnt-date-to" onchange="filterMntTable()" title="Sampai Tanggal" class="bg-gray-900 text-cyan-300 text-xs px-1.5 py-1 rounded-sm border border-cyan-900 focus:border-blue-400 focus:outline-none font-mono">
+          <button onclick="resetMntFilter()" type="button" title="Reset Filter Tanggal & Teks" class="px-2 py-1 text-[10px] font-bold text-blue-400 hover:text-white bg-blue-950/60 hover:bg-blue-600 border border-blue-500/50 rounded-sm transition-colors uppercase">
+            <i class="fa-solid fa-rotate-left"></i> RESET
+          </button>
+        </div>
+
+        <!-- INPUT SEARCH MAINTENANCE -->
+        <input type="text" id="mnt-search-input" onkeyup="filterMntTable()" placeholder="CARI ALAT / TEKNISI / KENDALA..." class="bg-gray-950 border border-cyan-700 text-cyan-300 text-xs px-3 py-2 rounded-sm uppercase w-full sm:w-56 focus:border-blue-400 focus:outline-none">
+
+        <!-- TOMBOL AKSI -->
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button onclick="exportMaintenancePDF()" class="px-3 py-2 bg-gray-950 border border-red-500 text-red-400 hover:bg-red-500 hover:text-gray-950 rounded-sm text-xs font-bold uppercase shrink-0"><i class="fa-solid fa-file-pdf"></i> EXPORT PDF</button>
+          <button onclick="openMntModal()" class="px-4 py-2 bg-blue-600 border border-blue-400 text-white hover:bg-blue-500 rounded-sm text-xs font-bold uppercase shadow-[0_0_12px_rgba(59,130,246,0.5)] shrink-0"><i class="fa-solid fa-plus-circle"></i> INPUT LAPORAN</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mnt Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div onclick="showMntDetailModal('QUEUE')" class="bg-gray-900 border border-blue-900 p-3 rounded-sm border-t-2 border-t-blue-400 flex items-center justify-between cursor-pointer aurora-card hover:border-blue-400 group">
+        <div>
+          <span class="text-[9px] text-blue-400 uppercase font-bold tracking-widest group-hover:text-blue-300 transition-colors">ALAT DALAM ANTREAN</span>
+          <span id="mnt-count-queue" class="text-xl font-black text-blue-300 mt-1 block">0</span>
+        </div>
+        <div class="p-2 bg-blue-950/60 border border-blue-800 rounded-sm shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+          <i class="fa-solid fa-clipboard-list text-xl text-blue-400"></i>
         </div>
       </div>
 
-      <!-- Mnt Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div onclick="showMntDetailModal('QUEUE')" class="bg-gray-900 border border-blue-900 p-3 rounded-sm border-t-2 border-t-blue-400 flex items-center justify-between cursor-pointer aurora-card hover:border-blue-400 group">
-          <div>
-            <span class="text-[9px] text-blue-400 uppercase font-bold tracking-widest group-hover:text-blue-300 transition-colors">ALAT DALAM ANTREAN</span>
-            <span id="mnt-count-queue" class="text-xl font-black text-blue-300 mt-1 block">0</span>
-          </div>
-          <div class="p-2 bg-blue-950/60 border border-blue-800 rounded-sm shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-            <i class="fa-solid fa-clipboard-list text-xl text-blue-400"></i>
-          </div>
+      <div onclick="showMntDetailModal('REPAIR')" class="bg-gray-900 border border-yellow-900 p-3 rounded-sm border-t-2 border-t-yellow-400 flex items-center justify-between cursor-pointer aurora-card hover:border-yellow-400 group">
+        <div>
+          <span class="text-[9px] text-yellow-400 uppercase font-bold tracking-widest group-hover:text-yellow-300 transition-colors">SEDANG DIPERBAIKI</span>
+          <span id="mnt-count-repair" class="text-xl font-black text-yellow-300 mt-1 block">0</span>
         </div>
-
-        <div onclick="showMntDetailModal('REPAIR')" class="bg-gray-900 border border-yellow-900 p-3 rounded-sm border-t-2 border-t-yellow-400 flex items-center justify-between cursor-pointer aurora-card hover:border-yellow-400 group">
-          <div>
-            <span class="text-[9px] text-yellow-400 uppercase font-bold tracking-widest group-hover:text-yellow-300 transition-colors">SEDANG DIPERBAIKI</span>
-            <span id="mnt-count-repair" class="text-xl font-black text-yellow-300 mt-1 block">0</span>
-          </div>
-          <div class="p-2 bg-yellow-950/60 border border-yellow-800 rounded-sm shadow-[0_0_10px_rgba(250,204,21,0.3)]">
-            <i class="fa-solid fa-screwdriver-wrench text-xl text-yellow-400"></i>
-          </div>
-        </div>
-
-        <div onclick="showMntDetailModal('DONE')" class="bg-gray-900 border border-green-900 p-3 rounded-sm border-t-2 border-t-green-400 flex items-center justify-between cursor-pointer aurora-card hover:border-green-400 group">
-          <div>
-            <span class="text-[9px] text-green-400 uppercase font-bold tracking-widest group-hover:text-green-300 transition-colors">SELESAI (BULAN INI)</span>
-            <span id="mnt-count-done" class="text-xl font-black text-green-300 mt-1 block">0</span>
-          </div>
-          <div class="p-2 bg-green-950/60 border border-green-800 rounded-sm shadow-[0_0_10px_rgba(34,197,94,0.3)]">
-            <i class="fa-solid fa-circle-check text-xl text-green-400"></i>
-          </div>
+        <div class="p-2 bg-yellow-950/60 border border-yellow-800 rounded-sm shadow-[0_0_10px_rgba(250,204,21,0.3)]">
+          <i class="fa-solid fa-screwdriver-wrench text-xl text-yellow-400"></i>
         </div>
       </div>
 
-      <!-- Mnt Table -->
-      <div class="bg-gray-900 border border-blue-800 flex-1 flex flex-col rounded-sm overflow-hidden">
-        <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[calc(100vh-340px)] w-full">
-          <table class="w-full text-left text-sm border-collapse">
-            <thead class="bg-gray-950 text-blue-400 text-[10px] md:text-xs uppercase sticky top-0 z-40">
-              <tr>
-                <th class="p-3 border-b-2 border-blue-600">WAKTU LAPOR</th>
-                <th class="p-3 border-b-2 border-blue-600">NAMA ALAT / PERANGKAT</th>
-                <th class="p-3 border-b-2 border-blue-600">LOKASI / STUDIO</th>
-                <th class="p-3 border-b-2 border-blue-600">MAINTENANCE / MONITORING</th>
-                <th class="p-3 border-b-2 border-blue-600">TEKNISI</th>
-                <th class="p-3 border-b-2 border-blue-600">STATUS</th>
-                <th class="p-3 border-b-2 border-blue-600 text-center min-w-[130px]">AKSI</th>
-              </tr>
-            </thead>
-            <tbody id="mnt-table-body" class="divide-y divide-blue-950 text-xs">
-              <tr><td colspan="7" class="text-center py-12 text-blue-500 font-bold uppercase">MEMUAT DATA MAINTENANCE...</td></tr>
-            </tbody>
-          </table>
+      <div onclick="showMntDetailModal('DONE')" class="bg-gray-900 border border-green-900 p-3 rounded-sm border-t-2 border-t-green-400 flex items-center justify-between cursor-pointer aurora-card hover:border-green-400 group">
+        <div>
+          <span class="text-[9px] text-green-400 uppercase font-bold tracking-widest group-hover:text-green-300 transition-colors">SELESAI (BULAN INI)</span>
+          <span id="mnt-count-done" class="text-xl font-black text-green-300 mt-1 block">0</span>
+        </div>
+        <div class="p-2 bg-green-950/60 border border-green-800 rounded-sm shadow-[0_0_10px_rgba(34,197,94,0.3)]">
+          <i class="fa-solid fa-circle-check text-xl text-green-400"></i>
         </div>
       </div>
-    </main>
-  </div>
+    </div>
+
+    <!-- Mnt Table -->
+    <div class="bg-gray-900 border border-blue-800 flex-1 flex flex-col rounded-sm overflow-hidden">
+      <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[calc(100vh-340px)] w-full">
+        <table class="w-full text-left text-sm border-collapse">
+          <thead class="bg-gray-950 text-blue-400 text-[10px] md:text-xs uppercase sticky top-0 z-40">
+            <tr>
+              <th class="p-3 border-b-2 border-blue-600">WAKTU LAPOR</th>
+              <th class="p-3 border-b-2 border-blue-600">NAMA ALAT / PERANGKAT</th>
+              <th class="p-3 border-b-2 border-blue-600">LOKASI / STUDIO</th>
+              <th class="p-3 border-b-2 border-blue-600">MAINTENANCE / MONITORING</th>
+              <th class="p-3 border-b-2 border-blue-600">TEKNISI</th>
+              <th class="p-3 border-b-2 border-blue-600">STATUS</th>
+              <th class="p-3 border-b-2 border-blue-600 text-center min-w-[130px]">AKSI</th>
+            </tr>
+          </thead>
+          <tbody id="mnt-table-body" class="divide-y divide-blue-950 text-xs">
+            <tr><td colspan="7" class="text-center py-12 text-blue-500 font-bold uppercase">MEMUAT DATA MAINTENANCE...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
 
   <!-- VIEW 4: SYSTEM LOGS -->
   <div id="view-logs" class="flex-1 flex-col hidden">
@@ -819,25 +883,45 @@
 	});
 
 	function checkExistingSession() {
-	  try {
-		const saved = localStorage.getItem(SESSION_STORAGE_KEY);
-		if (saved) {
-		  const parsed = JSON.parse(saved);
-		  if (parsed && parsed.role && parsed.name) {
-			currentSession = {
-			  role: String(parsed.role).toLowerCase().trim(),
-			  name: String(parsed.name).trim()
-			};
-			forceShowDashboardUI();
-			if (typeof fetchData === 'function') fetchData();
-			return;
-		  }
-		}
-	  } catch (err) {
-		console.error("Gagal membaca sesi tersimpan:", err);
-	  }
-	  forceShowLoginUI();
-	}
+  try {
+    const saved = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.role && parsed.name) {
+        const userRole = String(parsed.role).toLowerCase().trim();
+        
+        // PROTEKSI KHUSUS ADMIN: Jika sesi sebelumnya adalah Admin, paksa Auto-Logout
+        if (userRole === 'admin' || userRole === 'root') {
+          localStorage.removeItem(SESSION_STORAGE_KEY);
+          if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
+          currentSession = { role: null, name: null };
+          
+          if (typeof showToast === 'function') {
+            showToast("Sesi Admin telah berakhir. Silakan login kembali untuk keamanan.", "warning");
+          }
+          forceShowLoginUI();
+          return;
+        }
+
+        // AKUN CREW / GUEST: Tetap Auto-Login otomatis
+        currentSession = {
+          role: userRole,
+          name: String(parsed.name).trim()
+        };
+        forceShowDashboardUI();
+        if (typeof fetchData === 'function') fetchData();
+        return;
+      }
+    }
+  } catch (err) {
+    console.error("Gagal membaca sesi tersimpan:", err);
+  }
+
+  // Jika tidak ada sesi valid atau bukan Crew, tampilkan modal login
+  currentSession = { role: null, name: null };
+  forceShowLoginUI();
+}
+
 
 	function saveActiveSession(sessionObj) {
 	  localStorage.removeItem(SESSION_STORAGE_KEY);
@@ -1675,117 +1759,123 @@
 	  }
 	}
 
-    function renderMaintenanceTable() {
-	  const tbody = document.getElementById('mnt-table-body');
-	  if (!tbody) return;
-	  tbody.innerHTML = '';
+  function renderMaintenanceTable(dataToRender = null) {
+  const tbody = document.getElementById('mnt-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
 
-	  if (!globalMaintenanceData || globalMaintenanceData.length === 0) {
-		tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-cyan-500/70 font-bold font-mono uppercase">BELUM ADA LAPORAN MAINTENANCE</td></tr>';
-		if (typeof updateMntCounters === 'function') updateMntCounters();
-		return;
-	  }
+  // 1. Gunakan dataToRender (jika ada hasil filter), jika tidak ada gunakan globalMaintenanceData
+  const baseData = dataToRender !== null ? dataToRender : globalMaintenanceData;
 
-	  const isAdmin = (typeof currentSession !== 'undefined' && currentSession.role === 'admin');
-	  const isCrew = (typeof currentSession !== 'undefined' && currentSession.role === 'crew');
+  if (!baseData || baseData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-cyan-500/70 font-bold font-mono uppercase">TIDAK ADA LAPORAN MAINTENANCE TERSEDIA / SESUAI FILTER</td></tr>';
+    if (typeof updateMntCounters === 'function') updateMntCounters();
+    return;
+  }
 
-	  let displayedData = globalMaintenanceData;
-	  if (isCrew && currentSession.name) {
-		displayedData = globalMaintenanceData.filter(item => 
-		  item.teknisi && item.teknisi.toUpperCase().includes(currentSession.name.toUpperCase())
-		);
-	  }
+  const isAdmin = (typeof currentSession !== 'undefined' && currentSession.role === 'admin');
+  const isCrew = (typeof currentSession !== 'undefined' && currentSession.role === 'crew');
 
-	  if (displayedData.length === 0) {
-		tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-gray-500 font-bold font-mono uppercase">TIDAK ADA LAPORAN MAINTENANCE UNTUK AKUN ANDA</td></tr>';
-		if (typeof updateMntCounters === 'function') updateMntCounters();
-		return;
-	  }
+  // 2. Filter data berdasarkan sesi akun jika login sebagai crew biasa
+  let displayedData = baseData;
+  if (isCrew && currentSession.name) {
+    displayedData = baseData.filter(item => 
+      item.teknisi && item.teknisi.toUpperCase().includes(currentSession.name.toUpperCase())
+    );
+  }
 
-	  displayedData = [...displayedData].sort((a, b) => {
-		const timeA = new Date(a.timestamp || a.waktuLapor || 0).getTime();
-		const timeB = new Date(b.timestamp || b.waktuLapor || 0).getTime();
-		
-		if (!isNaN(timeA) && !isNaN(timeB) && timeA !== 0 && timeB !== 0) {
-		  return timeB - timeA;
-		}
-		return String(b.sheetRow || '').localeCompare(String(a.sheetRow || ''));
-	  });
+  if (displayedData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-gray-500 font-bold font-mono uppercase">TIDAK ADA LAPORAN MAINTENANCE UNTUK AKUN ANDA</td></tr>';
+    if (typeof updateMntCounters === 'function') updateMntCounters();
+    return;
+  }
 
-	  const safeStr = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  // 3. Urutkan data berdasarkan timestamp terbaru
+  displayedData = [...displayedData].sort((a, b) => {
+    const timeA = new Date(a.timestamp || a.waktuLapor || 0).getTime();
+    const timeB = new Date(b.timestamp || b.waktuLapor || 0).getTime();
+    
+    if (!isNaN(timeA) && !isNaN(timeB) && timeA !== 0 && timeB !== 0) {
+      return timeB - timeA;
+    }
+    return String(b.sheetRow || '').localeCompare(String(a.sheetRow || ''));
+  });
 
-	  displayedData.forEach(item => {
-		const statusUpper = String(item.status || 'ANTREAN').toUpperCase();
-		let badgeHTML = '';
+  const safeStr = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
-		if (statusUpper.includes('DIPERBAIKI') || statusUpper.includes('REPAIR') || statusUpper.includes('RUSAK')) {
-		  badgeHTML = `
-			<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-500/60 rounded-sm shadow-[0_0_8px_rgba(245,158,11,0.35)] tracking-wider">
-			  <span class="relative flex h-1.5 w-1.5">
-				<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-				<span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
-			  </span>
-			  <i class="fa-solid fa-wrench text-[8px] animate-spin"></i> SEDANG DIPERBAIKI
-			</span>`;
-		} else if (statusUpper.includes('MONITORING') || statusUpper.includes('PANTAU')) {
-		  badgeHTML = `
-			<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-mono font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/60 rounded-sm shadow-[0_0_8px_rgba(6,182,212,0.35)] tracking-wider">
-			  <span class="relative flex h-1.5 w-1.5">
-				<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-				<span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
-			  </span>
-			  <i class="fa-solid fa-eye text-[8px]"></i> MONITORING
-			</span>`;
-		} else if (statusUpper.includes('SELESAI') || statusUpper.includes('RESOLVED') || statusUpper.includes('OK')) {
-		  badgeHTML = `
-			<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-500/60 rounded-sm shadow-[0_0_8px_rgba(16,185,129,0.35)] tracking-wider">
-			  <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-			  <i class="fa-solid fa-circle-check text-[8px]"></i> SELESAI
-			</span>`;
-		} else {
-		  badgeHTML = `
-			<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-mono font-bold bg-blue-950/80 text-blue-300 border border-blue-500/60 rounded-sm shadow-[0_0_6px_rgba(59,130,246,0.25)] tracking-wider">
-			  <span class="h-1.5 w-1.5 rounded-full bg-blue-400"></span>
-			  <i class="fa-solid fa-clock text-[8px]"></i> ANTREAN
-			</span>`;
-		}
+  // 4. Render baris tabel
+  displayedData.forEach(item => {
+    const statusUpper = String(item.status || 'ANTREAN').toUpperCase();
+    let badgeHTML = '';
 
-		const rowIdStr = String(item.sheetRow);
+    if (statusUpper.includes('DIPERBAIKI') || statusUpper.includes('REPAIR') || statusUpper.includes('RUSAK')) {
+      badgeHTML = `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-500/60 rounded-sm shadow-[0_0_8px_rgba(245,158,11,0.35)] tracking-wider">
+          <span class="relative flex h-1.5 w-1.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
+          </span>
+          <i class="fa-solid fa-wrench text-[8px] animate-spin"></i> SEDANG DIPERBAIKI
+        </span>`;
+    } else if (statusUpper.includes('MONITORING') || statusUpper.includes('PANTAU')) {
+      badgeHTML = `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-mono font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/60 rounded-sm shadow-[0_0_8px_rgba(6,182,212,0.35)] tracking-wider">
+          <span class="relative flex h-1.5 w-1.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
+          </span>
+          <i class="fa-solid fa-eye text-[8px]"></i> MONITORING
+        </span>`;
+    } else if (statusUpper.includes('SELESAI') || statusUpper.includes('RESOLVED') || statusUpper.includes('OK')) {
+      badgeHTML = `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-500/60 rounded-sm shadow-[0_0_8px_rgba(16,185,129,0.35)] tracking-wider">
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+          <i class="fa-solid fa-circle-check text-[8px]"></i> SELESAI
+        </span>`;
+    } else {
+      badgeHTML = `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-mono font-bold bg-blue-950/80 text-blue-300 border border-blue-500/60 rounded-sm shadow-[0_0_6px_rgba(59,130,246,0.25)] tracking-wider">
+          <span class="h-1.5 w-1.5 rounded-full bg-blue-400"></span>
+          <i class="fa-solid fa-clock text-[8px]"></i> ANTREAN
+        </span>`;
+    }
 
-		let actionBtn = '';
-		if (item.status === 'ANTREAN' || item.status === 'MONITORING') {
-		  actionBtn = `<button onclick="toggleMntStatus('${rowIdStr}', '${safeStr(item.status)}')" class="px-2.5 py-1 bg-blue-950 hover:bg-blue-900 border border-blue-400 text-blue-300 text-[10px] rounded-sm font-bold font-mono uppercase transition-colors">PROSES</button>`;
-		} else if (item.status === 'SEDANG DIPERBAIKI') {
-		  actionBtn = `<button onclick="toggleMntStatus('${rowIdStr}', '${safeStr(item.status)}')" class="px-2.5 py-1 bg-yellow-950 hover:bg-yellow-900 border border-yellow-400 text-yellow-300 text-[10px] rounded-sm font-bold font-mono uppercase transition-colors">SELESAIKAN</button>`;
-		} else {
-		  actionBtn = `<span class="text-emerald-400 font-bold font-mono text-[10px] uppercase tracking-wider">>> RESOLVED</span>`;
-		}
+    const rowIdStr = String(item.sheetRow);
 
-		let controlBtns = '';
-		if (isAdmin || isCrew) {
-		  controlBtns = `
-			<button onclick="openEditMntModal('${rowIdStr}', '${safeStr(item.namaAlat)}', '${safeStr(item.lokasi)}', '${safeStr(item.kendala)}', '${safeStr(item.teknisi)}')" class="px-2 py-1 bg-cyan-950 hover:bg-cyan-900 border border-cyan-400 text-cyan-300 text-[10px] rounded-sm font-bold uppercase transition-colors" title="Edit"><i class="fa-solid fa-pen"></i></button>
-			<button onclick="deleteMntReport('${rowIdStr}', '${safeStr(item.namaAlat)}')" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-500 text-red-400 text-[10px] rounded-sm font-bold uppercase transition-colors" title="Hapus"><i class="fa-solid fa-trash"></i></button>
-			${actionBtn}
-		  `;
-		}
+    let actionBtn = '';
+    if (item.status === 'ANTREAN' || item.status === 'MONITORING') {
+      actionBtn = `<button onclick="toggleMntStatus('${rowIdStr}', '${safeStr(item.status)}')" class="px-2.5 py-1 bg-blue-950 hover:bg-blue-900 border border-blue-400 text-blue-300 text-[10px] rounded-sm font-bold font-mono uppercase transition-colors">PROSES</button>`;
+    } else if (item.status === 'SEDANG DIPERBAIKI') {
+      actionBtn = `<button onclick="toggleMntStatus('${rowIdStr}', '${safeStr(item.status)}')" class="px-2.5 py-1 bg-yellow-950 hover:bg-yellow-900 border border-yellow-400 text-yellow-300 text-[10px] rounded-sm font-bold font-mono uppercase transition-colors">SELESAIKAN</button>`;
+    } else {
+      actionBtn = `<span class="text-emerald-400 font-bold font-mono text-[10px] uppercase tracking-wider">>> RESOLVED</span>`;
+    }
 
-		const tr = document.createElement('tr');
-		tr.className = 'hover:bg-blue-950/30 border-b border-blue-950/40 text-xs font-mono transition-colors';
-		tr.innerHTML = `
-		  <td class="p-3 text-cyan-400 font-mono">${typeof formatCleanTimestamp === 'function' ? formatCleanTimestamp(item.timestamp) : (item.timestamp || '-')}</td>
-		  <td class="p-3 font-bold text-white uppercase">${item.namaAlat || '-'}</td>
-		  <td class="p-3 text-cyan-300 uppercase">${item.lokasi || '-'}</td>
-		  <td class="p-3 text-yellow-300 uppercase">${item.kendala || '-'}</td>
-		  <td class="p-3 text-pink-400 font-bold uppercase">${item.teknisi || '-'}</td>
-		  <td class="p-3 whitespace-nowrap">${badgeHTML}</td>
-		  <td class="p-3 text-center flex items-center justify-center gap-1.5 flex-wrap">${controlBtns}</td>
-		`;
-		tbody.appendChild(tr);
-	  });
+    let controlBtns = '';
+    if (isAdmin || isCrew) {
+      controlBtns = `
+        <button onclick="openEditMntModal('${rowIdStr}', '${safeStr(item.namaAlat)}', '${safeStr(item.lokasi)}', '${safeStr(item.kendala)}', '${safeStr(item.teknisi)}')" class="px-2 py-1 bg-cyan-950 hover:bg-cyan-900 border border-cyan-400 text-cyan-300 text-[10px] rounded-sm font-bold uppercase transition-colors" title="Edit"><i class="fa-solid fa-pen"></i></button>
+        <button onclick="deleteMntReport('${rowIdStr}', '${safeStr(item.namaAlat)}')" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-500 text-red-400 text-[10px] rounded-sm font-bold uppercase transition-colors" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+        ${actionBtn}
+      `;
+    }
 
-	  if (typeof updateMntCounters === 'function') updateMntCounters();
-	}
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-blue-950/30 border-b border-blue-950/40 text-xs font-mono transition-colors';
+    tr.innerHTML = `
+      <td class="p-3 text-cyan-400 font-mono">${typeof formatCleanTimestamp === 'function' ? formatCleanTimestamp(item.timestamp || item.waktuLapor) : (item.timestamp || item.waktuLapor || '-')}</td>
+      <td class="p-3 font-bold text-white uppercase">${item.namaAlat || '-'}</td>
+      <td class="p-3 text-cyan-300 uppercase">${item.lokasi || '-'}</td>
+      <td class="p-3 text-yellow-300 uppercase">${item.kendala || '-'}</td>
+      <td class="p-3 text-pink-400 font-bold uppercase">${item.teknisi || '-'}</td>
+      <td class="p-3 whitespace-nowrap">${badgeHTML}</td>
+      <td class="p-3 text-center flex items-center justify-center gap-1.5 flex-wrap">${controlBtns}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if (typeof updateMntCounters === 'function') updateMntCounters();
+}
 
     function updateMntCounters() {
       let queue = 0, repair = 0, done = 0;
@@ -1836,6 +1926,66 @@
       contentEl.innerHTML = html;
       modal.classList.remove('hidden'); modal.classList.add('flex');
     }
+    
+    // FUNGSI FILTER MULTI-KRITERIA MAINTENANCE (SEARCH + TANGGAL)
+function filterMntTable() {
+  const searchInput = document.getElementById('mnt-search-input');
+  const dateFromInput = document.getElementById('mnt-date-from');
+  const dateToInput = document.getElementById('mnt-date-to');
+
+  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const fromDateStr = dateFromInput ? dateFromInput.value : '';
+  const toDateStr = dateToInput ? dateToInput.value : '';
+
+  const fromDate = fromDateStr ? new Date(fromDateStr + 'T00:00:00') : null;
+  const toDate = toDateStr ? new Date(toDateStr + 'T23:59:59') : null;
+
+  if (typeof globalMaintenanceData === 'undefined' || !Array.isArray(globalMaintenanceData)) return;
+
+  const filteredData = globalMaintenanceData.filter(item => {
+    // 1. Filter Pencarian Teks (Alat, Lokasi, Kendala, Teknisi, Status, Waktu)
+    const matchesText = !query || 
+      (item.namaAlat && String(item.namaAlat).toLowerCase().includes(query)) ||
+      (item.lokasi && String(item.lokasi).toLowerCase().includes(query)) ||
+      (item.kendala && String(item.kendala).toLowerCase().includes(query)) ||
+      (item.teknisi && String(item.teknisi).toLowerCase().includes(query)) ||
+      (item.status && String(item.status).toLowerCase().includes(query)) ||
+      (item.timestamp && String(item.timestamp).toLowerCase().includes(query));
+
+    // 2. Filter Tanggal
+    let matchesDate = true;
+    if (fromDate || toDate) {
+      const itemDate = (typeof parseFlexibleDate === 'function') 
+        ? parseFlexibleDate(item.timestamp || item.waktuLapor) 
+        : new Date(item.timestamp || item.waktuLapor);
+        
+      if (itemDate && !isNaN(itemDate.getTime())) {
+        if (fromDate && itemDate < fromDate) matchesDate = false;
+        if (toDate && itemDate > toDate) matchesDate = false;
+      }
+    }
+
+    return matchesText && matchesDate;
+  });
+
+  // Render ulang tabel maintenance menggunakan data terfilter
+  if (typeof renderMaintenanceTable === 'function') {
+    renderMaintenanceTable(filteredData);
+  }
+}
+
+// FUNGSI RESET FILTER MAINTENANCE
+function resetMntFilter() {
+  const searchInput = document.getElementById('mnt-search-input');
+  const dateFrom = document.getElementById('mnt-date-from');
+  const dateTo = document.getElementById('mnt-date-to');
+
+  if (searchInput) searchInput.value = '';
+  if (dateFrom) dateFrom.value = '';
+  if (dateTo) dateTo.value = '';
+
+  filterMntTable();
+}
 
     function exportMaintenancePDF() {
       if (globalMaintenanceData.length === 0) return showToast("Tidak ada data maintenance!");
@@ -2177,106 +2327,115 @@
 	const HIDDEN_CREWS = ["SHINDI MEGA PURNAMA"];
 
 	function renderTable() {
-	  const headerRow = document.getElementById('table-headers');
-	  const body = document.getElementById('table-body');
-	  headerRow.querySelectorAll('.date-header').forEach(el => el.remove());
-	  
-	  const d = new Date(), curYear = d.getFullYear();
-	  const curMon = typeof currentMonthIndex !== 'undefined' ? currentMonthIndex : d.getMonth();
-	  const namaHari = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
+  const headerRow = document.getElementById('table-headers');
+  const body = document.getElementById('table-body');
+  headerRow.querySelectorAll('.date-header').forEach(el => el.remove());
+  
+  const d = new Date(), curYear = d.getFullYear();
+  const curMon = typeof currentMonthIndex !== 'undefined' ? currentMonthIndex : d.getMonth();
+  const namaHari = ['MGG', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
 
-	  globalHeaders.forEach(dateStr => {
-		const th = document.createElement('th');
-		th.className = 'p-2 md:p-3 border-b-2 border-pink-600 font-bold text-center min-w-[100px] md:min-w-[150px] bg-gray-950 sticky top-0 z-40 date-header text-cyan-400 whitespace-nowrap';
-		let content = dateStr;
-		if (!isNaN(dateStr) && String(dateStr).trim()) {
-		  const dayNum = parseInt(dateStr);
-		  if (dayNum >= 1 && dayNum <= 31) {
-			content = `<span class="block text-[8px] md:text-[10px] text-pink-500 mb-1">${namaHari[new Date(curYear, curMon, dayNum).getDay()]}</span><span class="text-sm md:text-base">${dayNum}</span>`;
-		  }
-		}
-		th.innerHTML = content;
-		headerRow.appendChild(th);
-	  });
+  globalHeaders.forEach(dateStr => {
+    const th = document.createElement('th');
+    // Penyesuaian min-w pada HP menjadi 75px agar sel tanggal ringkas
+    th.className = 'p-1.5 md:p-3 border-b-2 border-pink-600 font-bold text-center min-w-[75px] md:min-w-[140px] bg-gray-950 sticky top-0 z-40 date-header text-cyan-400 whitespace-nowrap';
+    let content = dateStr;
+    if (!isNaN(dateStr) && String(dateStr).trim()) {
+      const dayNum = parseInt(dateStr);
+      if (dayNum >= 1 && dayNum <= 31) {
+        content = `<span class="block text-[8px] md:text-[10px] text-pink-500 mb-0.5">${namaHari[new Date(curYear, curMon, dayNum).getDay()]}</span><span class="text-xs md:text-base">${dayNum}</span>`;
+      }
+    }
+    th.innerHTML = content;
+    headerRow.appendChild(th);
+  });
 
-	  body.innerHTML = '';
+  body.innerHTML = '';
 
-	  const isAdmin = (typeof currentSession !== 'undefined' && (currentSession.role === 'admin' || currentSession.role === 'root'));
+  const isAdmin = (typeof currentSession !== 'undefined' && (currentSession.role === 'admin' || currentSession.role === 'root'));
 
-	  let validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
+  let validCrews = globalCrewData.filter(c => c.nama && c.nama.toUpperCase() !== "NAMA CREW" && c.nama.toUpperCase() !== "NAMA");
 
-	  if (!isAdmin) {
-		validCrews = validCrews.filter(crew => {
-		  const nameUpper = (crew.nama || '').trim().toUpperCase();
-		  return !HIDDEN_CREWS.some(hidden => hidden.toUpperCase() === nameUpper);
-		});
-	  }
+  if (!isAdmin) {
+    validCrews = validCrews.filter(crew => {
+      const nameUpper = (crew.nama || '').trim().toUpperCase();
+      return !HIDDEN_CREWS.some(hidden => hidden.toUpperCase() === nameUpper);
+    });
+  }
 
-	  if (validCrews.length === 0) {
-		body.innerHTML = `<tr><td colspan="${globalHeaders.length + 2}" class="text-center py-12 text-red-500 font-bold uppercase text-xs">DATA_NOT_FOUND PADA TAB ${selectedBulanTab}</td></tr>`;
-		return;
-	  }
+  if (validCrews.length === 0) {
+    body.innerHTML = `<tr><td colspan="${globalHeaders.length + 2}" class="text-center py-12 text-red-500 font-bold uppercase text-xs">DATA_NOT_FOUND PADA TAB ${selectedBulanTab}</td></tr>`;
+    return;
+  }
 
-	  validCrews.forEach((crew) => {
-		const tr = document.createElement('tr');
-		tr.className = 'hover:bg-cyan-900/20 crew-row group';
-		let waNum = (crew.hp || '').replace(/\D/g, '');
-		if (waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
+  validCrews.forEach((crew) => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-cyan-900/20 crew-row group';
+    let waNum = (crew.hp || '').replace(/\D/g, '');
+    if (waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
 
-		let mntCount = 0;
-		let offCount = 0;
-		let progCount = 0;
-		let adminBamsCount = 0;
-		let monitoringCount = 0;
+    let mntCount = 0;
+    let offCount = 0;
+    let progCount = 0;
+    let adminBamsCount = 0;
+    let monitoringCount = 0;
 
-		if (crew.schedule) {
-		  Object.values(crew.schedule).forEach(val => {
-			const v = String(val).trim().toUpperCase();
-			if (v === 'MNT') mntCount++;
-			else if (v === 'OFF') offCount++;
-			else if (v.includes('ADMIN BAMS')) adminBamsCount++;
-			else if (v.includes('MONITORING')) monitoringCount++;
-			else if (v && v !== '-') progCount++;
-		  });
-		}
+    if (crew.schedule) {
+      Object.values(crew.schedule).forEach(val => {
+        const v = String(val).trim().toUpperCase();
+        if (v === 'MNT') mntCount++;
+        else if (v === 'OFF') offCount++;
+        else if (v.includes('ADMIN BAMS')) adminBamsCount++;
+        else if (v.includes('MONITORING')) monitoringCount++;
+        else if (v && v !== '-') progCount++;
+      });
+    }
 
-		let badgeHtml = '';
-		if (isAdmin) {
-		  badgeHtml = `
-			<div class="flex items-center gap-1 mt-1.5 flex-wrap">
-			  <span class="text-[8px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1 py-0.5 rounded-sm font-mono" title="Total Program">P:${progCount}</span>
-			  <span class="text-[8px] bg-amber-950 text-amber-300 border border-amber-800 px-1 py-0.5 rounded-sm font-mono" title="Maintenance">MNT:${mntCount}</span>
-			  <span class="text-[8px] bg-gray-900 text-gray-400 border border-gray-700 px-1 py-0.5 rounded-sm font-mono" title="OFF">OFF:${offCount}</span>
-			  ${adminBamsCount > 0 ? `<span class="text-[8px] bg-pink-950 text-pink-300 border border-pink-800 px-1 py-0.5 rounded-sm font-mono" title="Admin BAMS">BAMS:${adminBamsCount}</span>` : ''}
-			  ${monitoringCount > 0 ? `<span class="text-[8px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 py-0.5 rounded-sm font-mono" title="Monitoring">MON:${monitoringCount}</span>` : ''}
-			</div>
-		  `;
-		}
+    let badgeHtml = '';
+    if (isAdmin) {
+      badgeHtml = `
+        <div class="flex items-center gap-1 mt-1 flex-wrap">
+          <span class="text-[7px] md:text-[8px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1 py-0.5 rounded-sm font-mono" title="Total Program">P:${progCount}</span>
+          <span class="text-[7px] md:text-[8px] bg-amber-950 text-amber-300 border border-amber-800 px-1 py-0.5 rounded-sm font-mono" title="Maintenance">MNT:${mntCount}</span>
+          <span class="text-[7px] md:text-[8px] bg-gray-900 text-gray-400 border border-gray-700 px-1 py-0.5 rounded-sm font-mono" title="OFF">OFF:${offCount}</span>
+          ${adminBamsCount > 0 ? `<span class="text-[7px] md:text-[8px] bg-pink-950 text-pink-300 border border-pink-800 px-1 py-0.5 rounded-sm font-mono" title="Admin BAMS">BAMS:${adminBamsCount}</span>` : ''}
+          ${monitoringCount > 0 ? `<span class="text-[7px] md:text-[8px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 py-0.5 rounded-sm font-mono" title="Monitoring">MON:${monitoringCount}</span>` : ''}
+        </div>
+      `;
+    }
 
-		let tdNama = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 font-bold text-cyan-300 sticky left-0 bg-gray-900 z-30 group-hover:bg-gray-800 uppercase text-[10px] md:text-xs min-w-[110px] max-w-[110px] md:min-w-[180px] md:max-w-[180px]">
-		  <div>${crew.nama}</div>
-		  ${badgeHtml}
-		</td>`;
-		
-		let tdHp = `<td class="p-2.5 md:p-4 border-b border-cyan-900/50 sticky left-[110px] md:left-[180px] bg-gray-900 z-30 group-hover:bg-gray-800 text-[10px] md:text-xs min-w-[100px] max-w-[100px] md:min-w-[140px] md:max-w-[140px] truncate"><a href="https://wa.me/${waNum}?text=Halo%20${encodeURIComponent(crew.nama)},%20pembaruan%20jadwal%20ITB%203TV." target="_blank" class="text-pink-400 hover:text-green-400 flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-400"></i> ${crew.hp}</a></td>`;
+    // PENYESUAIAN MOBILITY LEBAR STICKY:
+    // Kolom 1 (Nama): HP = 95px | Desktop = 180px
+    let tdNama = `<td class="p-1.5 md:p-3 border-b border-cyan-900/50 font-bold text-cyan-300 sticky left-0 bg-gray-900 z-30 group-hover:bg-gray-800 uppercase text-[9px] md:text-xs min-w-[95px] max-w-[95px] md:min-w-[180px] md:max-w-[180px] truncate">
+      <div class="truncate">${crew.nama}</div>
+      ${badgeHtml}
+    </td>`;
+    
+    // Kolom 2 (HP): HP = 85px & sticky left-[95px] | Desktop = 130px & sticky left-[180px]
+    let tdHp = `<td class="p-1.5 md:p-3 border-b border-cyan-900/50 sticky left-[95px] md:left-[180px] bg-gray-900 z-30 group-hover:bg-gray-800 text-[9px] md:text-xs min-w-[85px] max-w-[85px] md:min-w-[130px] md:max-w-[130px] truncate">
+      <a href="https://wa.me/${waNum}?text=Halo%20${encodeURIComponent(crew.nama)},%20pembaruan%20jadwal%20ITB%203TV." target="_blank" class="text-pink-400 hover:text-green-400 flex items-center gap-1">
+        <i class="fa-brands fa-whatsapp text-green-400 text-[10px] md:text-xs"></i> 
+        <span class="truncate">${crew.hp}</span>
+      </a>
+    </td>`;
 
-		let tdShifts = globalHeaders.map((dateStr, cIdx) => {
-		  const val = (crew.schedule && crew.schedule[dateStr]) ? crew.schedule[dateStr] : '';
-		  const colNum = cIdx + 4;
-		  const color = getColorClass(val);
-		  if (isAdmin) {
-			return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" id="input-${crew.rowIndex}-${dateStr}" oninput="this.value=this.value.toUpperCase();updateInputColor(this);" onchange="handleInputChange(${crew.rowIndex},'${dateStr}',${crew.rowIndex},${colNum},this.value)" class="w-full bg-gray-950 border border-cyan-900 rounded-sm text-center py-1.5 px-2 text-[10px] md:text-xs font-bold uppercase ${color}" placeholder="-"></td>`;
-		  } else {
-			return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" readonly class="w-full bg-gray-950/60 border border-cyan-900/40 rounded-sm text-center py-1.5 px-2 text-[10px] md:text-xs font-bold uppercase cursor-default ${color}" placeholder="-"></td>`;
-		  }
-		}).join('');
+    let tdShifts = globalHeaders.map((dateStr, cIdx) => {
+      const val = (crew.schedule && crew.schedule[dateStr]) ? crew.schedule[dateStr] : '';
+      const colNum = cIdx + 4;
+      const color = getColorClass(val);
+      if (isAdmin) {
+        return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" id="input-${crew.rowIndex}-${dateStr}" oninput="this.value=this.value.toUpperCase();updateInputColor(this);" onchange="handleInputChange(${crew.rowIndex},'${dateStr}',${crew.rowIndex},${colNum},this.value)" class="w-full bg-gray-950 border border-cyan-900 rounded-sm text-center py-1 px-1 md:py-1.5 md:px-2 text-[9px] md:text-xs font-bold uppercase ${color}" placeholder="-"></td>`;
+      } else {
+        return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" readonly class="w-full bg-gray-950/60 border border-cyan-900/40 rounded-sm text-center py-1 px-1 md:py-1.5 md:px-2 text-[9px] md:text-xs font-bold uppercase cursor-default ${color}" placeholder="-"></td>`;
+      }
+    }).join('');
 
-		tr.innerHTML = tdNama + tdHp + tdShifts;
-		body.appendChild(tr);
-	  });
+    tr.innerHTML = tdNama + tdHp + tdShifts;
+    body.appendChild(tr);
+  });
 
-	  setTimeout(() => scrollToTodayColumn(), 300);
-	}
+  setTimeout(() => scrollToTodayColumn(), 300);
+}
 
     function scrollToTodayColumn() {
       const todayDate = new Date().getDate().toString();
