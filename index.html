@@ -276,83 +276,34 @@ html, body {
 }
 
 /* =========================================================
-   PWA LANDSCAPE FULL-VIEW FIX (SIDE RAIL + UNCLIPPED TABLE)
+   PWA STANDALONE & LANDSCAPE FIX (100dvh + SAFE AREA)
    ========================================================= */
-@media (orientation: landscape) and (max-height: 550px) {
-  /* 1. Beri ruang di kiri untuk Side Rail Nav, bebaskan bagian bawah */
+@media (orientation: landscape) and (max-height: 550px),
+       all and (display-mode: standalone) and (orientation: landscape) {
+  
   html, body {
-    height: auto !important;
+    height: 100dvh !important;
     min-height: 100dvh !important;
-    padding-left: calc(52px + env(safe-area-inset-left)) !important;
-    padding-right: env(safe-area-inset-right) !important;
-    padding-bottom: env(safe-area-inset-bottom) !important;
-  }
-
-  /* 2. Pindahkan Bottom Nav menjadi Side Rail di sisi kiri agar tidak menutupi tabel */
-  nav.fixed {
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: auto !important;
-    width: calc(52px + env(safe-area-inset-left)) !important;
     padding-left: env(safe-area-inset-left) !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    border-top: none !important;
-    border-right: 2px solid rgba(236, 72, 153, 0.7) !important;
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
+    padding-right: env(safe-area-inset-right) !important;
+    padding-bottom: calc(44px + env(safe-area-inset-bottom)) !important;
   }
 
-  nav.fixed button {
-    flex: 0 0 auto !important;
-    width: 42px !important;
-    padding: 8px 2px !important;
-    flex-direction: column !important;
-    font-size: 7.5px !important;
-    gap: 3px !important;
-  }
-
-  /* 3. Ringkaskan Header & Sembunyikan elemen non-tabel agar tabel langsung terlihat */
-  header {
-    padding: 4px 10px !important;
-  }
-  header > div:nth-child(2), /* Running text */
-  body > .grid.grid-cols-4,  /* Global Mini Stats */
-  #view-jadwal .grid.grid-cols-6, /* 6 Kartu Jadwal */
-  #view-maintenance .grid.grid-cols-1.sm\:grid-cols-3, /* 3 Kartu Mnt */
-  footer {
-    display: none !important;
-  }
-
-  /* 4. Lepas batasan max-height agar tabel tampil utuh dan bisa di-scroll lega */
-  #view-jadwal main,
-  #view-daily main,
-  #view-maintenance main,
-  #view-logs main {
-    padding: 6px 10px !important;
-    gap: 6px !important;
-  }
-
+  /* Paksa tinggi kontainer tabel mengikuti tinggi layar aktual PWA */
   #table-scroll-container,
   #view-daily .overflow-y-auto,
   #view-maintenance .overflow-y-auto,
   #view-logs .overflow-y-auto {
-    max-height: none !important;
-    height: auto !important;
-    min-height: 220px !important;
-    overflow-x: auto !important;
+    max-height: calc(100dvh - 135px) !important;
+    min-height: 160px !important;
   }
 
-  /* 5. Presisikan Kolom Sticky Nama & HP */
+  /* Kunci lebar & posisi kolom sticky agar tidak geser di PWA */
   #table-headers th:nth-child(1),
   #table-body td:nth-child(1) {
     min-width: 110px !important;
     max-width: 110px !important;
     left: 0 !important;
-    padding: 5px 6px !important;
-    font-size: 10px !important;
   }
 
   #table-headers th:nth-child(2),
@@ -360,8 +311,14 @@ html, body {
     min-width: 95px !important;
     max-width: 95px !important;
     left: 110px !important;
-    padding: 5px 6px !important;
-    font-size: 9.5px !important;
+  }
+
+  /* Pastikan Bottom Nav menempel presisi di atas gesture bar Android */
+  nav.fixed {
+    bottom: 0 !important;
+    padding-bottom: calc(4px + env(safe-area-inset-bottom)) !important;
+    padding-left: env(safe-area-inset-left) !important;
+    padding-right: env(safe-area-inset-right) !important;
   }
 }
   </style>
