@@ -138,6 +138,55 @@ html, body {
     font-size: 9px !important;
   }
 }
+
+/* =========================================================
+   DYNAMIC MOBILE UI (COMPACT ICON WIDGETS & BOTTOM BAR)
+   ========================================================= */
+@media (max-width: 639px) {
+  /* Beri ruang di bawah agar konten tidak tertutup Bottom Nav di HP */
+  body {
+    padding-bottom: 64px !important;
+  }
+
+  /* Paksa ukuran kolom sticky tabel jadwal agar 100% sinkron dengan JS renderTable() */
+  #table-headers th:nth-child(1),
+  #table-body td:nth-child(1) {
+    min-width: 95px !important;
+    max-width: 95px !important;
+    left: 0 !important;
+    padding: 6px 4px !important;
+    font-size: 9.5px !important;
+  }
+
+  #table-headers th:nth-child(2),
+  #table-body td:nth-child(2) {
+    min-width: 85px !important;
+    max-width: 85px !important;
+    left: 95px !important;
+    padding: 6px 4px !important;
+    font-size: 9px !important;
+  }
+
+  /* Sel tanggal ringkas & nyaman diketuk */
+  #table-headers th.date-header {
+    min-width: 72px !important;
+    padding: 4px 2px !important;
+  }
+
+  #table-body td:nth-child(n+3) {
+    padding: 4px 2px !important;
+  }
+
+  /* Pastikan Modal tidak pernah terpotong di HP layar pendek */
+  #mnt-modal > div,
+  #daily-modal > div,
+  #wa-notif-modal > div,
+  #global-login-modal > div,
+  #detail-modal > div {
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+  }
+}
   </style>
 </head>
 <body class="bg-gray-950 text-cyan-400 min-h-screen font-mono flex flex-col relative overflow-x-hidden selection:bg-pink-500 selection:text-white">
@@ -253,54 +302,75 @@ html, body {
     </div>
   </div>
   
-  <!-- GLOBAL MINI STATS COUNTER -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 my-3 px-3 md:px-6">
-    <div class="p-3 bg-slate-950/90 border border-pink-500/40 rounded-sm shadow-[0_0_12px_rgba(236,72,153,0.15)] flex items-center justify-between">
-      <div>
-        <div class="text-[9px] font-bold text-pink-400 uppercase tracking-widest">LAPORAN BARU HARI INI</div>
-        <div id="stat-total-program" class="text-xl font-black text-slate-100 font-mono mt-0.5">0</div>
+  <!-- GLOBAL MINI STATS COUNTER (ICON-ONLY ON MOBILE, FULL CARD ON DESKTOP) -->
+  <div class="grid grid-cols-4 gap-1.5 sm:gap-3 my-2 px-2.5 md:px-6">
+    <!-- 1. Laporan Baru -->
+    <div title="Laporan Baru Hari Ini" class="p-2 sm:p-3 bg-slate-950/90 border border-pink-500/50 rounded-sm shadow-[0_0_10px_rgba(236,72,153,0.15)] flex flex-col sm:flex-row items-center justify-center sm:justify-between text-center sm:text-left">
+      <div class="order-2 sm:order-1 mt-1 sm:mt-0">
+        <div class="hidden sm:block text-[9px] font-bold text-pink-400 uppercase tracking-widest">LAPORAN BARU HARI INI</div>
+        <div class="sm:hidden text-[8px] font-bold text-pink-400 uppercase tracking-wider">DAILY</div>
+        <div id="stat-total-program" class="text-sm sm:text-xl font-black text-slate-100 font-mono leading-tight">0</div>
       </div>
-      <div class="w-8 h-8 rounded-sm bg-pink-950/60 border border-pink-600/50 flex items-center justify-center text-pink-400 text-sm"><i class="fa-solid fa-tv"></i></div>
+      <div class="order-1 sm:order-2 w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-pink-950/70 border border-pink-500/60 flex items-center justify-center text-pink-400 text-xs sm:text-sm">
+        <i class="fa-solid fa-tv"></i>
+      </div>
     </div>
-    <div class="p-3 bg-slate-950/90 border border-yellow-500/40 rounded-sm shadow-[0_0_12px_rgba(234,179,8,0.15)] flex items-center justify-between">
-      <div>
-        <div class="text-[9px] font-bold text-yellow-400 uppercase tracking-widest">PERLU MAINTENANCE</div>
-        <div id="stat-total-mnt" class="text-xl font-black text-slate-100 font-mono mt-0.5">0</div>
+
+    <!-- 2. Perlu Maintenance -->
+    <div title="Perlu Maintenance" class="p-2 sm:p-3 bg-slate-950/90 border border-yellow-500/50 rounded-sm shadow-[0_0_10px_rgba(234,179,8,0.15)] flex flex-col sm:flex-row items-center justify-center sm:justify-between text-center sm:text-left">
+      <div class="order-2 sm:order-1 mt-1 sm:mt-0">
+        <div class="hidden sm:block text-[9px] font-bold text-yellow-400 uppercase tracking-widest">PERLU MAINTENANCE</div>
+        <div class="sm:hidden text-[8px] font-bold text-yellow-400 uppercase tracking-wider">MNT</div>
+        <div id="stat-total-mnt" class="text-sm sm:text-xl font-black text-slate-100 font-mono leading-tight">0</div>
       </div>
-      <div class="w-8 h-8 rounded-sm bg-yellow-950/60 border border-yellow-600/50 flex items-center justify-center text-yellow-400 text-sm"><i class="fa-solid fa-screwdriver-wrench animate-pulse"></i></div>
+      <div class="order-1 sm:order-2 w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-yellow-950/70 border border-yellow-500/60 flex items-center justify-center text-yellow-400 text-xs sm:text-sm">
+        <i class="fa-solid fa-screwdriver-wrench animate-pulse"></i>
+      </div>
     </div>
-    <div class="p-3 bg-slate-950/90 border border-cyan-500/40 rounded-sm shadow-[0_0_12px_rgba(6,182,212,0.15)] flex items-center justify-between">
-      <div>
-        <div class="text-[9px] font-bold text-cyan-400 uppercase tracking-widest">DALAM MONITORING</div>
-        <div id="stat-total-monitoring" class="text-xl font-black text-slate-100 font-mono mt-0.5">0</div>
+
+    <!-- 3. Dalam Monitoring -->
+    <div title="Dalam Monitoring" class="p-2 sm:p-3 bg-slate-950/90 border border-cyan-500/50 rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.15)] flex flex-col sm:flex-row items-center justify-center sm:justify-between text-center sm:text-left">
+      <div class="order-2 sm:order-1 mt-1 sm:mt-0">
+        <div class="hidden sm:block text-[9px] font-bold text-cyan-400 uppercase tracking-widest">DALAM MONITORING</div>
+        <div class="sm:hidden text-[8px] font-bold text-cyan-400 uppercase tracking-wider">MON</div>
+        <div id="stat-total-monitoring" class="text-sm sm:text-xl font-black text-slate-100 font-mono leading-tight">0</div>
       </div>
-      <div class="w-8 h-8 rounded-sm bg-cyan-950/60 border border-cyan-600/50 flex items-center justify-center text-cyan-400 text-sm"><i class="fa-solid fa-eye"></i></div>
+      <div class="order-1 sm:order-2 w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-cyan-950/70 border border-cyan-500/60 flex items-center justify-center text-cyan-400 text-xs sm:text-sm">
+        <i class="fa-solid fa-eye"></i>
+      </div>
     </div>
-    <div class="p-3 bg-slate-950/90 border border-blue-500/40 rounded-sm shadow-[0_0_12px_rgba(59,130,246,0.15)] flex items-center justify-between">
-      <div>
-        <div class="text-[9px] font-bold text-blue-400 uppercase tracking-widest">LOG AKTIVITAS HARI INI</div>
-        <div id="stat-total-logs" class="text-xl font-black text-slate-100 font-mono mt-0.5">0</div>
+
+    <!-- 4. Log Aktivitas -->
+    <div title="Log Aktivitas Hari Ini" class="p-2 sm:p-3 bg-slate-950/90 border border-blue-500/50 rounded-sm shadow-[0_0_10px_rgba(59,130,246,0.15)] flex flex-col sm:flex-row items-center justify-center sm:justify-between text-center sm:text-left">
+      <div class="order-2 sm:order-1 mt-1 sm:mt-0">
+        <div class="hidden sm:block text-[9px] font-bold text-blue-400 uppercase tracking-widest">LOG AKTIVITAS HARI INI</div>
+        <div class="sm:hidden text-[8px] font-bold text-blue-400 uppercase tracking-wider">LOGS</div>
+        <div id="stat-total-logs" class="text-sm sm:text-xl font-black text-slate-100 font-mono leading-tight">0</div>
       </div>
-      <div class="w-8 h-8 rounded-sm bg-blue-950/60 border border-blue-600/50 flex items-center justify-center text-blue-400 text-sm"><i class="fa-solid fa-list-check"></i></div>
+      <div class="order-1 sm:order-2 w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-blue-950/70 border border-blue-500/60 flex items-center justify-center text-blue-400 text-xs sm:text-sm">
+        <i class="fa-solid fa-list-check"></i>
+      </div>
     </div>
   </div>
 
-  <!-- Navigation Tabs -->
-  <nav class="bg-gray-900/80 border-b border-cyan-900/60 px-3 md:px-6 py-2.5 flex items-center justify-between gap-3 relative z-10 overflow-x-auto shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-    <div class="flex items-center gap-3">
-      <button id="tab-btn-jadwal" onclick="switchTab('jadwal')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border">
-        <i class="fa-solid fa-calendar-days text-pink-500"></i> JADWAL BULANAN
-      </button>
-      <button id="tab-btn-daily" onclick="switchTab('daily')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border">
-        <i class="fa-solid fa-clipboard-user text-cyan-400"></i> DAILY REPORT
-      </button>
-      <button id="tab-btn-maintenance" onclick="switchTab('maintenance')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border">
-        <i class="fa-solid fa-screwdriver-wrench text-blue-400"></i> MAINTENANCE
-      </button>
-      <button id="tab-btn-logs" onclick="switchTab('logs')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border">
-        <i class="fa-solid fa-terminal text-yellow-400"></i> SYSTEM LOGS
-      </button>
-    </div>
+  <!-- NAVIGATION TABS (FIXED BOTTOM ICON BAR ON MOBILE, TOP BAR ON DESKTOP) -->
+  <nav class="fixed bottom-0 inset-x-0 sm:static bg-gray-950/95 sm:bg-gray-900/80 backdrop-blur-md border-t-2 sm:border-t-0 sm:border-b border-pink-500/70 sm:border-cyan-900/60 px-2 sm:px-6 py-1.5 sm:py-2.5 flex items-center justify-around sm:justify-start gap-1 sm:gap-3 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.8)] sm:shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+    <button id="tab-btn-jadwal" onclick="switchTab('jadwal')" class="flex-1 sm:flex-initial justify-center px-2 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex flex-col sm:flex-row items-center gap-1 sm:gap-2 whitespace-nowrap border">
+      <i class="fa-solid fa-calendar-days text-sm sm:text-xs text-pink-500"></i>
+      <span>JADWAL</span>
+    </button>
+    <button id="tab-btn-daily" onclick="switchTab('daily')" class="flex-1 sm:flex-initial justify-center px-2 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex flex-col sm:flex-row items-center gap-1 sm:gap-2 whitespace-nowrap border">
+      <i class="fa-solid fa-clipboard-user text-sm sm:text-xs text-cyan-400"></i>
+      <span>DAILY</span>
+    </button>
+    <button id="tab-btn-maintenance" onclick="switchTab('maintenance')" class="flex-1 sm:flex-initial justify-center px-2 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex flex-col sm:flex-row items-center gap-1 sm:gap-2 whitespace-nowrap border">
+      <i class="fa-solid fa-screwdriver-wrench text-sm sm:text-xs text-blue-400"></i>
+      <span>MAINT</span>
+    </button>
+    <button id="tab-btn-logs" onclick="switchTab('logs')" class="flex-1 sm:flex-initial justify-center px-2 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex flex-col sm:flex-row items-center gap-1 sm:gap-2 whitespace-nowrap border">
+      <i class="fa-solid fa-terminal text-sm sm:text-xs text-yellow-400"></i>
+      <span>LOGS</span>
+    </button>
   </nav>
 
   <!-- VIEW 1: JADWAL BULANAN -->
@@ -324,34 +394,69 @@ html, body {
         </div>
       </div>
 
-      <!-- Dashboard Cards -->
-      <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
-        <div onclick="showDetailModal('TOTAL_CREW')" class="bg-gray-900 border border-cyan-900 border-t-2 border-t-cyan-400 p-3 rounded-sm cursor-pointer aurora-card">
-          <span class="text-[9px] text-cyan-500 uppercase font-bold">TOTAL CREW</span>
-          <span id="card-total" class="text-xl md:text-2xl font-black text-cyan-300 mt-1 block">0</span>
-        </div>
-        <div onclick="showDetailModal('ON_DUTY')" class="bg-gray-900 border border-green-900 border-t-2 border-t-green-400 p-3 rounded-sm cursor-pointer aurora-card">
-          <span class="text-[9px] text-green-500 uppercase font-bold">ON DUTY (HARI INI)</span>
-          <span id="card-duty" class="text-xl md:text-2xl font-black text-green-400 mt-1 block">0</span>
-        </div>
-        <div onclick="showDetailModal('MAINTENANCE')" class="bg-gray-900 border border-blue-900 border-t-2 border-t-blue-400 p-3 rounded-sm cursor-pointer aurora-card">
-          <span class="text-[9px] text-blue-400 uppercase font-bold">MAINTENANCE</span>
-          <span id="card-mnt" class="text-xl md:text-2xl font-black text-blue-400 mt-1 block">0</span>
-        </div>
-        <div onclick="showDetailModal('OFF')" class="bg-gray-900 border border-red-900 border-t-2 border-t-red-500 p-3 rounded-sm cursor-pointer aurora-card">
-          <span class="text-[9px] text-red-400 uppercase font-bold">OFF (HARI INI)</span>
-          <span id="card-off" class="text-xl md:text-2xl font-black text-red-500 mt-1 block">0</span>
-        </div>
-        <div onclick="showDetailModal('PROGRAM_STATS')" class="bg-gray-900 border border-pink-900 border-t-2 border-t-pink-500 p-3 rounded-sm cursor-pointer aurora-card">
-          <span class="text-[9px] text-pink-400 uppercase font-bold">PROGRAM SIARAN</span>
-          <div class="flex items-center gap-2 mt-1">
-            <span class="text-[9px] text-cyan-400">H: <strong id="card-prog-today" class="text-white text-sm">0</strong></span>
-            <span class="text-[9px] text-cyan-400">B: <strong id="card-prog-month" class="text-pink-400 text-sm">0</strong></span>
+      <!-- Dashboard Cards (Compact Icon Badges on Mobile, Detailed Cards on Desktop) -->
+      <div class="grid grid-cols-6 gap-1.5 sm:gap-3">
+        <!-- Total Crew -->
+        <div onclick="showDetailModal('TOTAL_CREW')" title="Total Crew" class="bg-gray-900 border border-cyan-900 border-t-2 border-t-cyan-400 p-1.5 sm:p-3 rounded-sm cursor-pointer aurora-card flex flex-col items-center sm:items-start justify-center text-center sm:text-left">
+          <div class="flex items-center gap-1 text-cyan-400">
+            <i class="fa-solid fa-users text-xs sm:hidden"></i>
+            <span class="hidden sm:inline text-[9px] text-cyan-500 uppercase font-bold">TOTAL CREW</span>
           </div>
+          <span id="card-total" class="text-sm sm:text-2xl font-black text-cyan-300 mt-0.5 sm:mt-1 block">0</span>
+          <span class="sm:hidden text-[7px] text-cyan-500 font-bold uppercase">CREW</span>
         </div>
-        <div onclick="showDetailModal('TOP_CREW')" class="bg-gray-900 border border-yellow-900 border-t-2 border-t-yellow-400 p-3 rounded-sm cursor-pointer aurora-card">
-          <span class="text-[9px] text-yellow-400 uppercase font-bold"><i class="fa-solid fa-trophy mr-1"></i> TOP CREW</span>
-          <span id="card-top-crew" class="text-xs md:text-sm font-black text-yellow-300 mt-1 block truncate">-</span>
+
+        <!-- On Duty -->
+        <div onclick="showDetailModal('ON_DUTY')" title="On Duty Hari Ini" class="bg-gray-900 border border-green-900 border-t-2 border-t-green-400 p-1.5 sm:p-3 rounded-sm cursor-pointer aurora-card flex flex-col items-center sm:items-start justify-center text-center sm:text-left">
+          <div class="flex items-center gap-1 text-green-400">
+            <i class="fa-solid fa-tower-broadcast text-xs sm:hidden"></i>
+            <span class="hidden sm:inline text-[9px] text-green-500 uppercase font-bold">ON DUTY (HARI INI)</span>
+          </div>
+          <span id="card-duty" class="text-sm sm:text-2xl font-black text-green-400 mt-0.5 sm:mt-1 block">0</span>
+          <span class="sm:hidden text-[7px] text-green-500 font-bold uppercase">DUTY</span>
+        </div>
+
+        <!-- Maintenance -->
+        <div onclick="showDetailModal('MAINTENANCE')" title="Maintenance Hari Ini" class="bg-gray-900 border border-blue-900 border-t-2 border-t-blue-400 p-1.5 sm:p-3 rounded-sm cursor-pointer aurora-card flex flex-col items-center sm:items-start justify-center text-center sm:text-left">
+          <div class="flex items-center gap-1 text-blue-400">
+            <i class="fa-solid fa-wrench text-xs sm:hidden"></i>
+            <span class="hidden sm:inline text-[9px] text-blue-400 uppercase font-bold">MAINTENANCE</span>
+          </div>
+          <span id="card-mnt" class="text-sm sm:text-2xl font-black text-blue-400 mt-0.5 sm:mt-1 block">0</span>
+          <span class="sm:hidden text-[7px] text-blue-400 font-bold uppercase">MNT</span>
+        </div>
+
+        <!-- OFF -->
+        <div onclick="showDetailModal('OFF')" title="OFF Hari Ini" class="bg-gray-900 border border-red-900 border-t-2 border-t-red-500 p-1.5 sm:p-3 rounded-sm cursor-pointer aurora-card flex flex-col items-center sm:items-start justify-center text-center sm:text-left">
+          <div class="flex items-center gap-1 text-red-400">
+            <i class="fa-solid fa-power-off text-xs sm:hidden"></i>
+            <span class="hidden sm:inline text-[9px] text-red-400 uppercase font-bold">OFF (HARI INI)</span>
+          </div>
+          <span id="card-off" class="text-sm sm:text-2xl font-black text-red-500 mt-0.5 sm:mt-1 block">0</span>
+          <span class="sm:hidden text-[7px] text-red-400 font-bold uppercase">OFF</span>
+        </div>
+
+        <!-- Program Siaran -->
+        <div onclick="showDetailModal('PROGRAM_STATS')" title="Program Siaran" class="bg-gray-900 border border-pink-900 border-t-2 border-t-pink-500 p-1.5 sm:p-3 rounded-sm cursor-pointer aurora-card flex flex-col items-center sm:items-start justify-center text-center sm:text-left">
+          <div class="flex items-center gap-1 text-pink-400">
+            <i class="fa-solid fa-clapperboard text-xs sm:hidden"></i>
+            <span class="hidden sm:inline text-[9px] text-pink-400 uppercase font-bold">PROGRAM SIARAN</span>
+          </div>
+          <div class="flex items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
+            <span class="text-[8px] sm:text-[9px] text-cyan-400">H:<strong id="card-prog-today" class="text-white text-xs sm:text-sm">0</strong></span>
+            <span class="text-[8px] sm:text-[9px] text-cyan-400">B:<strong id="card-prog-month" class="text-pink-400 text-xs sm:text-sm">0</strong></span>
+          </div>
+          <span class="sm:hidden text-[7px] text-pink-400 font-bold uppercase">PROG</span>
+        </div>
+
+        <!-- Top Crew -->
+        <div onclick="showDetailModal('TOP_CREW')" title="Top Crew" class="bg-gray-900 border border-yellow-900 border-t-2 border-t-yellow-400 p-1.5 sm:p-3 rounded-sm cursor-pointer aurora-card flex flex-col items-center sm:items-start justify-center text-center sm:text-left overflow-hidden">
+          <div class="flex items-center gap-1 text-yellow-400">
+            <i class="fa-solid fa-trophy text-xs sm:mr-1"></i>
+            <span class="hidden sm:inline text-[9px] text-yellow-400 uppercase font-bold">TOP CREW</span>
+          </div>
+          <span id="card-top-crew" class="text-[9px] sm:text-sm font-black text-yellow-300 mt-0.5 sm:mt-1 block truncate w-full">-</span>
+          <span class="sm:hidden text-[7px] text-yellow-400 font-bold uppercase">TOP</span>
         </div>
       </div>
 
@@ -1387,49 +1492,50 @@ html, body {
     }
 
     function switchTab(tab) {
-	  if (!currentSession.role) {
-		openGlobalLoginModal();
-		return;
-	  }
-	  if (currentSession.role === 'guest' && tab !== 'jadwal') {
-		showToast("AKSES DITOLAK: Akun Guest hanya dapat melihat Jadwal Bulanan.");
-		tab = 'jadwal';
-	  }
+  if (!currentSession.role) {
+    openGlobalLoginModal();
+    return;
+  }
+  if (currentSession.role === 'guest' && tab !== 'jadwal') {
+    showToast("AKSES DITOLAK: Akun Guest hanya dapat melihat Jadwal Bulanan.");
+    tab = 'jadwal';
+  }
 
-	  document.getElementById('view-jadwal').classList.toggle('flex', tab === 'jadwal');
-	  document.getElementById('view-jadwal').classList.toggle('hidden', tab !== 'jadwal');
-	  document.getElementById('view-daily').classList.toggle('flex', tab === 'daily');
-	  document.getElementById('view-daily').classList.toggle('hidden', tab !== 'daily');
-	  document.getElementById('view-maintenance').classList.toggle('flex', tab === 'maintenance');
-	  document.getElementById('view-maintenance').classList.toggle('hidden', tab !== 'maintenance');
-	  document.getElementById('view-logs').classList.toggle('flex', tab === 'logs');
-	  document.getElementById('view-logs').classList.toggle('hidden', tab !== 'logs');
+  document.getElementById('view-jadwal').classList.toggle('flex', tab === 'jadwal');
+  document.getElementById('view-jadwal').classList.toggle('hidden', tab !== 'jadwal');
+  document.getElementById('view-daily').classList.toggle('flex', tab === 'daily');
+  document.getElementById('view-daily').classList.toggle('hidden', tab !== 'daily');
+  document.getElementById('view-maintenance').classList.toggle('flex', tab === 'maintenance');
+  document.getElementById('view-maintenance').classList.toggle('hidden', tab !== 'maintenance');
+  document.getElementById('view-logs').classList.toggle('flex', tab === 'logs');
+  document.getElementById('view-logs').classList.toggle('hidden', tab !== 'logs');
 
-	  const btnJadwal = document.getElementById('tab-btn-jadwal');
-	  const btnDaily = document.getElementById('tab-btn-daily');
-	  const btnMnt = document.getElementById('tab-btn-maintenance');
-	  const btnLogs = document.getElementById('tab-btn-logs');
+  const btnJadwal = document.getElementById('tab-btn-jadwal');
+  const btnDaily = document.getElementById('tab-btn-daily');
+  const btnMnt = document.getElementById('tab-btn-maintenance');
+  const btnLogs = document.getElementById('tab-btn-logs');
 
-	  const inactiveClass = "bg-gray-950 border-cyan-900/80 text-cyan-700 hover:text-cyan-400 shadow-none";
-	  
-	  btnJadwal.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'jadwal' ? '' : inactiveClass}`;
-	  btnDaily.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'daily' ? '' : inactiveClass}`;
-	  btnMnt.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'maintenance' ? '' : inactiveClass}`;
-	  btnLogs.className = `px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all flex items-center gap-2 whitespace-nowrap border ${tab === 'logs' ? '' : inactiveClass}`;
+  const baseLayoutClass = "flex-1 sm:flex-initial justify-center px-2 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-xs uppercase tracking-wider rounded-sm transition-all flex flex-col sm:flex-row items-center gap-1 sm:gap-2 whitespace-nowrap";
+  const inactiveClass = `${baseLayoutClass} font-bold border bg-gray-950 border-cyan-900/80 text-cyan-700 hover:text-cyan-400 shadow-none`;
+  
+  btnJadwal.className = inactiveClass;
+  btnDaily.className = inactiveClass;
+  btnMnt.className = inactiveClass;
+  btnLogs.className = inactiveClass;
 
-	  if (tab === 'jadwal') {
-		btnJadwal.className = "px-4 py-2 bg-cyan-500 border-2 border-cyan-300 text-gray-950 text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(6,182,212,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
-	  } else if (tab === 'daily') {
-		btnDaily.className = "px-4 py-2 bg-emerald-600 border-2 border-emerald-400 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(16,185,129,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
-		renderDailyTable();
-	  } else if (tab === 'maintenance') {
-		btnMnt.className = "px-4 py-2 bg-amber-600 border-2 border-amber-400 text-gray-950 text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(245,158,11,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
-		renderMaintenanceTable();
-	  } else if (tab === 'logs') {
-		btnLogs.className = "px-4 py-2 bg-pink-600 border-2 border-pink-400 text-white text-xs font-black uppercase tracking-wider rounded-sm shadow-[0_0_20px_rgba(236,72,153,0.8)] flex items-center gap-2 whitespace-nowrap transition-all";
-		renderAuditLogsTable();
-	  }
-	}
+  if (tab === 'jadwal') {
+    btnJadwal.className = `${baseLayoutClass} font-black bg-cyan-500 border-2 border-cyan-300 text-gray-950 shadow-[0_0_20px_rgba(6,182,212,0.8)]`;
+  } else if (tab === 'daily') {
+    btnDaily.className = `${baseLayoutClass} font-black bg-emerald-600 border-2 border-emerald-400 text-white shadow-[0_0_20px_rgba(16,185,129,0.8)]`;
+    renderDailyTable();
+  } else if (tab === 'maintenance') {
+    btnMnt.className = `${baseLayoutClass} font-black bg-amber-600 border-2 border-amber-400 text-gray-950 shadow-[0_0_20px_rgba(245,158,11,0.8)]`;
+    renderMaintenanceTable();
+  } else if (tab === 'logs') {
+    btnLogs.className = `${baseLayoutClass} font-black bg-pink-600 border-2 border-pink-400 text-white shadow-[0_0_20px_rgba(236,72,153,0.8)]`;
+    renderAuditLogsTable();
+  }
+}
 
     function openMntModal() {
       if (!currentSession.role) {
@@ -2339,8 +2445,8 @@ function resetMntFilter() {
 
   globalHeaders.forEach(dateStr => {
     const th = document.createElement('th');
-    // Penyesuaian min-w pada HP menjadi 75px agar sel tanggal ringkas
-    th.className = 'p-1.5 md:p-3 border-b-2 border-pink-600 font-bold text-center min-w-[75px] md:min-w-[140px] bg-gray-950 sticky top-0 z-40 date-header text-cyan-400 whitespace-nowrap';
+    // Lebar proporsional: 100px di HP, 155px di Desktop agar teks panjang lega
+    th.className = 'p-1.5 md:p-3 border-b-2 border-pink-600 font-bold text-center min-w-[100px] md:min-w-[155px] bg-gray-950 sticky top-0 z-40 date-header text-cyan-400 whitespace-nowrap';
     let content = dateStr;
     if (!isNaN(dateStr) && String(dateStr).trim()) {
       const dayNum = parseInt(dateStr);
@@ -2406,29 +2512,46 @@ function resetMntFilter() {
       `;
     }
 
-    // PENYESUAIAN MOBILITY LEBAR STICKY:
-    // Kolom 1 (Nama): HP = 95px | Desktop = 180px
-    let tdNama = `<td class="p-1.5 md:p-3 border-b border-cyan-900/50 font-bold text-cyan-300 sticky left-0 bg-gray-900 z-30 group-hover:bg-gray-800 uppercase text-[9px] md:text-xs min-w-[95px] max-w-[95px] md:min-w-[180px] md:max-w-[180px] truncate">
-      <div class="truncate">${crew.nama}</div>
+    // Kolom 1 (Nama): Nama panjang juga otomatis wrap rapi tanpa terpotong
+    let tdNama = `<td class="p-1.5 md:p-3 border-b border-cyan-900/50 font-bold text-cyan-300 sticky left-0 bg-gray-900 z-30 group-hover:bg-gray-800 uppercase text-[9px] md:text-xs min-w-[95px] max-w-[95px] md:min-w-[180px] md:max-w-[180px] align-middle">
+      <div class="whitespace-normal break-words leading-tight">${crew.nama}</div>
       ${badgeHtml}
     </td>`;
     
-    // Kolom 2 (HP): HP = 85px & sticky left-[95px] | Desktop = 130px & sticky left-[180px]
-    let tdHp = `<td class="p-1.5 md:p-3 border-b border-cyan-900/50 sticky left-[95px] md:left-[180px] bg-gray-900 z-30 group-hover:bg-gray-800 text-[9px] md:text-xs min-w-[85px] max-w-[85px] md:min-w-[130px] md:max-w-[130px] truncate">
+    // Kolom 2 (HP)
+    let tdHp = `<td class="p-1.5 md:p-3 border-b border-cyan-900/50 sticky left-[95px] md:left-[180px] bg-gray-900 z-30 group-hover:bg-gray-800 text-[9px] md:text-xs min-w-[85px] max-w-[85px] md:min-w-[130px] md:max-w-[130px] align-middle">
       <a href="https://wa.me/${waNum}?text=Halo%20${encodeURIComponent(crew.nama)},%20pembaruan%20jadwal%20ITB%203TV." target="_blank" class="text-pink-400 hover:text-green-400 flex items-center gap-1">
-        <i class="fa-brands fa-whatsapp text-green-400 text-[10px] md:text-xs"></i> 
+        <i class="fa-brands fa-whatsapp text-green-400 text-[10px] md:text-xs shrink-0"></i> 
         <span class="truncate">${crew.hp}</span>
       </a>
     </td>`;
 
+    // Kolom Tanggal Dinamis (Multi-line Badge + Click-to-Edit untuk Admin)
     let tdShifts = globalHeaders.map((dateStr, cIdx) => {
       const val = (crew.schedule && crew.schedule[dateStr]) ? crew.schedule[dateStr] : '';
       const colNum = cIdx + 4;
       const color = getColorClass(val);
+      const displayVal = val || '-';
+      const safeVal = String(val).replace(/"/g, '&quot;');
+
       if (isAdmin) {
-        return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" id="input-${crew.rowIndex}-${dateStr}" oninput="this.value=this.value.toUpperCase();updateInputColor(this);" onchange="handleInputChange(${crew.rowIndex},'${dateStr}',${crew.rowIndex},${colNum},this.value)" class="w-full bg-gray-950 border border-cyan-900 rounded-sm text-center py-1 px-1 md:py-1.5 md:px-2 text-[9px] md:text-xs font-bold uppercase ${color}" placeholder="-"></td>`;
+        return `
+          <td class="p-1 md:p-1.5 border-b border-cyan-900/40 text-center align-middle min-w-[100px] max-w-[125px] md:min-w-[155px] md:max-w-[185px]">
+            <div id="cell-display-${crew.rowIndex}-${dateStr}" 
+                 onclick="activateCellEdit(${crew.rowIndex}, '${dateStr}', ${colNum})"
+                 title="${safeVal || 'Klik untuk ubah jadwal'}"
+                 class="w-full min-h-[30px] md:min-h-[34px] flex items-center justify-center bg-gray-950/90 hover:bg-cyan-950/50 border border-cyan-900/70 hover:border-pink-500 rounded-sm px-1.5 py-1 text-[9px] md:text-[11px] font-bold uppercase whitespace-normal break-words leading-snug cursor-pointer transition-all ${color}">
+              ${displayVal}
+            </div>
+          </td>`;
       } else {
-        return `<td class="p-1 md:p-2 border-b border-cyan-900/40 text-center"><input type="text" value="${val}" readonly class="w-full bg-gray-950/60 border border-cyan-900/40 rounded-sm text-center py-1 px-1 md:py-1.5 md:px-2 text-[9px] md:text-xs font-bold uppercase cursor-default ${color}" placeholder="-"></td>`;
+        return `
+          <td class="p-1 md:p-1.5 border-b border-cyan-900/40 text-center align-middle min-w-[100px] max-w-[125px] md:min-w-[155px] md:max-w-[185px]">
+            <div title="${safeVal}"
+                 class="w-full min-h-[30px] md:min-h-[34px] flex items-center justify-center bg-gray-950/50 border border-cyan-900/30 rounded-sm px-1.5 py-1 text-[9px] md:text-[11px] font-bold uppercase whitespace-normal break-words leading-snug cursor-default ${color}">
+              ${displayVal}
+            </div>
+          </td>`;
       }
     }).join('');
 
@@ -2437,6 +2560,60 @@ function resetMntFilter() {
   });
 
   setTimeout(() => scrollToTodayColumn(), 300);
+}
+
+// Fungsi Helper Click-to-Edit khusus Admin saat mengklik sel jadwal
+function activateCellEdit(crewRowIndex, dateStr, colNum) {
+  const displayEl = document.getElementById(`cell-display-${crewRowIndex}-${dateStr}`);
+  if (!displayEl) return;
+
+  const crewObj = globalCrewData.find(c => c.rowIndex === crewRowIndex);
+  const currentVal = (crewObj && crewObj.schedule && crewObj.schedule[dateStr]) ? crewObj.schedule[dateStr] : '';
+  const color = getColorClass(currentVal);
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = `input-${crewRowIndex}-${dateStr}`;
+  input.value = currentVal;
+  input.placeholder = '-';
+  input.className = `w-full bg-gray-900 border-2 border-pink-500 rounded-sm text-center py-1 px-1.5 text-[10px] md:text-xs font-bold uppercase shadow-[0_0_10px_rgba(236,72,153,0.5)] focus:outline-none ${color}`;
+
+  input.oninput = function() {
+    this.value = this.value.toUpperCase();
+    updateInputColor(this);
+  };
+
+  let isCommitted = false;
+  const commitAndRestore = (triggerSave) => {
+    if (isCommitted) return;
+    isCommitted = true;
+    const newVal = input.value.trim().toUpperCase();
+    
+    // Kembalikan tampilan ke kotak teks dinamis multi-baris
+    const updatedColor = getColorClass(newVal);
+    displayEl.className = `w-full min-h-[30px] md:min-h-[34px] flex items-center justify-center bg-gray-950/90 hover:bg-cyan-950/50 border border-cyan-900/70 hover:border-pink-500 rounded-sm px-1.5 py-1 text-[9px] md:text-[11px] font-bold uppercase whitespace-normal break-words leading-snug cursor-pointer transition-all ${updatedColor}`;
+    displayEl.innerText = newVal || '-';
+    displayEl.title = newVal || 'Klik untuk ubah jadwal';
+    input.replaceWith(displayEl);
+
+    if (triggerSave && newVal !== currentVal) {
+      handleInputChange(crewRowIndex, dateStr, crewRowIndex, colNum, newVal);
+    }
+  };
+
+  input.onblur = () => commitAndRestore(true);
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      input.blur();
+    } else if (e.key === 'Escape') {
+      commitAndRestore(false);
+    }
+  };
+
+  displayEl.replaceWith(input);
+  input.focus();
+  input.select();
 }
 
     function scrollToTodayColumn() {
