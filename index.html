@@ -5,6 +5,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#030712">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>IT Broadcast 3TV</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -271,6 +272,53 @@ html, body {
   #detail-modal > div {
     max-height: 92vh !important;
     padding: 10px 14px !important;
+  }
+}
+
+/* =========================================================
+   PWA STANDALONE & LANDSCAPE FIX (100dvh + SAFE AREA)
+   ========================================================= */
+@media (orientation: landscape) and (max-height: 550px),
+       all and (display-mode: standalone) and (orientation: landscape) {
+  
+  html, body {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    padding-left: env(safe-area-inset-left) !important;
+    padding-right: env(safe-area-inset-right) !important;
+    padding-bottom: calc(44px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Paksa tinggi kontainer tabel mengikuti tinggi layar aktual PWA */
+  #table-scroll-container,
+  #view-daily .overflow-y-auto,
+  #view-maintenance .overflow-y-auto,
+  #view-logs .overflow-y-auto {
+    max-height: calc(100dvh - 135px) !important;
+    min-height: 160px !important;
+  }
+
+  /* Kunci lebar & posisi kolom sticky agar tidak geser di PWA */
+  #table-headers th:nth-child(1),
+  #table-body td:nth-child(1) {
+    min-width: 110px !important;
+    max-width: 110px !important;
+    left: 0 !important;
+  }
+
+  #table-headers th:nth-child(2),
+  #table-body td:nth-child(2) {
+    min-width: 95px !important;
+    max-width: 95px !important;
+    left: 110px !important;
+  }
+
+  /* Pastikan Bottom Nav menempel presisi di atas gesture bar Android */
+  nav.fixed {
+    bottom: 0 !important;
+    padding-bottom: calc(4px + env(safe-area-inset-bottom)) !important;
+    padding-left: env(safe-area-inset-left) !important;
+    padding-right: env(safe-area-inset-right) !important;
   }
 }
   </style>
